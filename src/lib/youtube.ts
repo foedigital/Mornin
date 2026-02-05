@@ -21,16 +21,20 @@ export interface YouTubeVideo {
 }
 
 interface Channel {
-  id: string;
+  id?: string;
   name: string;
   category: string;
+  playlistId?: string;
 }
 
 async function fetchVideoForChannel(
   channel: Channel
 ): Promise<YouTubeVideo | null> {
   try {
-    const res = await fetch(`/api/youtube?channelId=${channel.id}`);
+    const query = channel.playlistId
+      ? `playlistId=${channel.playlistId}`
+      : `channelId=${channel.id}`;
+    const res = await fetch(`/api/youtube?${query}`);
     if (!res.ok) return null;
 
     const data = await res.json();

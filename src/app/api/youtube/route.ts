@@ -11,15 +11,16 @@ function parseDuration(iso: string): number {
 
 /**
  * Server-side proxy for YouTube API calls.
- * Fetches recent uploads then filters out Shorts (< 2 min)
+ * Fetches recent uploads then filters out Shorts/clips (< 5 min)
  * to return only the latest full-length video.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const channelId = searchParams.get("channelId");
+  const playlistId = searchParams.get("playlistId");
 
-  if (!channelId) {
-    return NextResponse.json({ error: "channelId required" }, { status: 400 });
+  if (!channelId && !playlistId) {
+    return NextResponse.json({ error: "channelId or playlistId required" }, { status: 400 });
   }
 
   const apiKey = process.env.YOUTUBE_API_KEY;
@@ -28,8 +29,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Every channel's uploads playlist ID = channel ID with "UC" replaced by "UU"
-    const uploadsPlaylistId = channelId.replace(/^UC/, "UU");
+    // Use explicit playlistId if provided, otherwise derive uploads playlist from channel ID
+    const uploadsPlaylistId = playlistId || channelId!.replace(/^UC/, "UU");
 
     // Step 1: Fetch recent uploads (grab 10 to have room after filtering Shorts)
     const playlistRes = await fetch(
@@ -75,10 +76,10 @@ export async function GET(request: Request) {
       durations.set(v.id, parseDuration(v.contentDetails.duration));
     }
 
-    // Step 3: Find the most recent video that's >= 2 minutes (skip Shorts/clips)
+    // Step 3: Find the most recent video that's >= 5 minutes (skip Shorts/clips)
     const fullVideo = items.find((item: { snippet: { resourceId: { videoId: string } } }) => {
       const dur = durations.get(item.snippet.resourceId.videoId) || 0;
-      return dur >= 120;
+      return dur >= 300;
     });
 
     return NextResponse.json({ items: fullVideo ? [fullVideo] : [items[0]] });
