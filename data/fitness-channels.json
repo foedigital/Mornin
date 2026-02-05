@@ -1,0 +1,44 @@
+{
+  "channels": [
+    {
+      "id": "UCFKE7WVJfvaHW5q283SxchA",
+      "name": "Yoga With Adriene",
+      "category": "yoga"
+    },
+    {
+      "id": "UCpQ34afVgk8cRQBjSJ1xuJQ",
+      "name": "MadFit",
+      "category": "workout"
+    },
+    {
+      "id": "UCZUUZFex6AaIU4QTopFudYA",
+      "name": "growwithjo",
+      "category": "cardio"
+    },
+    {
+      "id": "UCeJFgNahi--FKs0oJyeRDEw",
+      "name": "Hybrid Calisthenics",
+      "category": "bodyweight"
+    },
+    {
+      "id": "UCU0DZhN-8KFLYO6beSaYljg",
+      "name": "Tom Merrick",
+      "category": "mobility"
+    },
+    {
+      "id": "UCHJBoCDxaCTRrwCHXEBA-BA",
+      "name": "Mady Morrison",
+      "category": "yoga"
+    },
+    {
+      "id": "UCiP6wD_tYlYLYh3agzbByWQ",
+      "name": "FitnessBlender",
+      "category": "workout"
+    },
+    {
+      "id": "UCIJwWYOfsCfz6PjxbONYXSg",
+      "name": "Blogilates",
+      "category": "workout"
+    }
+  ]
+}

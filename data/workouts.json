@@ -1,0 +1,224 @@
+{
+  "morning": [
+    {
+      "name": "Rise & Stretch",
+      "description": "Gentle full-body wake-up with stretching and light movement",
+      "exercises": [
+        { "id": "neck-rolls", "sets": 1, "override": "20 sec each direction" },
+        { "id": "arm-circles", "sets": 1, "override": "30 sec" },
+        { "id": "march-in-place", "sets": 1, "override": "45 sec" },
+        { "id": "cat-cow", "sets": 1, "override": "30 sec" },
+        { "id": "toe-touches", "sets": 2, "override": "30 sec" },
+        { "id": "hip-circles", "sets": 1, "override": "20 sec each direction" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "shoulder-stretch", "sets": 1, "override": "30 sec each arm" },
+        { "id": "chest-opener", "sets": 1, "override": "30 sec" },
+        { "id": "childs-pose", "sets": 1, "override": "45 sec" }
+      ]
+    },
+    {
+      "name": "Morning Mobility",
+      "description": "Open up stiff joints and get blood flowing",
+      "exercises": [
+        { "id": "neck-rolls", "sets": 1, "override": "20 sec each direction" },
+        { "id": "arm-circles", "sets": 1, "override": "30 sec" },
+        { "id": "hip-circles", "sets": 1, "override": "20 sec each direction" },
+        { "id": "leg-swings", "sets": 1, "override": "10 each leg" },
+        { "id": "cat-cow", "sets": 2, "override": "30 sec" },
+        { "id": "inchworm", "sets": 1, "override": "5 reps" },
+        { "id": "torso-twists", "sets": 1, "override": "30 sec" },
+        { "id": "hamstring-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "tricep-stretch", "sets": 1, "override": "30 sec each arm" },
+        { "id": "spinal-twist", "sets": 1, "override": "30 sec each side" }
+      ]
+    },
+    {
+      "name": "Energize & Move",
+      "description": "Light cardio warmup into stretches to wake up your body",
+      "exercises": [
+        { "id": "march-in-place", "sets": 1, "override": "30 sec" },
+        { "id": "jumping-jacks", "sets": 2, "override": "30 sec" },
+        { "id": "arm-circles", "sets": 1, "override": "30 sec" },
+        { "id": "high-knees", "sets": 1, "override": "20 sec" },
+        { "id": "toe-touches", "sets": 2, "override": "30 sec" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "chest-opener", "sets": 1, "override": "30 sec" },
+        { "id": "cat-cow", "sets": 1, "override": "30 sec" },
+        { "id": "childs-pose", "sets": 1, "override": "45 sec" }
+      ]
+    },
+    {
+      "name": "Sunrise Strength",
+      "description": "Light bodyweight moves to activate muscles for the day",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 1, "override": "30 sec" },
+        { "id": "arm-circles", "sets": 1, "override": "30 sec" },
+        { "id": "squats", "sets": 2, "override": "10 reps" },
+        { "id": "pushups", "sets": 2, "override": "8 reps (knees ok)" },
+        { "id": "glute-bridge", "sets": 2, "override": "10 reps" },
+        { "id": "dead-bug", "sets": 1, "override": "8 reps alternating" },
+        { "id": "toe-touches", "sets": 1, "override": "30 sec" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "childs-pose", "sets": 1, "override": "45 sec" }
+      ]
+    },
+    {
+      "name": "Wake-Up Flow",
+      "description": "Yoga-inspired morning flow to warm up your whole body",
+      "exercises": [
+        { "id": "cat-cow", "sets": 2, "override": "30 sec" },
+        { "id": "childs-pose", "sets": 1, "override": "30 sec" },
+        { "id": "inchworm", "sets": 1, "override": "5 reps (slow)" },
+        { "id": "plank", "sets": 1, "override": "20 sec" },
+        { "id": "bird-dog", "sets": 1, "override": "8 reps alternating" },
+        { "id": "hip-circles", "sets": 1, "override": "20 sec each direction" },
+        { "id": "leg-swings", "sets": 1, "override": "10 each leg" },
+        { "id": "toe-touches", "sets": 1, "override": "30 sec" },
+        { "id": "shoulder-stretch", "sets": 1, "override": "30 sec each arm" },
+        { "id": "spinal-twist", "sets": 1, "override": "30 sec each side" }
+      ]
+    },
+    {
+      "name": "Quick Cardio Start",
+      "description": "Get your heart rate up and shake off the sleepiness",
+      "exercises": [
+        { "id": "march-in-place", "sets": 1, "override": "30 sec" },
+        { "id": "jumping-jacks", "sets": 3, "override": "20 reps" },
+        { "id": "high-knees", "sets": 2, "override": "20 sec" },
+        { "id": "butt-kicks", "sets": 2, "override": "20 sec" },
+        { "id": "squats", "sets": 1, "override": "10 reps" },
+        { "id": "calf-raises", "sets": 1, "override": "12 reps" },
+        { "id": "toe-touches", "sets": 1, "override": "30 sec" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "chest-opener", "sets": 1, "override": "30 sec" }
+      ]
+    },
+    {
+      "name": "Back & Core Focus",
+      "description": "Strengthen and stretch your back and core to start the day right",
+      "exercises": [
+        { "id": "cat-cow", "sets": 2, "override": "30 sec" },
+        { "id": "neck-rolls", "sets": 1, "override": "20 sec each direction" },
+        { "id": "bird-dog", "sets": 2, "override": "8 reps alternating" },
+        { "id": "superman", "sets": 2, "override": "15 sec hold" },
+        { "id": "dead-bug", "sets": 2, "override": "8 reps alternating" },
+        { "id": "plank", "sets": 1, "override": "20 sec" },
+        { "id": "spinal-twist", "sets": 1, "override": "30 sec each side" },
+        { "id": "childs-pose", "sets": 1, "override": "45 sec" },
+        { "id": "seated-forward-fold", "sets": 1, "override": "30 sec" }
+      ]
+    }
+  ],
+  "afternoon": [
+    {
+      "name": "Midday Recharge",
+      "description": "Shake off the afternoon slump with full-body activation",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 3, "override": "20 reps" },
+        { "id": "high-knees", "sets": 2, "override": "30 sec" },
+        { "id": "squats", "sets": 3, "override": "12 reps" },
+        { "id": "pushups", "sets": 3, "override": "10 reps" },
+        { "id": "plank", "sets": 2, "override": "30 sec" },
+        { "id": "lunges", "sets": 2, "override": "10 total" },
+        { "id": "crunches", "sets": 2, "override": "15 reps" },
+        { "id": "toe-touches", "sets": 1, "override": "30 sec" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" }
+      ]
+    },
+    {
+      "name": "Leg Day Express",
+      "description": "Target your lower body with squats, lunges, and glute work",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 2, "override": "30 sec" },
+        { "id": "leg-swings", "sets": 1, "override": "10 each leg" },
+        { "id": "squats", "sets": 3, "override": "15 reps" },
+        { "id": "lunges", "sets": 3, "override": "12 total" },
+        { "id": "wall-sit", "sets": 2, "override": "30 sec" },
+        { "id": "glute-bridge", "sets": 3, "override": "12 reps" },
+        { "id": "calf-raises", "sets": 2, "override": "15 reps" },
+        { "id": "side-lunges", "sets": 2, "override": "10 total" },
+        { "id": "quad-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "figure-four", "sets": 1, "override": "30 sec each side" }
+      ]
+    },
+    {
+      "name": "Push & Core",
+      "description": "Upper body push movements paired with core strengthening",
+      "exercises": [
+        { "id": "arm-circles", "sets": 1, "override": "30 sec" },
+        { "id": "jumping-jacks", "sets": 2, "override": "30 sec" },
+        { "id": "pushups", "sets": 3, "override": "10 reps" },
+        { "id": "plank", "sets": 3, "override": "30 sec" },
+        { "id": "mountain-climbers", "sets": 2, "override": "20 sec" },
+        { "id": "bicycle-crunches", "sets": 2, "override": "16 total" },
+        { "id": "side-plank", "sets": 2, "override": "20 sec each side" },
+        { "id": "superman", "sets": 2, "override": "20 sec" },
+        { "id": "chest-opener", "sets": 1, "override": "30 sec" },
+        { "id": "tricep-stretch", "sets": 1, "override": "30 sec each arm" }
+      ]
+    },
+    {
+      "name": "Full Body Burn",
+      "description": "Hit every muscle group in a quick circuit",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 2, "override": "30 sec" },
+        { "id": "squats", "sets": 2, "override": "12 reps" },
+        { "id": "pushups", "sets": 2, "override": "10 reps" },
+        { "id": "lunges", "sets": 2, "override": "10 total" },
+        { "id": "plank", "sets": 2, "override": "30 sec" },
+        { "id": "glute-bridge", "sets": 2, "override": "12 reps" },
+        { "id": "russian-twists", "sets": 2, "override": "20 total" },
+        { "id": "modified-burpees", "sets": 1, "override": "6 reps" },
+        { "id": "figure-four", "sets": 1, "override": "30 sec each side" },
+        { "id": "childs-pose", "sets": 1, "override": "45 sec" }
+      ]
+    },
+    {
+      "name": "Core Crusher",
+      "description": "Focused ab and core work to build a strong foundation",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 2, "override": "30 sec" },
+        { "id": "high-knees", "sets": 1, "override": "30 sec" },
+        { "id": "crunches", "sets": 3, "override": "15 reps" },
+        { "id": "bicycle-crunches", "sets": 3, "override": "16 total" },
+        { "id": "leg-raises", "sets": 2, "override": "10 reps" },
+        { "id": "plank", "sets": 2, "override": "30 sec" },
+        { "id": "side-plank", "sets": 2, "override": "20 sec each side" },
+        { "id": "russian-twists", "sets": 2, "override": "20 total" },
+        { "id": "dead-bug", "sets": 2, "override": "10 alternating" },
+        { "id": "spinal-twist", "sets": 1, "override": "30 sec each side" }
+      ]
+    },
+    {
+      "name": "Cardio & Legs",
+      "description": "Heart-pumping cardio mixed with lower body strength",
+      "exercises": [
+        { "id": "jumping-jacks", "sets": 3, "override": "30 sec" },
+        { "id": "high-knees", "sets": 3, "override": "30 sec" },
+        { "id": "butt-kicks", "sets": 2, "override": "30 sec" },
+        { "id": "squats", "sets": 3, "override": "15 reps" },
+        { "id": "side-lunges", "sets": 2, "override": "10 total" },
+        { "id": "mountain-climbers", "sets": 2, "override": "20 sec" },
+        { "id": "step-ups", "sets": 2, "override": "10 each leg" },
+        { "id": "standing-calf-stretch", "sets": 1, "override": "30 sec each leg" },
+        { "id": "toe-touches", "sets": 1, "override": "30 sec" }
+      ]
+    },
+    {
+      "name": "Functional Fitness",
+      "description": "Practical movements that build real-world strength",
+      "exercises": [
+        { "id": "inchworm", "sets": 2, "override": "5 reps" },
+        { "id": "squats", "sets": 2, "override": "12 reps" },
+        { "id": "pushups", "sets": 2, "override": "10 reps" },
+        { "id": "bird-dog", "sets": 2, "override": "10 alternating" },
+        { "id": "step-ups", "sets": 2, "override": "10 each leg" },
+        { "id": "modified-burpees", "sets": 2, "override": "6 reps" },
+        { "id": "wall-sit", "sets": 2, "override": "25 sec" },
+        { "id": "superman", "sets": 2, "override": "20 sec" },
+        { "id": "pigeon-stretch", "sets": 1, "override": "30 sec each side" },
+        { "id": "seated-forward-fold", "sets": 1, "override": "30 sec" }
+      ]
+    }
+  ]
+}
