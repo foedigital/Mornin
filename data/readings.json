@@ -1,0 +1,463 @@
+{
+  "readings": [
+    {
+      "title": "Invictus",
+      "author": "William Ernest Henley",
+      "type": "poem",
+      "year": 1888,
+      "excerpt": "I am the master of my fate, I am the captain of my soul.",
+      "url": "https://www.poetryfoundation.org/poems/51642/invictus",
+      "readTime": "1 min"
+    },
+    {
+      "title": "If—",
+      "author": "Rudyard Kipling",
+      "type": "poem",
+      "year": 1910,
+      "excerpt": "If you can keep your head when all about you are losing theirs and blaming it on you...",
+      "url": "https://www.poetryfoundation.org/poems/46473/if---",
+      "readTime": "2 min"
+    },
+    {
+      "title": "The Road Not Taken",
+      "author": "Robert Frost",
+      "type": "poem",
+      "year": 1916,
+      "excerpt": "Two roads diverged in a wood, and I— I took the one less traveled by, and that has made all the difference.",
+      "url": "https://www.poetryfoundation.org/poems/44272/the-road-not-taken",
+      "readTime": "1 min"
+    },
+    {
+      "title": "Do Not Go Gentle into That Good Night",
+      "author": "Dylan Thomas",
+      "type": "poem",
+      "year": 1951,
+      "excerpt": "Do not go gentle into that good night. Rage, rage against the dying of the light.",
+      "url": "https://poets.org/poem/do-not-go-gentle-good-night",
+      "readTime": "1 min"
+    },
+    {
+      "title": "Ozymandias",
+      "author": "Percy Bysshe Shelley",
+      "type": "poem",
+      "year": 1818,
+      "excerpt": "Look on my Works, ye Mighty, and despair! Nothing beside remains.",
+      "url": "https://www.poetryfoundation.org/poems/46565/ozymandias",
+      "readTime": "1 min"
+    },
+    {
+      "title": "The Charge of the Light Brigade",
+      "author": "Alfred, Lord Tennyson",
+      "type": "poem",
+      "year": 1854,
+      "excerpt": "Theirs not to make reply, theirs not to reason why, theirs but to do and die.",
+      "url": "https://www.poetryfoundation.org/poems/45319/the-charge-of-the-light-brigade",
+      "readTime": "2 min"
+    },
+    {
+      "title": "Still I Rise",
+      "author": "Maya Angelou",
+      "type": "poem",
+      "year": 1978,
+      "excerpt": "You may shoot me with your words, you may cut me with your eyes... but still, like air, I'll rise.",
+      "url": "https://www.poetryfoundation.org/poems/46446/still-i-rise",
+      "readTime": "2 min"
+    },
+    {
+      "title": "The Waste Land",
+      "author": "T.S. Eliot",
+      "type": "poem",
+      "year": 1922,
+      "excerpt": "April is the cruellest month, breeding lilacs out of the dead land, mixing memory and desire.",
+      "url": "https://www.poetryfoundation.org/poems/47311/the-waste-land",
+      "readTime": "15 min"
+    },
+    {
+      "title": "Song of Myself",
+      "author": "Walt Whitman",
+      "type": "poem",
+      "year": 1855,
+      "excerpt": "I celebrate myself, and sing myself, and what I assume you shall assume.",
+      "url": "https://www.poetryfoundation.org/poems/45477/song-of-myself-1892-version",
+      "readTime": "30 min"
+    },
+    {
+      "title": "The Raven",
+      "author": "Edgar Allan Poe",
+      "type": "poem",
+      "year": 1845,
+      "excerpt": "Once upon a midnight dreary, while I pondered, weak and weary... Quoth the Raven 'Nevermore.'",
+      "url": "https://www.poetryfoundation.org/poems/48860/the-raven",
+      "readTime": "5 min"
+    },
+    {
+      "title": "Howl",
+      "author": "Allen Ginsberg",
+      "type": "poem",
+      "year": 1956,
+      "excerpt": "I saw the best minds of my generation destroyed by madness, starving hysterical naked.",
+      "url": "https://www.poetryfoundation.org/poems/49303/howl",
+      "readTime": "15 min"
+    },
+    {
+      "title": "I Hear America Singing",
+      "author": "Walt Whitman",
+      "type": "poem",
+      "year": 1860,
+      "excerpt": "I hear America singing, the varied carols I hear.",
+      "url": "https://poets.org/poem/i-hear-america-singing",
+      "readTime": "1 min"
+    },
+    {
+      "title": "Stopping by Woods on a Snowy Evening",
+      "author": "Robert Frost",
+      "type": "poem",
+      "year": 1923,
+      "excerpt": "The woods are lovely, dark and deep, but I have promises to keep, and miles to go before I sleep.",
+      "url": "https://www.poetryfoundation.org/poems/42891/stopping-by-woods-on-a-snowy-evening",
+      "readTime": "1 min"
+    },
+    {
+      "title": "O Captain! My Captain!",
+      "author": "Walt Whitman",
+      "type": "poem",
+      "year": 1865,
+      "excerpt": "O Captain! my Captain! our fearful trip is done, the ship has weather'd every rack, the prize we sought is won.",
+      "url": "https://www.poetryfoundation.org/poems/45474/o-captain-my-captain",
+      "readTime": "2 min"
+    },
+    {
+      "title": "Dulce et Decorum Est",
+      "author": "Wilfred Owen",
+      "type": "poem",
+      "year": 1920,
+      "excerpt": "Bent double, like old beggars under sacks, knock-kneed, coughing like hags, we cursed through sludge.",
+      "url": "https://www.poetryfoundation.org/poems/46560/dulce-et-decorum-est",
+      "readTime": "2 min"
+    },
+    {
+      "title": "The Second Coming",
+      "author": "William Butler Yeats",
+      "type": "poem",
+      "year": 1920,
+      "excerpt": "Things fall apart; the centre cannot hold; mere anarchy is loosed upon the world.",
+      "url": "https://www.poetryfoundation.org/poems/43290/the-second-coming",
+      "readTime": "1 min"
+    },
+    {
+      "title": "Annabel Lee",
+      "author": "Edgar Allan Poe",
+      "type": "poem",
+      "year": 1849,
+      "excerpt": "It was many and many a year ago, in a kingdom by the sea, that a maiden there lived whom you may know by the name of Annabel Lee.",
+      "url": "https://www.poetryfoundation.org/poems/44885/annabel-lee",
+      "readTime": "2 min"
+    },
+    {
+      "title": "The Love Song of J. Alfred Prufrock",
+      "author": "T.S. Eliot",
+      "type": "poem",
+      "year": 1915,
+      "excerpt": "Let us go then, you and I, when the evening is spread out against the sky.",
+      "url": "https://www.poetryfoundation.org/poetrymagazine/poems/44212/the-love-song-of-j-alfred-prufrock",
+      "readTime": "5 min"
+    },
+    {
+      "title": "The Man in the Arena",
+      "author": "Theodore Roosevelt",
+      "type": "speech",
+      "year": 1910,
+      "excerpt": "It is not the critic who counts; not the man who points out how the strong man stumbles...",
+      "url": "https://www.presidency.ucsb.edu/documents/address-the-sorbonne-paris-france-citizenship-republic",
+      "readTime": "20 min"
+    },
+    {
+      "title": "The Tell-Tale Heart",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1843,
+      "excerpt": "TRUE! — nervous — very, very dreadfully nervous I had been and am; but why will you say that I am mad?",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-tell-tale-heart",
+      "readTime": "10 min"
+    },
+    {
+      "title": "The Cask of Amontillado",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1846,
+      "excerpt": "The thousand injuries of Fortunato I had borne as I best could, but when he ventured upon insult I vowed revenge.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-cask-of-amontillado",
+      "readTime": "12 min"
+    },
+    {
+      "title": "The Gift of the Magi",
+      "author": "O. Henry",
+      "type": "short story",
+      "year": 1905,
+      "excerpt": "One dollar and eighty-seven cents. That was all. And sixty cents of it was in pennies.",
+      "url": "https://americanliterature.com/author/o-henry/short-story/the-gift-of-the-magi",
+      "readTime": "10 min"
+    },
+    {
+      "title": "The Yellow Wallpaper",
+      "author": "Charlotte Perkins Gilman",
+      "type": "short story",
+      "year": 1892,
+      "excerpt": "It is very seldom that mere ordinary people like John and myself secure ancestral halls for the summer.",
+      "url": "https://americanliterature.com/author/charlotte-perkins-gilman/short-story/the-yellow-wallpaper",
+      "readTime": "20 min"
+    },
+    {
+      "title": "The Most Dangerous Game",
+      "author": "Richard Connell",
+      "type": "short story",
+      "year": 1924,
+      "excerpt": "'Off there to the right — somewhere — is a large island,' said Whitney. 'It's rather a mystery—'",
+      "url": "https://americanliterature.com/author/richard-connell/short-story/the-most-dangerous-game",
+      "readTime": "30 min"
+    },
+    {
+      "title": "An Occurrence at Owl Creek Bridge",
+      "author": "Ambrose Bierce",
+      "type": "short story",
+      "year": 1890,
+      "excerpt": "A man stood upon a railroad bridge in northern Alabama, looking down into the swift water twenty feet below.",
+      "url": "https://americanliterature.com/author/ambrose-bierce/short-story/an-occurrence-at-owl-creek-bridge",
+      "readTime": "15 min"
+    },
+    {
+      "title": "The Celebrated Jumping Frog of Calaveras County",
+      "author": "Mark Twain",
+      "type": "short story",
+      "year": 1865,
+      "excerpt": "In compliance with the request of a friend of mine... I called on good-natured, garrulous old Simon Wheeler.",
+      "url": "https://americanliterature.com/author/mark-twain/short-story/the-celebrated-jumping-frog-of-calaveras-county",
+      "readTime": "10 min"
+    },
+    {
+      "title": "The Story of an Hour",
+      "author": "Kate Chopin",
+      "type": "short story",
+      "year": 1894,
+      "excerpt": "Knowing that Mrs. Mallard was afflicted with a heart trouble, great care was taken to break to her as gently as possible the news of her husband's death.",
+      "url": "https://americanliterature.com/author/kate-chopin/short-story/the-story-of-an-hour",
+      "readTime": "5 min"
+    },
+    {
+      "title": "To Build a Fire",
+      "author": "Jack London",
+      "type": "short story",
+      "year": 1908,
+      "excerpt": "Day had broken cold and grey, exceedingly cold and grey, when the man turned aside from the main Yukon trail.",
+      "url": "https://americanliterature.com/author/jack-london/short-story/to-build-a-fire",
+      "readTime": "25 min"
+    },
+    {
+      "title": "The Legend of Sleepy Hollow",
+      "author": "Washington Irving",
+      "type": "short story",
+      "year": 1820,
+      "excerpt": "In the bosom of one of those spacious coves which indent the eastern shore of the Hudson...",
+      "url": "https://americanliterature.com/author/washington-irving/short-story/the-legend-of-sleepy-hollow",
+      "readTime": "40 min"
+    },
+    {
+      "title": "Bartleby, the Scrivener",
+      "author": "Herman Melville",
+      "type": "short story",
+      "year": 1853,
+      "excerpt": "I am a rather elderly man. The nature of my avocations for the last thirty years has brought me into more than ordinary contact with what would seem an interesting and somewhat singular set of men.",
+      "url": "https://americanliterature.com/author/herman-melville/short-story/bartleby-the-scrivener",
+      "readTime": "35 min"
+    },
+    {
+      "title": "The Metamorphosis",
+      "author": "Franz Kafka",
+      "type": "novella",
+      "year": 1915,
+      "excerpt": "One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.",
+      "url": "https://www.gutenberg.org/ebooks/5200",
+      "readTime": "60 min"
+    },
+    {
+      "title": "A Christmas Carol",
+      "author": "Charles Dickens",
+      "type": "novella",
+      "year": 1843,
+      "excerpt": "Marley was dead: to begin with. There is no doubt whatever about that.",
+      "url": "https://www.gutenberg.org/ebooks/46",
+      "readTime": "90 min"
+    },
+    {
+      "title": "The Adventures of Sherlock Holmes",
+      "author": "Arthur Conan Doyle",
+      "type": "short story collection",
+      "year": 1892,
+      "excerpt": "To Sherlock Holmes she is always the woman. I have seldom heard him mention her under any other name.",
+      "url": "https://www.gutenberg.org/ebooks/1661",
+      "readTime": "5+ hours"
+    },
+    {
+      "title": "Heart of Darkness",
+      "author": "Joseph Conrad",
+      "type": "novella",
+      "year": 1899,
+      "excerpt": "The Nellie, a cruising yawl, swung to her anchor without a flutter of the sails, and was at rest.",
+      "url": "https://www.gutenberg.org/ebooks/219",
+      "readTime": "90 min"
+    },
+    {
+      "title": "The Call of the Wild",
+      "author": "Jack London",
+      "type": "novella",
+      "year": 1903,
+      "excerpt": "Buck did not read the newspapers, or he would have known that trouble was brewing.",
+      "url": "https://www.gutenberg.org/ebooks/215",
+      "readTime": "3 hours"
+    },
+    {
+      "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+      "author": "Robert Louis Stevenson",
+      "type": "novella",
+      "year": 1886,
+      "excerpt": "Mr. Utterson the lawyer was a man of a rugged countenance that was never lighted by a smile.",
+      "url": "https://www.gutenberg.org/ebooks/43",
+      "readTime": "2 hours"
+    },
+    {
+      "title": "The Lottery",
+      "author": "Shirley Jackson",
+      "type": "short story",
+      "year": 1948,
+      "excerpt": "The morning of June 27th was clear and sunny, with the fresh warmth of a full-summer day.",
+      "url": "https://americanliterature.com/author/shirley-jackson/short-story/the-lottery",
+      "readTime": "12 min"
+    },
+    {
+      "title": "A Good Man Is Hard to Find",
+      "author": "Flannery O'Connor",
+      "type": "short story",
+      "year": 1953,
+      "excerpt": "The grandmother didn't want to go to Florida. She wanted to visit some of her connections in east Tennessee.",
+      "url": "https://americanliterature.com/author/flannery-oconnor/short-story/a-good-man-is-hard-to-find",
+      "readTime": "20 min"
+    },
+    {
+      "title": "The Open Boat",
+      "author": "Stephen Crane",
+      "type": "short story",
+      "year": 1897,
+      "excerpt": "None of them knew the colour of the sky. Their eyes glanced level, and were fastened upon the waves that swept toward them.",
+      "url": "https://americanliterature.com/author/stephen-crane/short-story/the-open-boat",
+      "readTime": "25 min"
+    },
+    {
+      "title": "The Necklace",
+      "author": "Guy de Maupassant",
+      "type": "short story",
+      "year": 1884,
+      "excerpt": "She was one of those pretty and charming girls born, as though fate had blundered over her, into a family of artisans.",
+      "url": "https://americanliterature.com/author/guy-de-maupassant/short-story/the-necklace",
+      "readTime": "12 min"
+    },
+    {
+      "title": "Paul's Case",
+      "author": "Willa Cather",
+      "type": "short story",
+      "year": 1905,
+      "excerpt": "It was Paul's afternoon to appear before the faculty of the Pittsburgh High School to account for his various misdemeanours.",
+      "url": "https://americanliterature.com/author/willa-cather/short-story/pauls-case",
+      "readTime": "25 min"
+    },
+    {
+      "title": "The Pit and the Pendulum",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1842,
+      "excerpt": "I was sick — sick unto death with that long agony; and when they at length unbound me, and I was permitted to sit, I felt that my senses were leaving me.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-pit-and-the-pendulum",
+      "readTime": "20 min"
+    },
+    {
+      "title": "The Fall of the House of Usher",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1839,
+      "excerpt": "During the whole of a dull, dark, and soundless day in the autumn of the year... I had been passing alone, on horseback, through a singularly dreary tract of country.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-fall-of-the-house-of-usher",
+      "readTime": "25 min"
+    },
+    {
+      "title": "Meditations (Book 2)",
+      "author": "Marcus Aurelius",
+      "type": "philosophy",
+      "year": 180,
+      "excerpt": "Begin the morning by saying to thyself, I shall meet with the busy-body, the ungrateful, arrogant, deceitful, envious, unsocial.",
+      "url": "https://www.gutenberg.org/ebooks/2680",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "The Art of War",
+      "author": "Sun Tzu",
+      "type": "philosophy",
+      "year": -500,
+      "excerpt": "The art of war is of vital importance to the State. It is a matter of life and death, a road either to safety or to ruin.",
+      "url": "https://www.gutenberg.org/ebooks/132",
+      "readTime": "2 hours"
+    },
+    {
+      "title": "Walden (Chapter 1: Economy)",
+      "author": "Henry David Thoreau",
+      "type": "essay",
+      "year": 1854,
+      "excerpt": "I went to the woods because I wished to live deliberately, to front only the essential facts of life.",
+      "url": "https://www.gutenberg.org/ebooks/205",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "Self-Reliance",
+      "author": "Ralph Waldo Emerson",
+      "type": "essay",
+      "year": 1841,
+      "excerpt": "Trust thyself: every heart vibrates to that iron string. Accept the place the divine providence has found for you.",
+      "url": "https://americanliterature.com/author/ralph-waldo-emerson/essay/self-reliance",
+      "readTime": "30 min"
+    },
+    {
+      "title": "Civil Disobedience",
+      "author": "Henry David Thoreau",
+      "type": "essay",
+      "year": 1849,
+      "excerpt": "That government is best which governs least.",
+      "url": "https://americanliterature.com/author/henry-david-thoreau/essay/civil-disobedience",
+      "readTime": "30 min"
+    },
+    {
+      "title": "The Gettysburg Address",
+      "author": "Abraham Lincoln",
+      "type": "speech",
+      "year": 1863,
+      "excerpt": "Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty.",
+      "url": "https://www.gutenberg.org/ebooks/4",
+      "readTime": "2 min"
+    },
+    {
+      "title": "The Prince",
+      "author": "Niccolò Machiavelli",
+      "type": "philosophy",
+      "year": 1532,
+      "excerpt": "All states, all powers, that have held and hold rule over men have been and are either republics or principalities.",
+      "url": "https://www.gutenberg.org/ebooks/1232",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "The Masque of the Red Death",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1842,
+      "excerpt": "The 'Red Death' had long devastated the country. No pestilence had ever been so fatal, or so hideous.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-masque-of-the-red-death",
+      "readTime": "10 min"
+    }
+  ]
+}

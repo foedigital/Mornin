@@ -28,16 +28,12 @@ export default function MediaSection() {
   useEffect(() => {
     fetchAllChannelVideos()
       .then((vids) => {
+        // Sort by newest upload first
+        vids.sort((a, b) =>
+          new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+        );
         setVideos(vids);
-        // Start on a different video each day
-        if (vids.length > 0) {
-          const now = new Date();
-          const start = new Date(now.getFullYear(), 0, 0);
-          const dayOfYear = Math.floor(
-            (now.getTime() - start.getTime()) / 86400000
-          );
-          setIndex(dayOfYear % vids.length);
-        }
+        setIndex(0);
       })
       .finally(() => setLoading(false));
   }, []);
