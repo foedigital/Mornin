@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import quotesData from "../../data/quotes.json";
 
 interface Quote {
@@ -22,6 +22,7 @@ function getStartIndex(): number {
 
 export default function QuoteSection() {
   const [index, setIndex] = useState<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     setIndex(getStartIndex());
@@ -31,12 +32,49 @@ export default function QuoteSection() {
     setIndex((prev) => (prev !== null ? (prev + 1) % quotes.length : 0));
   }, []);
 
+  const prevQuote = useCallback(() => {
+    setIndex((prev) =>
+      prev !== null ? (prev - 1 + quotes.length) % quotes.length : 0
+    );
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartX.current === null) return;
+      const delta = e.changedTouches[0].clientX - touchStartX.current;
+      if (delta > 50) {
+        // Swiped right → go back
+        prevQuote();
+      }
+      touchStartX.current = null;
+    },
+    [prevQuote]
+  );
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      // Only advance on tap, not at the end of a swipe
+      // Touch events that triggered a swipe won't fire click
+      nextQuote();
+    },
+    [nextQuote]
+  );
+
   if (index === null) return null;
 
   const quote: Quote = quotes[index];
 
   return (
-    <div className="card cursor-pointer select-none active:scale-[0.98] transition-transform" onClick={nextQuote}>
+    <div
+      className="card cursor-pointer select-none active:scale-[0.98] transition-transform"
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-accent text-xl">&ldquo;</span>
@@ -44,7 +82,7 @@ export default function QuoteSection() {
             Quote of the Day
           </h2>
         </div>
-        <span className="text-gray-600 text-xs">tap for next</span>
+        <span className="text-gray-600 text-xs">tap / swipe</span>
       </div>
       <blockquote className="text-xl md:text-2xl font-light leading-relaxed text-gray-100 mb-4">
         &ldquo;{quote.text}&rdquo;
