@@ -1,68 +1,54 @@
 {
   "channels": [
     {
+      "id": "UCkUaT0T03TJvafYkfATM2Ag",
+      "name": "The Daily Stoic",
+      "category": "educational"
+    },
+    {
+      "id": "UCkRMqL3hLrIYhxNCac4vR3w",
+      "name": "The Art of Manliness",
+      "category": "educational"
+    },
+    {
+      "id": "UCRynbHLPjClDwTNo_cx70Cw",
+      "name": "The Rest Is History",
+      "category": "podcast"
+    },
+    {
+      "id": "UCkqcY4CAuBFNFho6JgygCnA",
+      "name": "Jocko Podcast",
+      "category": "motivational"
+    },
+    {
+      "id": "UC3RcjbuyF5M1U4R62zjE3hg",
+      "name": "Dan Carlin",
+      "category": "educational"
+    },
+    {
       "id": "UCzQUP1qoWDoEbmsQxvdjxgQ",
       "name": "Joe Rogan Experience",
       "category": "podcast"
     },
     {
-      "id": "UCSHZKJJfhK61IS3bOD_SCNA",
-      "name": "Lex Fridman",
+      "id": "UC2D2CMWXMOVWx7giW1n3LIg",
+      "name": "Huberman Lab",
+      "category": "educational"
+    },
+    {
+      "id": "UC5AQEUAwCh1sGDvkQtkDWUQ",
+      "name": "Theo Von",
+      "category": "comedy"
+    },
+    {
+      "id": "UCznv7Vf9nBdJYvBagFdAHWw",
+      "name": "Tim Ferriss",
       "category": "podcast"
     },
     {
       "id": "UCGeBogGDZ9W3dsGx-mWQGJA",
       "name": "Jordan Peterson",
       "category": "podcast"
-    },
-    {
-      "id": "UCnQC_G5Xsjhp9fEJKuIcrSw",
-      "name": "Ben Shapiro",
-      "category": "podcast"
-    },
-    {
-      "id": "UC-lHJZR3Gqxm24_Vd_AJ5Yw",
-      "name": "PewDiePie",
-      "category": "comedy"
-    },
-    {
-      "id": "UCWv7vMbMWH4-V0ZXdmDpPBA",
-      "name": "Jocko Willink",
-      "category": "motivational"
-    },
-    {
-      "id": "UCKuHFGAoWRMnS8rh7tsBJjg",
-      "name": "David Goggins Fan",
-      "category": "motivational"
-    },
-    {
-      "id": "UCVjlpEjEY9GpksqbEesJnNA",
-      "name": "Theo Von",
-      "category": "comedy"
-    },
-    {
-      "id": "UCwIhFGtcGRx78oFLTPahIlw",
-      "name": "Matt Rife",
-      "category": "comedy"
-    },
-    {
-      "id": "UC0RhatS1pyxInC00YKjjBqQ",
-      "name": "Luke Combs",
-      "category": "music"
-    },
-    {
-      "id": "UCT68C0wRPbO1wUYqgtIYjgQ",
-      "name": "Zach Bryan",
-      "category": "music"
-    },
-    {
-      "id": "UCByOQJjav0CUDwxCk-jVNRQ",
-      "name": "Toby Keith",
-      "category": "music"
     }
-  ],
-  "_notes": {
-    "how_to_add": "Find a YouTube channel, go to their page, the channel ID is in the URL or use youtube.com/@channelname/about",
-    "categories": ["podcast", "music", "motivational", "comedy"]
-  }
+  ]
 }

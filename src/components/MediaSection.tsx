@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { fetchTodaysVideo, type YouTubeVideo } from "@/lib/youtube";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { fetchAllChannelVideos, type YouTubeVideo } from "@/lib/youtube";
 
 const CATEGORY_LABELS: Record<string, string> = {
   podcast: "Podcast",
   music: "Music",
   motivational: "Motivation",
   comedy: "Comedy",
+  educational: "Learn",
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
@@ -15,17 +16,59 @@ const CATEGORY_ICONS: Record<string, string> = {
   music: "\uD83C\uDFB5",
   motivational: "\uD83D\uDD25",
   comedy: "\uD83D\uDE02",
+  educational: "\uD83D\uDCDA",
 };
 
 export default function MediaSection() {
-  const [video, setVideo] = useState<YouTubeVideo | null>(null);
+  const [videos, setVideos] = useState<YouTubeVideo[]>([]);
+  const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchTodaysVideo()
-      .then(setVideo)
+    fetchAllChannelVideos()
+      .then((vids) => {
+        setVideos(vids);
+        // Start on a different video each day
+        if (vids.length > 0) {
+          const now = new Date();
+          const start = new Date(now.getFullYear(), 0, 0);
+          const dayOfYear = Math.floor(
+            (now.getTime() - start.getTime()) / 86400000
+          );
+          setIndex(dayOfYear % vids.length);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const next = useCallback(() => {
+    setIndex((prev) => (prev + 1) % videos.length);
+  }, [videos.length]);
+
+  const prev = useCallback(() => {
+    setIndex((prev) => (prev - 1 + videos.length) % videos.length);
+  }, [videos.length]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (touchStartX.current === null) return;
+      const delta = e.changedTouches[0].clientX - touchStartX.current;
+      if (delta > 50) {
+        prev();
+      }
+      touchStartX.current = null;
+    },
+    [prev]
+  );
+
+  const handleClick = useCallback(() => {
+    next();
+  }, [next]);
 
   if (loading) {
     return (
@@ -37,13 +80,18 @@ export default function MediaSection() {
     );
   }
 
-  if (!video) return null;
+  if (videos.length === 0) return null;
 
-  const hasRealVideo = video.videoId && video.thumbnailUrl;
+  const video = videos[index];
   const timeAgo = getTimeAgo(video.publishedAt);
 
   return (
-    <div className="card">
+    <div
+      className="card cursor-pointer select-none active:scale-[0.98] transition-transform"
+      onClick={handleClick}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="text-accent text-lg">
@@ -53,43 +101,41 @@ export default function MediaSection() {
             Today&apos;s {CATEGORY_LABELS[video.category] || "Media"}
           </h2>
         </div>
-        <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
-          {video.category}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-600 text-xs">tap / swipe</span>
+          <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
+            {index + 1}/{videos.length}
+          </span>
+        </div>
       </div>
 
-      {/* Thumbnail - links to YouTube */}
-      {hasRealVideo ? (
+      {/* Thumbnail */}
+      <div className="mb-4 rounded-xl overflow-hidden bg-dark-surface relative">
+        <img
+          src={video.thumbnailUrl}
+          alt={video.title}
+          className="w-full h-48 object-cover"
+          loading="lazy"
+        />
+        {/* Play button overlay */}
         <a
           href={video.youtubeUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="block mb-4 rounded-xl overflow-hidden bg-dark-surface relative group"
+          className="absolute inset-0 flex items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
         >
-          <img
-            src={video.thumbnailUrl}
-            alt={video.title}
-            className="w-full h-48 object-cover group-hover:opacity-80 transition-opacity"
-          />
-          {/* Play button overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-14 h-14 bg-black/60 rounded-full flex items-center justify-center group-hover:bg-red-600/90 transition-colors">
-              <svg className="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
+          <div className="w-14 h-14 bg-black/60 rounded-full flex items-center justify-center hover:bg-red-600/90 transition-colors">
+            <svg
+              className="w-6 h-6 text-white ml-1"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
           </div>
         </a>
-      ) : (
-        <div className="mb-4 rounded-xl overflow-hidden bg-dark-surface flex items-center justify-center h-48">
-          <div className="text-center">
-            <p className="text-4xl mb-2">
-              {CATEGORY_ICONS[video.category] || "\uD83C\uDFAC"}
-            </p>
-            <p className="text-gray-500 text-sm">Video loading...</p>
-          </div>
-        </div>
-      )}
+      </div>
 
       {/* Video info */}
       <h3 className="text-lg font-semibold text-gray-100 mb-2 leading-snug">
@@ -100,26 +146,30 @@ export default function MediaSection() {
         <p className="text-accent-light text-sm font-medium">
           {video.channelName}
         </p>
-        {hasRealVideo && (
-          <span className="text-gray-500 text-xs">{timeAgo}</span>
-        )}
+        <span className="text-gray-500 text-xs">{timeAgo}</span>
       </div>
 
       {/* Open in YouTube button */}
-      {hasRealVideo && (
-        <a
-          href={video.youtubeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-xl py-3 text-sm text-gray-300"
+      <a
+        href={video.youtubeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-xl py-3 text-sm text-gray-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <svg
+          className="w-5 h-5 text-red-500"
+          fill="currentColor"
+          viewBox="0 0 24 24"
         >
-          <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" />
-            <path d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z" fill="white" />
-          </svg>
-          Open in YouTube
-        </a>
-      )}
+          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z" />
+          <path
+            d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+            fill="white"
+          />
+        </svg>
+        Open in YouTube
+      </a>
     </div>
   );
 }
