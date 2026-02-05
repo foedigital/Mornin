@@ -6,6 +6,7 @@ import BattleSection from "@/components/BattleSection";
 import GospelSection from "@/components/GospelSection";
 import SaintSection from "@/components/SaintSection";
 import ArtSection from "@/components/ArtSection";
+import MediaSection from "@/components/MediaSection";
 import { getToday } from "@/lib/dates";
 
 export default function Home() {
@@ -38,6 +39,7 @@ export default function Home() {
       {/* Content Sections */}
       <div className="space-y-6">
         <QuoteSection />
+        <MediaSection />
         <BattleSection />
         <GospelSection />
         <SaintSection />
