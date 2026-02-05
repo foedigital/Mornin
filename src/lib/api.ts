@@ -81,14 +81,21 @@ export async function fetchDailyGospel(): Promise<GospelReading | null> {
 
     if (!refRes.ok || !textRes.ok) return null;
 
-    const reference = (await refRes.text()).trim();
+    const rawRef = (await refRes.text()).trim();
     const rawText = (await textRes.text()).trim();
 
-    // Clean up HTML tags from the response
+    // Fix reference format: "Mark 6,7-13." -> "Mark 6:7-13"
+    const reference = rawRef
+      .replace(/(\d+),(\d+)/g, "$1:$2")  // comma to colon between chapter,verse
+      .replace(/\.\s*$/, "");              // trailing period
+
+    // Clean up HTML and formatting from the response
     const text = rawText
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<[^>]+>/g, "")
+      .replace(/--/g, "\u2014")            // -- to em dash
       .replace(/Copyright[\s\S]*$/, "")
+      .replace(/To receive the Gospel[\s\S]*$/, "")
       .trim();
 
     if (!text) return null;
