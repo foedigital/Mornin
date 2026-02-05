@@ -1,0 +1,118 @@
+{
+  "saints": {
+    "01-01": {
+      "name": "Solemnity of Mary, Mother of God",
+      "type": "solemnity",
+      "description": "The Church celebrates the Blessed Virgin Mary's role as the Mother of God (Theotokos).",
+      "prayer": "Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death."
+    },
+    "01-02": {
+      "name": "St. Basil the Great & St. Gregory Nazianzen",
+      "type": "memorial",
+      "description": "Two of the four great Eastern Doctors of the Church, known for their defense of the faith against Arianism.",
+      "prayer": "Lord, help us to seek the truth with the passion of Basil and Gregory."
+    },
+    "01-17": {
+      "name": "St. Anthony of Egypt",
+      "type": "memorial",
+      "description": "The Father of All Monks, who lived as a hermit in the Egyptian desert for over 80 years.",
+      "prayer": "St. Anthony, help us resist temptation and seek God in solitude."
+    },
+    "01-28": {
+      "name": "St. Thomas Aquinas",
+      "type": "memorial",
+      "description": "Dominican friar, philosopher, and Doctor of the Church. Author of the Summa Theologica.",
+      "prayer": "Grant me, O Lord my God, a mind to know you, a heart to seek you, wisdom to find you."
+    },
+    "02-03": {
+      "name": "St. Blaise",
+      "type": "optional memorial",
+      "description": "Bishop and martyr, patron saint of throat ailments. Blessing of throats is traditional on this day.",
+      "prayer": "Through the intercession of St. Blaise, may God deliver you from ailments of the throat."
+    },
+    "02-04": {
+      "name": "St. John de Britto",
+      "type": "optional memorial",
+      "description": "Portuguese Jesuit missionary to India who was martyred for the faith in 1693.",
+      "prayer": "St. John de Britto, inspire us to share our faith with courage and love."
+    },
+    "02-05": {
+      "name": "St. Agatha",
+      "type": "memorial",
+      "description": "Virgin and martyr of Sicily, who died during the persecution of Decius around 251 AD.",
+      "prayer": "St. Agatha, help us remain faithful to Christ in times of trial."
+    },
+    "02-14": {
+      "name": "Sts. Cyril and Methodius",
+      "type": "memorial",
+      "description": "Brothers who evangelized the Slavic peoples and created the Cyrillic alphabet for translating Scripture.",
+      "prayer": "Sts. Cyril and Methodius, help us bring the Word of God to all peoples."
+    },
+    "03-17": {
+      "name": "St. Patrick",
+      "type": "optional memorial",
+      "description": "Apostle of Ireland who converted the Irish people to Christianity in the 5th century.",
+      "prayer": "Christ with me, Christ before me, Christ behind me, Christ in me."
+    },
+    "03-19": {
+      "name": "St. Joseph, Spouse of the Blessed Virgin Mary",
+      "type": "solemnity",
+      "description": "Foster father of Jesus and patron of the Universal Church, workers, and fathers.",
+      "prayer": "St. Joseph, guardian of Jesus and chaste husband of Mary, pray for us."
+    },
+    "04-23": {
+      "name": "St. George",
+      "type": "optional memorial",
+      "description": "Martyr and soldier saint, patron of England, known for the legend of slaying the dragon.",
+      "prayer": "St. George, give us courage to fight against evil and defend the faith."
+    },
+    "05-01": {
+      "name": "St. Joseph the Worker",
+      "type": "optional memorial",
+      "description": "Honors St. Joseph's role as a carpenter and the dignity of human work.",
+      "prayer": "St. Joseph, teach us to sanctify our daily work for the glory of God."
+    },
+    "06-29": {
+      "name": "Sts. Peter and Paul, Apostles",
+      "type": "solemnity",
+      "description": "The two pillars of the Church - Peter the rock, Paul the apostle to the Gentiles.",
+      "prayer": "Lord, guide your Church through the witness of Peter and Paul."
+    },
+    "07-04": {
+      "name": "St. Elizabeth of Portugal",
+      "type": "optional memorial",
+      "description": "Queen of Portugal known for her charity and peacemaking between warring factions.",
+      "prayer": "St. Elizabeth, help us be instruments of peace in our families and communities."
+    },
+    "08-28": {
+      "name": "St. Augustine of Hippo",
+      "type": "memorial",
+      "description": "Bishop, Doctor of the Church, author of Confessions. Converted after a life of sin.",
+      "prayer": "Our hearts are restless, Lord, until they rest in you."
+    },
+    "10-04": {
+      "name": "St. Francis of Assisi",
+      "type": "memorial",
+      "description": "Founder of the Franciscan Order, known for his poverty, love of nature, and the stigmata.",
+      "prayer": "Lord, make me an instrument of your peace."
+    },
+    "11-01": {
+      "name": "All Saints",
+      "type": "solemnity",
+      "description": "Celebration of all the saints, known and unknown, who are in heaven with God.",
+      "prayer": "May the communion of saints inspire us to lives of holiness."
+    },
+    "12-25": {
+      "name": "The Nativity of the Lord (Christmas)",
+      "type": "solemnity",
+      "description": "The birth of Jesus Christ, the Word made flesh, in Bethlehem.",
+      "prayer": "Glory to God in the highest, and on earth peace to people of good will."
+    }
+  },
+  "_format_notes": {
+    "date_format": "MM-DD (month-day, zero-padded)",
+    "types": ["solemnity", "feast", "memorial", "optional memorial"],
+    "hierarchy": "Solemnities > Feasts > Memorials > Optional Memorials",
+    "source": "General Roman Calendar - add more saints as needed"
+  }
+}
