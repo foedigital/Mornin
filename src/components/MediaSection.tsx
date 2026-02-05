@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchTodaysVideo, isUsingMockData, type YouTubeVideo } from "@/lib/youtube";
+import { fetchTodaysVideo, type YouTubeVideo } from "@/lib/youtube";
 
 const CATEGORY_LABELS: Record<string, string> = {
   podcast: "Podcast",
@@ -20,10 +20,8 @@ const CATEGORY_ICONS: Record<string, string> = {
 export default function MediaSection() {
   const [video, setVideo] = useState<YouTubeVideo | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMock, setIsMock] = useState(false);
 
   useEffect(() => {
-    setIsMock(isUsingMockData());
     fetchTodaysVideo()
       .then(setVideo)
       .finally(() => setLoading(false));
@@ -41,6 +39,7 @@ export default function MediaSection() {
 
   if (!video) return null;
 
+  const hasRealVideo = video.videoId && video.thumbnailUrl;
   const timeAgo = getTimeAgo(video.publishedAt);
 
   return (
@@ -60,21 +59,7 @@ export default function MediaSection() {
       </div>
 
       {/* Thumbnail - links to YouTube */}
-      {isMock ? (
-        <div className="mb-4 rounded-xl overflow-hidden bg-dark-surface flex items-center justify-center h-48">
-          <div className="text-center">
-            <p className="text-4xl mb-2">
-              {CATEGORY_ICONS[video.category] || "\uD83C\uDFAC"}
-            </p>
-            <p className="text-gray-500 text-sm">
-              Add YouTube API key to see real videos
-            </p>
-            <p className="text-gray-600 text-xs mt-1">
-              See src/lib/youtube.ts for setup instructions
-            </p>
-          </div>
-        </div>
-      ) : (
+      {hasRealVideo ? (
         <a
           href={video.youtubeUrl}
           target="_blank"
@@ -95,6 +80,15 @@ export default function MediaSection() {
             </div>
           </div>
         </a>
+      ) : (
+        <div className="mb-4 rounded-xl overflow-hidden bg-dark-surface flex items-center justify-center h-48">
+          <div className="text-center">
+            <p className="text-4xl mb-2">
+              {CATEGORY_ICONS[video.category] || "\uD83C\uDFAC"}
+            </p>
+            <p className="text-gray-500 text-sm">Video loading...</p>
+          </div>
+        </div>
       )}
 
       {/* Video info */}
@@ -106,13 +100,13 @@ export default function MediaSection() {
         <p className="text-accent-light text-sm font-medium">
           {video.channelName}
         </p>
-        {!isMock && (
+        {hasRealVideo && (
           <span className="text-gray-500 text-xs">{timeAgo}</span>
         )}
       </div>
 
       {/* Open in YouTube button */}
-      {!isMock && (
+      {hasRealVideo && (
         <a
           href={video.youtubeUrl}
           target="_blank"

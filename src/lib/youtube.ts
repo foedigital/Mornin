@@ -1,32 +1,11 @@
 /**
- * YouTube Data API v3 Integration
+ * YouTube Integration
  *
- * ============================================================
- * HOW TO GET YOUR YOUTUBE API KEY:
- * ============================================================
+ * The API key is stored server-side only (never in the browser).
+ * Client calls /api/youtube which proxies to YouTube's API.
  *
- * 1. Go to https://console.cloud.google.com
- * 2. Click "Select a project" at the top → "New Project"
- *    - Name it "Mornin" or whatever you like → Create
- * 3. With your new project selected, go to:
- *    APIs & Services → Library
- * 4. Search for "YouTube Data API v3" → click it → Enable
- * 5. Go to: APIs & Services → Credentials
- * 6. Click "+ Create Credentials" → "API key"
- * 7. Copy the key
- * 8. (Recommended) Click "Edit API key" → under "API restrictions",
- *    select "Restrict key" and choose only "YouTube Data API v3"
- *
- * Then create a file called .env.local in the project root:
- *
- *   NEXT_PUBLIC_YOUTUBE_API_KEY=your_key_here
- *
- * And add the same key to Vercel:
- *   vercel env add NEXT_PUBLIC_YOUTUBE_API_KEY
- *
- * Free tier: 10,000 quota units/day. Each search costs 100 units.
- * With 12 channels rotating daily, you'll use ~100 units/day.
- * ============================================================
+ * Setup: API key is configured via environment variable YOUTUBE_API_KEY
+ * on Vercel and in .env.local for local dev.
  */
 
 import channelsData from "../../data/channels.json";
@@ -57,17 +36,10 @@ function getTodaysChannel(): Channel {
   return channels[dayOfYear % channels.length];
 }
 
-const YOUTUBE_API_KEY = process.env.NEXT_PUBLIC_YOUTUBE_API_KEY;
-
 async function fetchFromAPI(channel: Channel): Promise<YouTubeVideo | null> {
-  if (!YOUTUBE_API_KEY) return null;
-
   try {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?` +
-        `part=snippet&channelId=${channel.id}&order=date` +
-        `&maxResults=1&type=video&key=${YOUTUBE_API_KEY}`
-    );
+    // Calls our own server-side API route — key never leaves the server
+    const res = await fetch(`/api/youtube?channelId=${channel.id}`);
 
     if (!res.ok) return null;
 
@@ -92,11 +64,11 @@ async function fetchFromAPI(channel: Channel): Promise<YouTubeVideo | null> {
   }
 }
 
-// Mock data for when no API key is configured
+// Mock data for when API key is not configured or API fails
 const MOCK_VIDEOS: Record<string, YouTubeVideo> = {
   podcast: {
-    videoId: "dQw4w9WgXcQ",
-    title: "Latest Episode — Deep Conversations on Life and Purpose",
+    videoId: "",
+    title: "Latest Episode \u2014 Deep Conversations on Life and Purpose",
     channelName: "",
     category: "podcast",
     thumbnailUrl: "",
@@ -104,8 +76,8 @@ const MOCK_VIDEOS: Record<string, YouTubeVideo> = {
     youtubeUrl: "#",
   },
   music: {
-    videoId: "dQw4w9WgXcQ",
-    title: "New Release — Country Roads & Open Skies",
+    videoId: "",
+    title: "New Release \u2014 Country Roads & Open Skies",
     channelName: "",
     category: "music",
     thumbnailUrl: "",
@@ -113,8 +85,8 @@ const MOCK_VIDEOS: Record<string, YouTubeVideo> = {
     youtubeUrl: "#",
   },
   motivational: {
-    videoId: "dQw4w9WgXcQ",
-    title: "Stay Hard — Morning Motivation Discipline Talk",
+    videoId: "",
+    title: "Stay Hard \u2014 Morning Motivation Discipline Talk",
     channelName: "",
     category: "motivational",
     thumbnailUrl: "",
@@ -122,8 +94,8 @@ const MOCK_VIDEOS: Record<string, YouTubeVideo> = {
     youtubeUrl: "#",
   },
   comedy: {
-    videoId: "dQw4w9WgXcQ",
-    title: "Stand-Up Clips — Best of This Week",
+    videoId: "",
+    title: "Stand-Up Clips \u2014 Best of This Week",
     channelName: "",
     category: "comedy",
     thumbnailUrl: "",
@@ -143,14 +115,8 @@ function getMockVideo(channel: Channel): YouTubeVideo {
 export async function fetchTodaysVideo(): Promise<YouTubeVideo> {
   const channel = getTodaysChannel();
 
-  // Try live API first
   const live = await fetchFromAPI(channel);
   if (live) return live;
 
-  // Fall back to mock data
   return getMockVideo(channel);
-}
-
-export function isUsingMockData(): boolean {
-  return !YOUTUBE_API_KEY;
 }
