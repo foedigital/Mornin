@@ -2,38 +2,10 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import { fetchFitnessVideos, type YouTubeVideo } from "@/lib/youtube";
-import exercisesData from "../../data/exercises.json";
-import workoutsData from "../../data/workouts.json";
-
-/* ── Types ─────────────────────────────────────────────────────── */
-
-interface Exercise {
-  id: string;
-  name: string;
-  category: string;
-  target: string;
-  difficulty: string;
-  emoji: string;
-  instructions: string;
-  demoUrl: string;
-  unit: string;
-}
-
-interface WorkoutExercise {
-  id: string;
-  sets: number;
-  override: string;
-}
-
-interface Workout {
-  name: string;
-  description: string;
-  exercises: WorkoutExercise[];
-}
 
 /* ── Constants ─────────────────────────────────────────────────── */
 
-const STORAGE_KEY = "mornin-workout-completed";
+const STORAGE_KEY = "mornin-fitness-saved";
 const CATEGORY_ICONS: Record<string, string> = {
   yoga: "\uD83E\uDDD8",
   workout: "\uD83C\uDFCB\uFE0F",
@@ -42,47 +14,29 @@ const CATEGORY_ICONS: Record<string, string> = {
   mobility: "\uD83E\uDDB5",
 };
 
-const exerciseMap = new Map<string, Exercise>();
-for (const ex of exercisesData.exercises) {
-  exerciseMap.set(ex.id, ex as Exercise);
-}
-
 /* ── Helpers ───────────────────────────────────────────────────── */
 
-function getDayOfYear(): number {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  return Math.floor((now.getTime() - start.getTime()) / 86400000);
+interface SavedVideo {
+  videoId: string;
+  title: string;
+  channelName: string;
+  category: string;
+  thumbnailUrl: string;
+  youtubeUrl: string;
+  savedAt: string;
 }
 
-function isAfternoon(): boolean {
-  return new Date().getHours() >= 12;
-}
-
-function getTodayKey(): string {
-  const d = new Date();
-  const period = isAfternoon() ? "pm" : "am";
-  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}-${period}`;
-}
-
-function loadCompleted(): Set<string> {
+function loadSaved(): SavedVideo[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return new Set();
-    const data = JSON.parse(raw);
-    if (data.key !== getTodayKey()) return new Set();
-    return new Set(data.done as string[]);
-  } catch {
-    return new Set();
-  }
+    if (raw) return JSON.parse(raw) as SavedVideo[];
+  } catch {}
+  return [];
 }
 
-function saveCompleted(done: Set<string>) {
+function saveSaved(videos: SavedVideo[]) {
   try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ key: getTodayKey(), done: Array.from(done) })
-    );
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
   } catch {}
 }
 
@@ -101,27 +55,12 @@ function getTimeAgo(dateStr: string): string {
 /* ── Component ─────────────────────────────────────────────────── */
 
 export default function WorkoutSection() {
-  /* Workout state */
-  const [workout, setWorkout] = useState<Workout | null>(null);
-  const [period, setPeriod] = useState<"morning" | "afternoon">("morning");
-  const [completed, setCompleted] = useState<Set<string>>(new Set());
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  /* Fitness video state */
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [vidIndex, setVidIndex] = useState(0);
   const [vidLoading, setVidLoading] = useState(true);
+  const [saved, setSaved] = useState<SavedVideo[]>([]);
+  const [showArchive, setShowArchive] = useState(false);
   const touchStartX = useRef<number | null>(null);
-
-  /* Init workout */
-  useEffect(() => {
-    const afternoon = isAfternoon();
-    setPeriod(afternoon ? "afternoon" : "morning");
-    const pool = afternoon ? workoutsData.afternoon : workoutsData.morning;
-    const dayIdx = getDayOfYear() % pool.length;
-    setWorkout(pool[dayIdx] as Workout);
-    setCompleted(loadCompleted());
-  }, []);
 
   /* Fetch fitness videos */
   useEffect(() => {
@@ -136,16 +75,37 @@ export default function WorkoutSection() {
         setVidIndex(0);
       })
       .finally(() => setVidLoading(false));
+    setSaved(loadSaved());
   }, []);
 
   /* Handlers */
-  const toggleExercise = useCallback((exId: string, setIdx: number) => {
-    const key = `${exId}-${setIdx}`;
-    setCompleted((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      saveCompleted(next);
+  const toggleSaved = useCallback((video: YouTubeVideo) => {
+    setSaved((prev) => {
+      const exists = prev.some((v) => v.videoId === video.videoId);
+      let next: SavedVideo[];
+      if (exists) {
+        next = prev.filter((v) => v.videoId !== video.videoId);
+      } else {
+        const newSaved: SavedVideo = {
+          videoId: video.videoId,
+          title: video.title,
+          channelName: video.channelName,
+          category: video.category,
+          thumbnailUrl: video.thumbnailUrl,
+          youtubeUrl: video.youtubeUrl,
+          savedAt: new Date().toISOString(),
+        };
+        next = [newSaved, ...prev];
+      }
+      saveSaved(next);
+      return next;
+    });
+  }, []);
+
+  const removeSaved = useCallback((videoId: string) => {
+    setSaved((prev) => {
+      const next = prev.filter((v) => v.videoId !== videoId);
+      saveSaved(next);
       return next;
     });
   }, []);
@@ -172,12 +132,10 @@ export default function WorkoutSection() {
     [prevVid]
   );
 
-  /* Derived */
-  const totalSets = workout
-    ? workout.exercises.reduce((sum, e) => sum + e.sets, 0)
-    : 0;
-  const doneSets = completed.size;
-  const progressPct = totalSets > 0 ? Math.round((doneSets / totalSets) * 100) : 0;
+  const currentVideo = videos[vidIndex];
+  const isSaved = currentVideo
+    ? saved.some((v) => v.videoId === currentVideo.videoId)
+    : false;
 
   return (
     <div className="space-y-6">
@@ -196,7 +154,7 @@ export default function WorkoutSection() {
           <div className="h-48 bg-white/10 rounded-xl mb-3" />
           <div className="h-4 bg-white/10 rounded w-2/3" />
         </div>
-      ) : videos.length > 0 ? (
+      ) : videos.length > 0 && currentVideo ? (
         <div
           className="card cursor-pointer select-none active:scale-[0.98] transition-transform"
           onClick={nextVid}
@@ -206,7 +164,7 @@ export default function WorkoutSection() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="text-accent text-lg">
-                {CATEGORY_ICONS[videos[vidIndex].category] || "\uD83C\uDFAC"}
+                {CATEGORY_ICONS[currentVideo.category] || "\uD83C\uDFAC"}
               </span>
               <h3 className="text-accent font-semibold text-sm uppercase tracking-wider">
                 Fitness Videos
@@ -222,13 +180,13 @@ export default function WorkoutSection() {
 
           <div className="mb-4 rounded-xl overflow-hidden bg-dark-surface relative">
             <img
-              src={videos[vidIndex].thumbnailUrl}
-              alt={videos[vidIndex].title}
+              src={currentVideo.thumbnailUrl}
+              alt={currentVideo.title}
               className="w-full h-48 object-cover"
               loading="lazy"
             />
             <a
-              href={videos[vidIndex].youtubeUrl}
+              href={currentVideo.youtubeUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="absolute inset-0 flex items-center justify-center"
@@ -243,22 +201,53 @@ export default function WorkoutSection() {
           </div>
 
           <h4 className="text-lg font-semibold text-gray-100 mb-2 leading-snug">
-            {videos[vidIndex].title}
+            {currentVideo.title}
           </h4>
           <div className="flex items-center justify-between">
             <p className="text-accent-light text-sm font-medium">
-              {videos[vidIndex].channelName}
+              {currentVideo.channelName}
             </p>
             <span className="text-gray-500 text-xs">
-              {getTimeAgo(videos[vidIndex].publishedAt)}
+              {getTimeAgo(currentVideo.publishedAt)}
             </span>
           </div>
 
+          {/* Save button */}
+          <button
+            className={`mt-4 flex items-center gap-3 w-full rounded-xl py-3 px-4 text-sm transition-colors ${
+              isSaved
+                ? "bg-accent/10 text-accent"
+                : "bg-white/5 text-gray-400 hover:bg-white/10"
+            }`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSaved(currentVideo);
+            }}
+          >
+            <svg
+              className={`w-5 h-5 ${isSaved ? "fill-accent" : "fill-none stroke-current"}`}
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+              />
+            </svg>
+            {isSaved ? "Saved" : "Save"}
+            {saved.length > 0 && (
+              <span className="ml-auto text-xs text-gray-500">
+                {saved.length} saved
+              </span>
+            )}
+          </button>
+
           <a
-            href={videos[vidIndex].youtubeUrl}
+            href={currentVideo.youtubeUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-xl py-3 text-sm text-gray-300"
+            className="mt-3 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 transition-colors rounded-xl py-3 text-sm text-gray-300"
             onClick={(e) => e.stopPropagation()}
           >
             <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24">
@@ -270,207 +259,90 @@ export default function WorkoutSection() {
         </div>
       ) : null}
 
-      {/* ── Today's Workout ─────────────────────────────── */}
-      {workout && (
+      {/* ── Saved Videos Archive ─────────────────────────── */}
+      {saved.length > 0 && (
         <div className="card">
-          <div className="flex items-center justify-between mb-2">
+          <button
+            className="flex items-center justify-between w-full"
+            onClick={() => setShowArchive((prev) => !prev)}
+          >
             <div className="flex items-center gap-2">
-              <span className="text-accent text-lg">
-                {period === "morning" ? "\u2600\uFE0F" : "\uD83C\uDF24\uFE0F"}
+              <svg
+                className="w-5 h-5 text-accent fill-accent"
+                viewBox="0 0 24 24"
+              >
+                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <h2 className="text-accent font-semibold text-sm uppercase tracking-wider">
+                Saved Workouts
+              </h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
+                {saved.length} saved
               </span>
-              <h3 className="text-accent font-semibold text-sm uppercase tracking-wider">
-                {period === "morning" ? "Morning" : "Afternoon"} Workout
-              </h3>
+              <svg
+                className={`w-4 h-4 text-gray-500 transition-transform ${showArchive ? "rotate-180" : ""}`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
             </div>
-            <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
-              ~10 min
-            </span>
-          </div>
+          </button>
 
-          <h4 className="text-xl font-semibold text-gray-100 mb-1">
-            {workout.name}
-          </h4>
-          <p className="text-gray-400 text-sm mb-4">
-            {workout.description}
-          </p>
-
-          {/* Progress bar */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-500">Progress</span>
-              <span className="text-xs text-gray-400">
-                {doneSets}/{totalSets} sets &middot; {progressPct}%
-              </span>
-            </div>
-            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-accent rounded-full transition-all duration-300"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Exercise list */}
-          <div className="space-y-2">
-            {workout.exercises.map((we) => {
-              const ex = exerciseMap.get(we.id);
-              if (!ex) return null;
-
-              const allDone = Array.from({ length: we.sets }, (_, i) =>
-                completed.has(`${we.id}-${i}`)
-              ).every(Boolean);
-
-              const isExpanded = expandedId === we.id;
-
-              return (
+          {showArchive && (
+            <div className="mt-4 space-y-3">
+              {saved.map((v) => (
                 <div
-                  key={we.id}
-                  className={`rounded-xl border transition-colors ${
-                    allDone
-                      ? "border-accent/20 bg-accent/5"
-                      : "border-white/5 bg-white/[0.02]"
-                  }`}
+                  key={v.videoId}
+                  className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0"
                 >
-                  {/* Exercise header */}
                   <button
-                    className="w-full flex items-center gap-3 px-4 py-3 text-left"
-                    onClick={() =>
-                      setExpandedId(isExpanded ? null : we.id)
-                    }
+                    className="mt-0.5 flex-shrink-0"
+                    onClick={() => removeSaved(v.videoId)}
+                    title="Remove from saved"
                   >
-                    <span className="text-lg flex-shrink-0">{ex.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span
-                          className={`text-sm font-medium ${
-                            allDone ? "text-accent line-through" : "text-gray-200"
-                          }`}
-                        >
-                          {ex.name}
-                        </span>
-                      </div>
-                      <span className="text-xs text-gray-500">
-                        {we.sets > 1 ? `${we.sets} sets \u00D7 ` : ""}
-                        {we.override}
-                      </span>
-                    </div>
                     <svg
-                      className={`w-4 h-4 text-gray-500 transition-transform flex-shrink-0 ${
-                        isExpanded ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
+                      className="w-5 h-5 text-accent fill-accent"
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
+                      <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   </button>
-
-                  {/* Expanded details */}
-                  {isExpanded && (
-                    <div className="px-4 pb-3 space-y-3">
-                      <p className="text-xs text-gray-400 leading-relaxed">
-                        {ex.instructions}
-                      </p>
-
-                      {/* Set checkboxes */}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {Array.from({ length: we.sets }, (_, i) => {
-                          const key = `${we.id}-${i}`;
-                          const done = completed.has(key);
-                          return (
-                            <button
-                              key={key}
-                              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition-colors ${
-                                done
-                                  ? "bg-accent/20 text-accent"
-                                  : "bg-white/5 text-gray-400 hover:bg-white/10"
-                              }`}
-                              onClick={() => toggleExercise(we.id, i)}
-                            >
-                              <div
-                                className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                                  done
-                                    ? "border-accent bg-accent"
-                                    : "border-gray-500"
-                                }`}
-                              >
-                                {done && (
-                                  <svg
-                                    className="w-2.5 h-2.5 text-dark-bg"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth={3}
-                                    viewBox="0 0 24 24"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M5 13l4 4L19 7"
-                                    />
-                                  </svg>
-                                )}
-                              </div>
-                              {we.sets > 1 ? `Set ${i + 1}` : "Done"}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Demo link */}
-                      <a
-                        href={ex.demoUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-gray-500 hover:text-accent transition-colors"
-                      >
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M10.172 13.828a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.102 1.101"
-                          />
-                        </svg>
-                        How to do this exercise
-                      </a>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-gray-600 uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded-full">
-                          {ex.target}
-                        </span>
-                        <span className="text-[10px] text-gray-600 uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded-full">
-                          {ex.difficulty}
-                        </span>
-                      </div>
-                    </div>
-                  )}
+                  <a
+                    href={v.youtubeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-shrink-0 w-20 h-12 rounded-lg overflow-hidden bg-dark-surface"
+                  >
+                    <img
+                      src={v.thumbnailUrl}
+                      alt={v.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  </a>
+                  <div className="flex-1 min-w-0">
+                    <a
+                      href={v.youtubeUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-300 hover:text-accent transition-colors font-medium line-clamp-2"
+                    >
+                      {v.title}
+                    </a>
+                    <p className="text-xs text-gray-500">
+                      {v.channelName}
+                    </p>
+                  </div>
+                  <span className="text-lg flex-shrink-0">
+                    {CATEGORY_ICONS[v.category] || "\uD83C\uDFAC"}
+                  </span>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Completion message */}
-          {progressPct === 100 && (
-            <div className="mt-4 text-center py-3 bg-accent/10 rounded-xl">
-              <span className="text-accent font-semibold text-sm">
-                {"\uD83C\uDF89"} Workout Complete! Great job!
-              </span>
+              ))}
             </div>
           )}
         </div>
