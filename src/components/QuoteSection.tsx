@@ -9,34 +9,49 @@ interface Quote {
   category: string;
 }
 
-const quotes = quotesData.quotes;
+// Seeded shuffle so the order is mixed but consistent for a given day
+function seededShuffle(arr: Quote[], seed: number): Quote[] {
+  const shuffled = [...arr];
+  let s = seed;
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    s = (s * 16807 + 0) % 2147483647; // simple LCG
+    const j = s % (i + 1);
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
-function getStartIndex(): number {
+function getShuffledQuotes(): { quotes: Quote[]; startIndex: number } {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const diff = now.getTime() - start.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  return dayOfYear % quotes.length;
+  // Seed changes yearly so shuffle order refreshes each year
+  const quotes = seededShuffle(quotesData.quotes, now.getFullYear());
+  return { quotes, startIndex: dayOfYear % quotes.length };
 }
 
 export default function QuoteSection() {
   const [index, setIndex] = useState<number | null>(null);
+  const [shuffled, setShuffled] = useState<Quote[]>([]);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
-    setIndex(getStartIndex());
+    const { quotes: q, startIndex } = getShuffledQuotes();
+    setShuffled(q);
+    setIndex(startIndex);
   }, []);
 
   const nextQuote = useCallback(() => {
-    setIndex((prev) => (prev !== null ? (prev + 1) % quotes.length : 0));
-  }, []);
+    setIndex((prev) => (prev !== null ? (prev + 1) % shuffled.length : 0));
+  }, [shuffled.length]);
 
   const prevQuote = useCallback(() => {
     setIndex((prev) =>
-      prev !== null ? (prev - 1 + quotes.length) % quotes.length : 0
+      prev !== null ? (prev - 1 + shuffled.length) % shuffled.length : 0
     );
-  }, []);
+  }, [shuffled.length]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -64,9 +79,9 @@ export default function QuoteSection() {
     [nextQuote]
   );
 
-  if (index === null) return null;
+  if (index === null || shuffled.length === 0) return null;
 
-  const quote: Quote = quotes[index];
+  const quote: Quote = shuffled[index];
 
   return (
     <div
