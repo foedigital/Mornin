@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 
 /**
  * Server-side proxy for YouTube API calls.
+ * Uses the PlaylistItems API with the channel's uploads playlist
+ * (more reliable than Search API for getting the latest video).
  * The API key stays on the server - never exposed to the browser.
  */
 export async function GET(request: Request) {
@@ -18,10 +20,13 @@ export async function GET(request: Request) {
   }
 
   try {
+    // Every channel's uploads playlist ID = channel ID with "UC" replaced by "UU"
+    const uploadsPlaylistId = channelId.replace(/^UC/, "UU");
+
     const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?` +
-        `part=snippet&channelId=${channelId}&order=date` +
-        `&maxResults=1&type=video&key=${apiKey}`,
+      `https://www.googleapis.com/youtube/v3/playlistItems?` +
+        `part=snippet&playlistId=${uploadsPlaylistId}` +
+        `&maxResults=1&key=${apiKey}`,
       { next: { revalidate: 3600 } } // cache for 1 hour
     );
 

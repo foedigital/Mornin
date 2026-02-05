@@ -1,104 +1,30 @@
 {
   "quotes": [
     {
-      "text": "Do what you can, with what you have, where you are.",
-      "author": "Theodore Roosevelt",
-      "category": "action"
+      "text": "God provides the wind, but man must raise the sails.",
+      "author": "St. Augustine",
+      "category": "faith"
     },
     {
-      "text": "It is not the critic who counts; not the man who points out how the strong man stumbles. The credit belongs to the man who is actually in the arena.",
-      "author": "Theodore Roosevelt",
-      "category": "perseverance"
-    },
-    {
-      "text": "Believe you can and you're halfway there.",
-      "author": "Theodore Roosevelt",
-      "category": "belief"
-    },
-    {
-      "text": "The only man who never makes mistakes is the man who never does anything.",
-      "author": "Theodore Roosevelt",
-      "category": "action"
-    },
-    {
-      "text": "Speak softly and carry a big stick; you will go far.",
-      "author": "Theodore Roosevelt",
+      "text": "Beware of the person of one book.",
+      "author": "St. Thomas Aquinas",
       "category": "wisdom"
     },
     {
-      "text": "A country boy can survive.",
-      "author": "Hank Williams Jr.",
-      "category": "resilience"
+      "text": "Impartiality is a pompous name for indifference, which is an elegant name for ignorance.",
+      "author": "G.K. Chesterton",
+      "source": "The Speaker",
+      "category": "truth"
     },
     {
-      "text": "If you mind your own business, you won't be minding mine.",
-      "author": "Hank Williams Jr.",
+      "text": "It is impossible for a man to learn what he thinks he already knows.",
+      "author": "Epictetus",
       "category": "wisdom"
     },
     {
-      "text": "I learned all the basics from my father. He taught me about songwriting and how to take care of business.",
-      "author": "Hank Williams Jr.",
-      "category": "legacy"
-    },
-    {
-      "text": "Everyone has a plan until they get punched in the mouth.",
-      "author": "Mike Tyson",
-      "category": "reality"
-    },
-    {
-      "text": "Discipline is doing what you hate to do but doing it like you love it.",
-      "author": "Mike Tyson",
-      "category": "discipline"
-    },
-    {
-      "text": "I'm a dreamer. I have to dream and reach for the stars, and if I miss a star then I grab a handful of clouds.",
-      "author": "Mike Tyson",
-      "category": "ambition"
-    },
-    {
-      "text": "Fear is your best friend or your worst enemy. It's like fire. If you can control it, it can cook for you; if you can't, it will burn everything around you and destroy you.",
-      "author": "Mike Tyson",
-      "category": "fear"
-    },
-    {
-      "text": "An investment in knowledge pays the best interest.",
-      "author": "Benjamin Franklin",
-      "category": "wisdom"
-    },
-    {
-      "text": "By failing to prepare, you are preparing to fail.",
-      "author": "Benjamin Franklin",
-      "category": "preparation"
-    },
-    {
-      "text": "Energy and persistence conquer all things.",
-      "author": "Benjamin Franklin",
-      "category": "perseverance"
-    },
-    {
-      "text": "Well done is better than well said.",
-      "author": "Benjamin Franklin",
-      "category": "action"
-    },
-    {
-      "text": "Accept the challenges so that you can feel the exhilaration of victory.",
-      "author": "George S. Patton",
-      "category": "challenge"
-    },
-    {
-      "text": "A good plan violently executed now is better than a perfect plan executed next week.",
-      "author": "George S. Patton",
-      "category": "action"
-    },
-    {
-      "text": "Lead me, follow me, or get out of my way.",
-      "author": "George S. Patton",
-      "category": "leadership"
-    },
-    {
-      "text": "Courage is fear holding on a minute longer.",
-      "author": "George S. Patton",
-      "category": "courage"
+      "text": "In keeping silent about evil, in burying it so deep within us that no sign of it appears on the surface, we are implanting it, and it will rise up a thousand fold in the future.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "evil"
     },
     {
       "text": "Success is not final, failure is not fatal: it is the courage to continue that counts.",
@@ -106,9 +32,218 @@
       "category": "perseverance"
     },
     {
-      "text": "Float like a butterfly, sting like a bee.",
-      "author": "Muhammad Ali",
-      "category": "style"
+      "text": "It is the mark of an educated mind to be able to entertain a thought without accepting it.",
+      "author": "Aristotle",
+      "category": "wisdom"
+    },
+    {
+      "text": "Home is behind, the world ahead, and there are many paths to tread.",
+      "author": "J.R.R. Tolkien",
+      "category": "adventure"
+    },
+    {
+      "text": "What is a friend? A single soul dwelling in two bodies.",
+      "author": "Aristotle",
+      "category": "friendship"
+    },
+    {
+      "text": "You act like mortals in all that you fear, and like immortals in all that you desire.",
+      "author": "Seneca",
+      "category": "perspective"
+    },
+    {
+      "text": "Hope is the power of being cheerful in circumstances which we know to be desperate.",
+      "author": "G.K. Chesterton",
+      "source": "Heretics",
+      "category": "hope"
+    },
+    {
+      "text": "There is nothing on this earth more to be prized than true friendship.",
+      "author": "St. Thomas Aquinas",
+      "category": "love"
+    },
+    {
+      "text": "It is not that we have spoken about it too much, but that we have not spoken enough.",
+      "author": "G.K. Chesterton",
+      "source": "Orthodoxy",
+      "category": "truth"
+    },
+    {
+      "text": "The poets have been mysteriously silent on the subject of cheese.",
+      "author": "G.K. Chesterton",
+      "source": "Alarms and Discursions",
+      "category": "humor"
+    },
+    {
+      "text": "Freedom is the only worthy goal in life. It is won by disregarding things that lie beyond our control.",
+      "author": "Epictetus",
+      "category": "freedom"
+    },
+    {
+      "text": "We meet no ordinary people in our lives.",
+      "author": "C.S. Lewis",
+      "source": "The Weight of Glory",
+      "category": "wonder"
+    },
+    {
+      "text": "The cleverest of all, in my opinion, is the man who calls himself a fool at least once a month.",
+      "author": "Fyodor Dostoevsky",
+      "category": "wisdom"
+    },
+    {
+      "text": "When a man loves a woman, he has to become worthy of her. The higher her virtue, the more noble her character, the more devoted she is to truth, justice, goodness, the more a man has to aspire to be worthy of her.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "marriage"
+    },
+    {
+      "text": "Wishing to be friends is quick work, but friendship is a slow ripening fruit.",
+      "author": "Aristotle",
+      "category": "friendship"
+    },
+    {
+      "text": "Only time can heal what reason cannot.",
+      "author": "Seneca",
+      "category": "acceptance"
+    },
+    {
+      "text": "The line separating good and evil passes not through states, nor between classes, nor between political parties either — but right through every human heart.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "evil"
+    },
+    {
+      "text": "Everyone has a plan until they get punched in the mouth.",
+      "author": "Mike Tyson",
+      "category": "reality"
+    },
+    {
+      "text": "An investment in knowledge pays the best interest.",
+      "author": "Benjamin Franklin",
+      "category": "wisdom"
+    },
+    {
+      "text": "Above all, don't lie to yourself.",
+      "author": "Fyodor Dostoevsky",
+      "category": "truth"
+    },
+    {
+      "text": "Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth.",
+      "author": "Marcus Aurelius",
+      "category": "perspective"
+    },
+    {
+      "text": "It is not that we have a short time to live, but that we waste a great deal of it.",
+      "author": "Seneca",
+      "category": "time"
+    },
+    {
+      "text": "Show me your hands. Do they have scars from giving? Show me your feet. Are they wounded from service? Show me your heart. Have you left a place for divine love?",
+      "author": "Archbishop Fulton Sheen",
+      "category": "service"
+    },
+    {
+      "text": "The key is to keep company only with people who uplift you, whose presence calls forth your best.",
+      "author": "Epictetus",
+      "category": "character"
+    },
+    {
+      "text": "Not everything that is more difficult is more meritorious.",
+      "author": "St. Thomas Aquinas",
+      "category": "wisdom"
+    },
+    {
+      "text": "Art, like morality, consists of drawing the line somewhere.",
+      "author": "G.K. Chesterton",
+      "source": "Illustrated London News",
+      "category": "truth"
+    },
+    {
+      "text": "Pleasure in the job puts perfection in the work.",
+      "author": "Aristotle",
+      "category": "excellence"
+    },
+    {
+      "text": "The wide world is all about you: you can fence yourselves in, but you cannot for ever fence it out.",
+      "author": "J.R.R. Tolkien",
+      "category": "adventure"
+    },
+    {
+      "text": "Love takes up where knowledge leaves off.",
+      "author": "St. Thomas Aquinas",
+      "category": "love"
+    },
+    {
+      "text": "An adventure is only an inconvenience rightly considered. An inconvenience is only an adventure wrongly considered.",
+      "author": "G.K. Chesterton",
+      "source": "All Things Considered",
+      "category": "adventure"
+    },
+    {
+      "text": "To fall in love with God is the greatest romance; to seek him the greatest adventure; to find him, the greatest human achievement.",
+      "author": "St. Augustine",
+      "category": "desire"
+    },
+    {
+      "text": "You can resolve to live your life with integrity. Let your credo be this: Let the lie come into the world, let it even triumph. But not through me.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "truth"
+    },
+    {
+      "text": "Hope has two beautiful daughters; their names are Anger and Courage. Anger at the way things are, and Courage to see that they do not remain as they are.",
+      "author": "St. Augustine",
+      "category": "hope"
+    },
+    {
+      "text": "Jealousy is the tribute mediocrity pays to genius.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "wisdom"
+    },
+    {
+      "text": "Good habits formed at youth make all the difference.",
+      "author": "Aristotle",
+      "category": "discipline"
+    },
+    {
+      "text": "He who laughs at himself never runs out of things to laugh at.",
+      "author": "Epictetus",
+      "category": "wisdom"
+    },
+    {
+      "text": "Grief is like a long valley, a winding valley where any bend may reveal a totally new landscape.",
+      "author": "C.S. Lewis",
+      "source": "A Grief Observed",
+      "category": "grief"
+    },
+    {
+      "text": "Three things are necessary for the salvation of man: to know what he ought to believe, to know what he ought to desire, and to know what he ought to do.",
+      "author": "St. Thomas Aquinas",
+      "category": "truth"
+    },
+    {
+      "text": "I can't imagine a man really enjoying a book and reading it only once.",
+      "author": "C.S. Lewis",
+      "source": "Collected Letters",
+      "category": "joy"
+    },
+    {
+      "text": "We are not necessarily doubting that God will do the best for us; we are wondering how painful the best will turn out to be.",
+      "author": "C.S. Lewis",
+      "source": "Letters of C.S. Lewis",
+      "category": "faith"
+    },
+    {
+      "text": "Fear is your best friend or your worst enemy. It's like fire. If you can control it, it can cook for you; if you can't, it will burn everything around you and destroy you.",
+      "author": "Mike Tyson",
+      "category": "fear"
+    },
+    {
+      "text": "By failing to prepare, you are preparing to fail.",
+      "author": "Benjamin Franklin",
+      "category": "preparation"
+    },
+    {
+      "text": "The treacherous are ever distrustful.",
+      "author": "J.R.R. Tolkien",
+      "category": "wisdom"
     },
     {
       "text": "I hated every minute of training, but I said, 'Don't quit. Suffer now and live the rest of your life as a champion.'",
@@ -116,29 +251,190 @@
       "category": "discipline"
     },
     {
-      "text": "He who is not courageous enough to take risks will accomplish nothing in life.",
-      "author": "Muhammad Ali",
+      "text": "Many that live deserve death. And some that die deserve life. Can you give it to them? Then do not be too eager to deal out death in judgement.",
+      "author": "J.R.R. Tolkien",
+      "category": "justice"
+    },
+    {
+      "text": "The traveler sees what he sees. The tourist sees what he has come to see.",
+      "author": "G.K. Chesterton",
+      "source": "Collected Works",
+      "category": "wisdom"
+    },
+    {
+      "text": "A man that flies from his fear may find that he has only taken a short cut to meet it.",
+      "author": "J.R.R. Tolkien",
       "category": "courage"
     },
     {
-      "text": "The man who has no imagination has no wings.",
-      "author": "Muhammad Ali",
-      "category": "imagination"
+      "text": "The soul is dyed the color of its thoughts.",
+      "author": "St. Augustine",
+      "category": "wisdom"
     },
     {
-      "text": "I am the greatest, I said that even before I knew I was.",
-      "author": "Muhammad Ali",
-      "category": "belief"
+      "text": "Patience is the companion of wisdom.",
+      "author": "St. Augustine",
+      "category": "wisdom"
     },
     {
-      "text": "It's not the size of the dog in the fight, it's the size of the fight in the dog.",
-      "author": "Mark Twain",
-      "category": "determination"
+      "text": "The whole future lies in uncertainty: live immediately.",
+      "author": "Seneca",
+      "category": "time"
     },
     {
-      "text": "The secret of getting ahead is getting started.",
-      "author": "Mark Twain",
+      "text": "Happiness depends upon ourselves.",
+      "author": "Aristotle",
+      "category": "happiness"
+    },
+    {
+      "text": "Taking a new step, uttering a new word, is what people fear most.",
+      "author": "Fyodor Dostoevsky",
+      "category": "courage"
+    },
+    {
+      "text": "The man who kills a man kills a man. The man who kills himself kills all men.",
+      "author": "G.K. Chesterton",
+      "source": "Orthodoxy",
+      "category": "wisdom"
+    },
+    {
+      "text": "Courage is almost a contradiction in terms. It means a strong desire to live taking the form of a readiness to die.",
+      "author": "G.K. Chesterton",
+      "source": "Heretics",
+      "category": "courage"
+    },
+    {
+      "text": "Not all those who wander are lost.",
+      "author": "J.R.R. Tolkien",
+      "category": "adventure"
+    },
+    {
+      "text": "I believe in Christianity as I believe that the sun has risen: not only because I see it, but because by it I see everything else.",
+      "author": "C.S. Lewis",
+      "source": "Is Theology Poetry?",
+      "category": "faith"
+    },
+    {
+      "text": "Hardships often prepare ordinary people for an extraordinary destiny.",
+      "author": "C.S. Lewis",
+      "source": "The Problem of Pain",
+      "category": "courage"
+    },
+    {
+      "text": "Begin at once to live, and count each separate day as a separate life.",
+      "author": "Seneca",
       "category": "action"
+    },
+    {
+      "text": "Look back over the past, with its changing empires that rose and fell, and you can foresee the future too.",
+      "author": "Marcus Aurelius",
+      "category": "perspective"
+    },
+    {
+      "text": "Be tolerant with others and strict with yourself.",
+      "author": "Marcus Aurelius",
+      "category": "discipline"
+    },
+    {
+      "text": "Other people's views and troubles can be contagious. Don't sabotage yourself by unwittingly adopting negative, unproductive attitudes.",
+      "author": "Epictetus",
+      "category": "discipline"
+    },
+    {
+      "text": "Friendship is the source of the greatest pleasures, and without friends even the most agreeable pursuits become tedious.",
+      "author": "St. Thomas Aquinas",
+      "category": "love"
+    },
+    {
+      "text": "The denial of the right of ownership to a man is a denial of his basic freedom: freedom without property is always incomplete.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "society"
+    },
+    {
+      "text": "Complete abstinence is easier than perfect moderation.",
+      "author": "St. Augustine",
+      "category": "virtue"
+    },
+    {
+      "text": "There are far, far better things ahead than any we leave behind.",
+      "author": "C.S. Lewis",
+      "source": "Collected Letters",
+      "category": "hope"
+    },
+    {
+      "text": "Discipline is doing what you hate to do but doing it like you love it.",
+      "author": "Mike Tyson",
+      "category": "discipline"
+    },
+    {
+      "text": "Compassion is the chief law of human existence.",
+      "author": "Fyodor Dostoevsky",
+      "category": "compassion"
+    },
+    {
+      "text": "There is no saint without a past, no sinner without a future.",
+      "author": "St. Augustine",
+      "category": "conversion"
+    },
+    {
+      "text": "It was pride that changed angels into devils; it is humility that makes men as angels.",
+      "author": "St. Augustine",
+      "category": "humility"
+    },
+    {
+      "text": "In my deepest wound I saw your glory, and it dazzled me.",
+      "author": "St. Augustine",
+      "category": "grace"
+    },
+    {
+      "text": "Courage is the first of human qualities because it is the quality which guarantees the others.",
+      "author": "Aristotle",
+      "category": "courage"
+    },
+    {
+      "text": "If it is not right, do not do it; if it is not true, do not say it.",
+      "author": "Marcus Aurelius",
+      "category": "truth"
+    },
+    {
+      "text": "Each of us makes his own weather, determines the color of the skies in the emotional universe which he inhabits.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "wisdom"
+    },
+    {
+      "text": "It takes three to make love, not two: you, your spouse, and God.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "marriage"
+    },
+    {
+      "text": "If only it were all so simple! If only there were evil people somewhere insidiously committing evil deeds, and it were necessary only to separate them from the rest of us and destroy them.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "evil"
+    },
+    {
+      "text": "Poverty is the parent of revolution and crime.",
+      "author": "Aristotle",
+      "category": "justice"
+    },
+    {
+      "text": "Beauty will save the world.",
+      "author": "Fyodor Dostoevsky",
+      "category": "beauty"
+    },
+    {
+      "text": "You become what you give your attention to.",
+      "author": "Epictetus",
+      "category": "discipline"
+    },
+    {
+      "text": "Luck is what happens when preparation meets opportunity.",
+      "author": "Seneca",
+      "category": "perseverance"
+    },
+    {
+      "text": "Very little is needed to make a happy life; it is all within yourself, in your way of thinking.",
+      "author": "Marcus Aurelius",
+      "category": "perspective"
     },
     {
       "text": "Twenty years from now you will be more disappointed by the things you didn't do than by the ones you did do.",
@@ -146,9 +442,1268 @@
       "category": "regret"
     },
     {
+      "text": "Fairy tales do not tell children the dragons exist. Children already know that dragons exist. Fairy tales tell children the dragons can be killed.",
+      "author": "G.K. Chesterton",
+      "source": "Tremendous Trifles",
+      "category": "courage"
+    },
+    {
+      "text": "Difficulties strengthen the mind, as labor does the body.",
+      "author": "Seneca",
+      "category": "resilience"
+    },
+    {
+      "text": "Deeds will not be less valiant because they are unpraised.",
+      "author": "J.R.R. Tolkien",
+      "category": "courage"
+    },
+    {
+      "text": "Seek not the good in external things; seek it in yourselves.",
+      "author": "Epictetus",
+      "category": "stoicism"
+    },
+    {
+      "text": "Right or wrong, it's very pleasant to break something from time to time.",
+      "author": "Fyodor Dostoevsky",
+      "category": "freedom"
+    },
+    {
+      "text": "Happiness does not lie in happiness, but in the achievement of it.",
+      "author": "Fyodor Dostoevsky",
+      "category": "perseverance"
+    },
+    {
+      "text": "You are a little soul carrying about a corpse.",
+      "author": "Marcus Aurelius",
+      "category": "stoicism"
+    },
+    {
+      "text": "Blow the dust off the clock. Your watches are behind the times. Throw open the heavy curtains which are so dear to you — you do not even suspect that the day has already dawned outside.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "courage"
+    },
+    {
+      "text": "While we are postponing, life speeds by.",
+      "author": "Seneca",
+      "category": "time"
+    },
+    {
+      "text": "What need is there to weep over parts of life? The whole of it calls for tears.",
+      "author": "Seneca",
+      "category": "stoicism"
+    },
+    {
+      "text": "Failures, repeated failures, are finger posts on the road to achievement.",
+      "author": "C.S. Lewis",
+      "source": "Collected Works",
+      "category": "courage"
+    },
+    {
+      "text": "Wealth consists not in having great possessions, but in having few wants.",
+      "author": "Epictetus",
+      "category": "wisdom"
+    },
+    {
+      "text": "Nothing that you have not given away will ever be really yours.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "wisdom"
+    },
+    {
+      "text": "Pray as though everything depended on God. Work as though everything depended on you.",
+      "author": "St. Augustine",
+      "category": "prayer"
+    },
+    {
+      "text": "The object of life is not to be on the side of the majority, but to escape finding oneself in the ranks of the insane.",
+      "author": "Marcus Aurelius",
+      "category": "wisdom"
+    },
+    {
+      "text": "The truth is like a lion; you don't have to defend it. Let it loose; it will defend itself.",
+      "author": "St. Augustine",
+      "category": "truth"
+    },
+    {
+      "text": "The soul becomes dyed with the color of its thoughts.",
+      "author": "Marcus Aurelius",
+      "category": "wisdom"
+    },
+    {
+      "text": "Speak softly and carry a big stick; you will go far.",
+      "author": "Theodore Roosevelt",
+      "category": "wisdom"
+    },
+    {
+      "text": "If there were no God, there would be no atheists.",
+      "author": "G.K. Chesterton",
+      "source": "Where All Roads Lead",
+      "category": "faith"
+    },
+    {
+      "text": "Affection is responsible for nine-tenths of whatever solid and durable happiness there is in our lives.",
+      "author": "C.S. Lewis",
+      "source": "The Four Loves",
+      "category": "love"
+    },
+    {
+      "text": "No man was ever wise by chance.",
+      "author": "Seneca",
+      "category": "discipline"
+    },
+    {
+      "text": "Late have I loved you, Beauty so ancient and so new, late have I loved you!",
+      "author": "St. Augustine",
+      "category": "beauty"
+    },
+    {
+      "text": "The soul is healed by being with children.",
+      "author": "Fyodor Dostoevsky",
+      "category": "soul"
+    },
+    {
+      "text": "Accept the things to which fate binds you, and love the people with whom fate brings you together.",
+      "author": "Marcus Aurelius",
+      "category": "acceptance"
+    },
+    {
+      "text": "Wealth is the slave of a wise man and the master of a fool.",
+      "author": "Seneca",
+      "category": "wisdom"
+    },
+    {
+      "text": "Accept the challenges so that you can feel the exhilaration of victory.",
+      "author": "George S. Patton",
+      "category": "challenge"
+    },
+    {
+      "text": "To have a right to do a thing is not at all the same as to be right in doing it.",
+      "author": "G.K. Chesterton",
+      "source": "A Short History of England",
+      "category": "wisdom"
+    },
+    {
+      "text": "A great writer is, so to speak, a second government in his country.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "truth"
+    },
+    {
+      "text": "It's an universal law — intolerance is the first sign of an inadequate education.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "wisdom"
+    },
+    {
+      "text": "We are what we believe we are.",
+      "author": "C.S. Lewis",
+      "source": "Collected Works",
+      "category": "truth"
+    },
+    {
+      "text": "To avoid criticism say nothing, do nothing, be nothing.",
+      "author": "Aristotle",
+      "category": "courage"
+    },
+    {
+      "text": "To wisdom belongs the intellectual apprehension of things eternal; to knowledge, the rational apprehension of things temporal.",
+      "author": "St. Augustine",
+      "category": "wisdom"
+    },
+    {
+      "text": "Getting over a painful experience is much like crossing monkey bars. You have to let go at some point in order to move forward.",
+      "author": "C.S. Lewis",
+      "source": "Collected Works",
+      "category": "grief"
+    },
+    {
+      "text": "A gem cannot be polished without friction, nor a man perfected without trials.",
+      "author": "Seneca",
+      "category": "perseverance"
+    },
+    {
+      "text": "Fantasy is escapist, and that is its glory.",
+      "author": "J.R.R. Tolkien",
+      "category": "imagination"
+    },
+    {
+      "text": "The impediment to action advances action. What stands in the way becomes the way.",
+      "author": "Marcus Aurelius",
+      "category": "resilience"
+    },
+    {
+      "text": "Faith has to do with things that are not seen and hope with things that are not at hand.",
+      "author": "St. Thomas Aquinas",
+      "category": "faith"
+    },
+    {
+      "text": "Grant me, O Lord my God, a mind to know you, a heart to seek you, wisdom to find you.",
+      "author": "St. Thomas Aquinas",
+      "category": "prayer"
+    },
+    {
+      "text": "Man is sometimes extraordinarily, passionately, in love with suffering.",
+      "author": "Fyodor Dostoevsky",
+      "category": "suffering"
+    },
+    {
+      "text": "Patience is power. Patience is not an absence of action; rather it is timing.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "patience"
+    },
+    {
+      "text": "I'm a dreamer. I have to dream and reach for the stars, and if I miss a star then I grab a handful of clouds.",
+      "author": "Mike Tyson",
+      "category": "ambition"
+    },
+    {
+      "text": "Aim at heaven and you will get earth thrown in. Aim at earth and you will get neither.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "faith"
+    },
+    {
+      "text": "Every new beginning comes from some other beginning's end.",
+      "author": "Seneca",
+      "category": "acceptance"
+    },
+    {
+      "text": "Reject your sense of injury and the injury itself disappears.",
+      "author": "Marcus Aurelius",
+      "category": "resilience"
+    },
+    {
+      "text": "Brave men rejoice in adversity, just as brave soldiers triumph in war.",
+      "author": "Seneca",
+      "category": "resilience"
+    },
+    {
+      "text": "If you believe what you like in the gospels, and reject what you don't like, it is not the gospel you believe, but yourself.",
+      "author": "St. Augustine",
+      "category": "faith"
+    },
+    {
+      "text": "That the saints may enjoy their beatitude more fully, a perfect sight of the punishment of the damned is granted them.",
+      "author": "St. Thomas Aquinas",
+      "category": "truth"
+    },
+    {
+      "text": "The task of the modern educator is not to cut down jungles, but to irrigate deserts.",
+      "author": "C.S. Lewis",
+      "source": "The Abolition of Man",
+      "category": "wisdom"
+    },
+    {
+      "text": "The aim of art is to represent not the outward appearance of things, but their inward significance.",
+      "author": "Aristotle",
+      "category": "truth"
+    },
+    {
+      "text": "As is a tale, so is life: not how long it is, but how good it is, is what matters.",
+      "author": "Seneca",
+      "category": "wisdom"
+    },
+    {
+      "text": "Humility is the foundation of all the other virtues.",
+      "author": "St. Augustine",
+      "category": "humility"
+    },
+    {
       "text": "Continuous effort, not strength or intelligence, is the key to unlocking our potential.",
       "author": "Winston Churchill",
       "category": "effort"
+    },
+    {
+      "text": "Little by little, one travels far.",
+      "author": "J.R.R. Tolkien",
+      "category": "perseverance"
+    },
+    {
+      "text": "It is not because things are difficult that we do not dare; it is because we do not dare that things are difficult.",
+      "author": "Seneca",
+      "category": "courage"
+    },
+    {
+      "text": "Float like a butterfly, sting like a bee.",
+      "author": "Muhammad Ali",
+      "category": "style"
+    },
+    {
+      "text": "When you arise in the morning, think of what a precious privilege it is to be alive — to breathe, to think, to enjoy, to love.",
+      "author": "Marcus Aurelius",
+      "category": "acceptance"
+    },
+    {
+      "text": "Man only likes to count his troubles; he doesn't calculate his happiness.",
+      "author": "Fyodor Dostoevsky",
+      "category": "wisdom"
+    },
+    {
+      "text": "Educating the mind without educating the heart is no education at all.",
+      "author": "Aristotle",
+      "category": "education"
+    },
+    {
+      "text": "A country boy can survive.",
+      "author": "Hank Williams Jr.",
+      "category": "resilience"
+    },
+    {
+      "text": "I have learned now that while those who speak about one's miseries usually hurt, those who keep silence hurt more.",
+      "author": "C.S. Lewis",
+      "source": "Collected Letters",
+      "category": "grief"
+    },
+    {
+      "text": "Courage is fear holding on a minute longer.",
+      "author": "George S. Patton",
+      "category": "courage"
+    },
+    {
+      "text": "Integrity is doing the right thing, even when no one is watching.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "virtue"
+    },
+    {
+      "text": "Experience: that most brutal of teachers. But you learn, my God do you learn.",
+      "author": "C.S. Lewis",
+      "source": "Collected Works",
+      "category": "wisdom"
+    },
+    {
+      "text": "Nothing ever happens in the world that does not happen first inside human hearts.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "truth"
+    },
+    {
+      "text": "Those who know, do. Those that understand, teach.",
+      "author": "Aristotle",
+      "category": "wisdom"
+    },
+    {
+      "text": "Music with dinner is an insult both to the cook and the violinist.",
+      "author": "G.K. Chesterton",
+      "source": "Collected Works",
+      "category": "humor"
+    },
+    {
+      "text": "A man is happy so long as he chooses to be happy.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "wisdom"
+    },
+    {
+      "text": "There are two ways of waking up in the morning. One is to say, 'Good morning, God,' and the other is to say, 'Good God, morning!'",
+      "author": "Archbishop Fulton Sheen",
+      "category": "humor"
+    },
+    {
+      "text": "It takes something more than intelligence to act intelligently.",
+      "author": "Fyodor Dostoevsky",
+      "category": "wisdom"
+    },
+    {
+      "text": "Courage, dear heart.",
+      "author": "C.S. Lewis",
+      "source": "The Voyage of the Dawn Treader",
+      "category": "courage"
+    },
+    {
+      "text": "The first rule is to keep an untroubled spirit. The second is to look things in the face and know them for what they are.",
+      "author": "Marcus Aurelius",
+      "category": "stoicism"
+    },
+    {
+      "text": "Merely having an open mind is nothing. The object of opening the mind, as of opening the mouth, is to shut it again on something solid.",
+      "author": "G.K. Chesterton",
+      "source": "Autobiography",
+      "category": "wisdom"
+    },
+    {
+      "text": "Quality is not an act, it is a habit.",
+      "author": "Aristotle",
+      "category": "habit"
+    },
+    {
+      "text": "It is requisite for the relaxation of the mind that we make use, from time to time, of playful deeds and jokes.",
+      "author": "St. Thomas Aquinas",
+      "category": "humor"
+    },
+    {
+      "text": "Faithless is he that says farewell when the road darkens.",
+      "author": "J.R.R. Tolkien",
+      "category": "perseverance"
+    },
+    {
+      "text": "What is hell? I maintain that it is the suffering of being unable to love.",
+      "author": "Fyodor Dostoevsky",
+      "category": "love"
+    },
+    {
+      "text": "Hang on to your youthful enthusiasms — you'll be able to use them better when you're older.",
+      "author": "Seneca",
+      "category": "perseverance"
+    },
+    {
+      "text": "Never esteem anything as of advantage to you that will make you break your word or lose your self-respect.",
+      "author": "Marcus Aurelius",
+      "category": "character"
+    },
+    {
+      "text": "You only have power over people as long as you don't take everything away from them.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "freedom"
+    },
+    {
+      "text": "The world is a book, and those who do not travel read only one page.",
+      "author": "St. Augustine",
+      "category": "wisdom"
+    },
+    {
+      "text": "The proud man counts his newspaper clippings, the humble man his blessings.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "humility"
+    },
+    {
+      "text": "The whole is greater than the sum of its parts.",
+      "author": "Aristotle",
+      "category": "truth"
+    },
+    {
+      "text": "It is not the critic who counts; not the man who points out how the strong man stumbles. The credit belongs to the man who is actually in the arena.",
+      "author": "Theodore Roosevelt",
+      "category": "perseverance"
+    },
+    {
+      "text": "One word of truth outweighs the whole world.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "truth"
+    },
+    {
+      "text": "The most incredible thing about miracles is that they happen.",
+      "author": "G.K. Chesterton",
+      "source": "The Innocence of Father Brown",
+      "category": "wonder"
+    },
+    {
+      "text": "Lead me, follow me, or get out of my way.",
+      "author": "George S. Patton",
+      "category": "leadership"
+    },
+    {
+      "text": "To one who has faith, no explanation is necessary. To one without faith, no explanation is possible.",
+      "author": "St. Thomas Aquinas",
+      "category": "faith"
+    },
+    {
+      "text": "Think of yourself as dead. You have lived your life. Now take what's left and live it properly.",
+      "author": "Marcus Aurelius",
+      "category": "stoicism"
+    },
+    {
+      "text": "The happy man in this life needs friends.",
+      "author": "St. Thomas Aquinas",
+      "category": "joy"
+    },
+    {
+      "text": "Don't explain your philosophy. Embody it.",
+      "author": "Epictetus",
+      "category": "action"
+    },
+    {
+      "text": "Sorrow can be alleviated by good sleep, a bath, and a glass of wine.",
+      "author": "St. Thomas Aquinas",
+      "category": "humor"
+    },
+    {
+      "text": "He who created you without you will not justify you without you.",
+      "author": "St. Augustine",
+      "category": "faith"
+    },
+    {
+      "text": "There is some good in this world, and it's worth fighting for.",
+      "author": "J.R.R. Tolkien",
+      "category": "hope"
+    },
+    {
+      "text": "It's a dangerous business, Frodo, going out your door. You step onto the road, and if you don't keep your feet, there's no knowing where you might be swept off to.",
+      "author": "J.R.R. Tolkien",
+      "category": "adventure"
+    },
+    {
+      "text": "People are frugal in guarding their personal property; but as soon as it comes to squandering time, they are most wasteful of the one thing in which it is right to be stingy.",
+      "author": "Seneca",
+      "category": "time"
+    },
+    {
+      "text": "Despair is only for those who see the end beyond all doubt. We do not.",
+      "author": "J.R.R. Tolkien",
+      "category": "hope"
+    },
+    {
+      "text": "How you think when you lose determines how long it will be until you win.",
+      "author": "G.K. Chesterton",
+      "source": "Collected Works",
+      "category": "courage"
+    },
+    {
+      "text": "The best revenge is to be unlike him who performed the injury.",
+      "author": "Marcus Aurelius",
+      "category": "virtue"
+    },
+    {
+      "text": "You have made us for yourself, O Lord, and our hearts are restless until they rest in you.",
+      "author": "St. Augustine",
+      "category": "rest"
+    },
+    {
+      "text": "How much more grievous are the consequences of anger than the causes of it.",
+      "author": "Marcus Aurelius",
+      "category": "discipline"
+    },
+    {
+      "text": "God loves each of us as if there were only one of us.",
+      "author": "St. Augustine",
+      "category": "love"
+    },
+    {
+      "text": "How can we live in harmony? First we need to know we are all madly in love with the same God.",
+      "author": "St. Thomas Aquinas",
+      "category": "faith"
+    },
+    {
+      "text": "Knowing yourself is the beginning of all wisdom.",
+      "author": "Aristotle",
+      "category": "wisdom"
+    },
+    {
+      "text": "First say to yourself what you would be; and then do what you have to do.",
+      "author": "Epictetus",
+      "category": "action"
+    },
+    {
+      "text": "It is not the strength of the body, but the strength of the spirit.",
+      "author": "J.R.R. Tolkien",
+      "category": "soul"
+    },
+    {
+      "text": "Without education, we are in a horrible and deadly danger of taking educated people seriously.",
+      "author": "G.K. Chesterton",
+      "source": "Illustrated London News",
+      "category": "humor"
+    },
+    {
+      "text": "Since love grows within you, so beauty grows. For love is the beauty of the soul.",
+      "author": "St. Augustine",
+      "category": "beauty"
+    },
+    {
+      "text": "The mystery of human existence lies not in just staying alive, but in finding something to live for.",
+      "author": "Fyodor Dostoevsky",
+      "category": "wisdom"
+    },
+    {
+      "text": "Our bodies are shaped to bear children, and our lives are a working out of the processes of creation.",
+      "author": "St. Augustine",
+      "category": "wisdom"
+    },
+    {
+      "text": "The meaning of earthly existence lies not, as we have grown used to thinking, in prospering, but in the development of the soul.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "soul"
+    },
+    {
+      "text": "We suffer more often in imagination than in reality.",
+      "author": "Seneca",
+      "category": "perspective"
+    },
+    {
+      "text": "The things that we love tell us what we are.",
+      "author": "St. Thomas Aquinas",
+      "category": "love"
+    },
+    {
+      "text": "People are not disturbed by things, but by the views they take of them.",
+      "author": "Epictetus",
+      "category": "perspective"
+    },
+    {
+      "text": "Still round the corner there may wait a new road or a secret gate.",
+      "author": "J.R.R. Tolkien",
+      "category": "hope"
+    },
+    {
+      "text": "The soul is like an uninhabited world that comes to life only when God lays His head against us.",
+      "author": "St. Thomas Aquinas",
+      "category": "prayer"
+    },
+    {
+      "text": "When men choose not to believe in God, they do not thereafter believe in nothing, they then become capable of believing in anything.",
+      "author": "G.K. Chesterton",
+      "source": "Father Brown Stories",
+      "category": "faith"
+    },
+    {
+      "text": "Well done is better than well said.",
+      "author": "Benjamin Franklin",
+      "category": "action"
+    },
+    {
+      "text": "Own only what you can always carry with you: know languages, know countries, know people. Let your memory be your travel bag.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "wisdom"
+    },
+    {
+      "text": "The roots of education are bitter, but the fruit is sweet.",
+      "author": "Aristotle",
+      "category": "education"
+    },
+    {
+      "text": "He who is brave is free.",
+      "author": "Seneca",
+      "category": "courage"
+    },
+    {
+      "text": "The more you know, the more you realize you don't know.",
+      "author": "Aristotle",
+      "category": "knowledge"
+    },
+    {
+      "text": "Courage is found in unlikely places.",
+      "author": "J.R.R. Tolkien",
+      "category": "courage"
+    },
+    {
+      "text": "All that is gold does not glitter, not all those who wander are lost; the old that is strong does not wither, deep roots are not reached by the frost.",
+      "author": "J.R.R. Tolkien",
+      "category": "perseverance"
+    },
+    {
+      "text": "The happiness of your life depends upon the quality of your thoughts.",
+      "author": "Marcus Aurelius",
+      "category": "wisdom"
+    },
+    {
+      "text": "Power is given only to those who dare to lower themselves and pick it up.",
+      "author": "Fyodor Dostoevsky",
+      "category": "courage"
+    },
+    {
+      "text": "Violence can only be concealed by a lie, and the lie can only be maintained by violence.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "truth"
+    },
+    {
+      "text": "That which is not good for the bee-hive cannot be good for the bees.",
+      "author": "Marcus Aurelius",
+      "category": "virtue"
+    },
+    {
+      "text": "What you see and what you hear depends a great deal on where you are standing.",
+      "author": "C.S. Lewis",
+      "source": "The Magician's Nephew",
+      "category": "wisdom"
+    },
+    {
+      "text": "Wonder is the desire for knowledge.",
+      "author": "St. Thomas Aquinas",
+      "category": "wisdom"
+    },
+    {
+      "text": "Men go abroad to wonder at the heights of mountains, the huge waves of the sea, the long courses of rivers, yet they pass by themselves without wondering.",
+      "author": "St. Augustine",
+      "category": "wisdom"
+    },
+    {
+      "text": "If you don't behave as you believe, you will end by believing as you behave.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "faith"
+    },
+    {
+      "text": "A single dream is more powerful than a thousand realities.",
+      "author": "J.R.R. Tolkien",
+      "category": "imagination"
+    },
+    {
+      "text": "The big print giveth and the fine print taketh away.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "humor"
+    },
+    {
+      "text": "The secret of getting ahead is getting started.",
+      "author": "Mark Twain",
+      "category": "action"
+    },
+    {
+      "text": "Any person capable of angering you becomes your master.",
+      "author": "Epictetus",
+      "category": "discipline"
+    },
+    {
+      "text": "The world is a great book, of which they who never stir from home read only a page.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "wisdom"
+    },
+    {
+      "text": "Hearing nuns' confessions is like being stoned to death with popcorn.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "humor"
+    },
+    {
+      "text": "Love is not affectionate feeling, but a steady wish for the loved person's ultimate good as far as it can be obtained.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "love"
+    },
+    {
+      "text": "Believe you can and you're halfway there.",
+      "author": "Theodore Roosevelt",
+      "category": "belief"
+    },
+    {
+      "text": "Make the best use of what is in your power, and take the rest as it happens.",
+      "author": "Epictetus",
+      "category": "acceptance"
+    },
+    {
+      "text": "The Christian ideal has not been tried and found wanting. It has been found difficult and left untried.",
+      "author": "G.K. Chesterton",
+      "source": "What's Wrong with the World",
+      "category": "faith"
+    },
+    {
+      "text": "The darker the night, the brighter the stars. The deeper the grief, the closer is God.",
+      "author": "Fyodor Dostoevsky",
+      "category": "faith"
+    },
+    {
+      "text": "Friendship is born at that moment when one person says to another: 'What! You too? I thought I was the only one.'",
+      "author": "C.S. Lewis",
+      "source": "The Four Loves",
+      "category": "friendship"
+    },
+    {
+      "text": "The way to love anything is to realize that it may be lost.",
+      "author": "G.K. Chesterton",
+      "source": "Tremendous Trifles",
+      "category": "love"
+    },
+    {
+      "text": "Never forget that there are only two philosophies to rule your life: the one of the cross, which starts with the fast and ends with the feast. The other of Satan, which starts with the feast and ends with the headache.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "faith"
+    },
+    {
+      "text": "If you want to improve, be content to be thought foolish and stupid.",
+      "author": "Epictetus",
+      "category": "perseverance"
+    },
+    {
+      "text": "Whatever is received is received according to the nature of the recipient.",
+      "author": "St. Thomas Aquinas",
+      "category": "wisdom"
+    },
+    {
+      "text": "We can't have full knowledge all at once. We must start by believing; then afterwards we may be led on to master the evidence for ourselves.",
+      "author": "St. Thomas Aquinas",
+      "category": "faith"
+    },
+    {
+      "text": "People who make history know nothing about history. You can see that in the sort of history they make.",
+      "author": "G.K. Chesterton",
+      "source": "Heretics",
+      "category": "humor"
+    },
+    {
+      "text": "Begin — to begin is half the work, let half still remain; again begin this, and thou wilt have finished.",
+      "author": "Marcus Aurelius",
+      "category": "action"
+    },
+    {
+      "text": "I will not say: do not weep; for not all tears are an evil.",
+      "author": "J.R.R. Tolkien",
+      "category": "compassion"
+    },
+    {
+      "text": "It is not death that a man should fear, but he should fear never beginning to live.",
+      "author": "Marcus Aurelius",
+      "category": "courage"
+    },
+    {
+      "text": "True happiness is to enjoy the present, without anxious dependence upon the future.",
+      "author": "Seneca",
+      "category": "wisdom"
+    },
+    {
+      "text": "He who lives in harmony with himself lives in harmony with the universe.",
+      "author": "Marcus Aurelius",
+      "category": "wisdom"
+    },
+    {
+      "text": "Nothing in this world is harder than speaking the truth, nothing easier than flattery.",
+      "author": "Fyodor Dostoevsky",
+      "category": "truth"
+    },
+    {
+      "text": "Circumstances don't make the man, they only reveal him to himself.",
+      "author": "Epictetus",
+      "category": "character"
+    },
+    {
+      "text": "A dead thing can go with the stream, but only a living thing can go against it.",
+      "author": "G.K. Chesterton",
+      "source": "The Everlasting Man",
+      "category": "courage"
+    },
+    {
+      "text": "The sun also shines on the wicked.",
+      "author": "Seneca",
+      "category": "truth"
+    },
+    {
+      "text": "The refusal to take sides on great moral issues is itself a decision. It is a silent acquiescence to evil.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "courage"
+    },
+    {
+      "text": "The true soldier fights not because he hates what is in front of him, but because he loves what is behind him.",
+      "author": "G.K. Chesterton",
+      "source": "Illustrated London News",
+      "category": "love"
+    },
+    {
+      "text": "It's not what happens to you, but how you react to it that matters.",
+      "author": "Epictetus",
+      "category": "resilience"
+    },
+    {
+      "text": "We are what we repeatedly do. Excellence, then, is not an act, but a habit.",
+      "author": "Aristotle",
+      "category": "excellence"
+    },
+    {
+      "text": "To bear with patience wrongs done to oneself is a mark of perfection, but to bear with patience wrongs done to someone else is a mark of imperfection and even of actual sin.",
+      "author": "St. Thomas Aquinas",
+      "category": "courage"
+    },
+    {
+      "text": "Loss is nothing else but change, and change is nature's delight.",
+      "author": "Marcus Aurelius",
+      "category": "acceptance"
+    },
+    {
+      "text": "It is not enough to be good; you must be good for something.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "virtue"
+    },
+    {
+      "text": "Even the smallest person can change the course of the future.",
+      "author": "J.R.R. Tolkien",
+      "category": "courage"
+    },
+    {
+      "text": "It's not the size of the dog in the fight, it's the size of the fight in the dog.",
+      "author": "Mark Twain",
+      "category": "determination"
+    },
+    {
+      "text": "Thieves respect property. They merely wish the property to become their property that they may more perfectly respect it.",
+      "author": "G.K. Chesterton",
+      "source": "The Man Who Was Thursday",
+      "category": "paradox"
+    },
+    {
+      "text": "There is a road from the eye to the heart that does not go through the intellect.",
+      "author": "G.K. Chesterton",
+      "source": "The Defendant",
+      "category": "love"
+    },
+    {
+      "text": "The soul never thinks without a picture.",
+      "author": "Aristotle",
+      "category": "knowledge"
+    },
+    {
+      "text": "Baloney is the unvarnished lie laid on so thick you hate it. Blarney is flattery laid on so thin you love it.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "humor"
+    },
+    {
+      "text": "The homemaker has the ultimate career. All other careers exist for one purpose only — and that is to support the ultimate career.",
+      "author": "C.S. Lewis",
+      "source": "Letters to an American Lady",
+      "category": "virtue"
+    },
+    {
+      "text": "Man is by nature a social animal.",
+      "author": "Aristotle",
+      "category": "truth"
+    },
+    {
+      "text": "I learned all the basics from my father. He taught me about songwriting and how to take care of business.",
+      "author": "Hank Williams Jr.",
+      "category": "legacy"
+    },
+    {
+      "text": "I am the greatest, I said that even before I knew I was.",
+      "author": "Muhammad Ali",
+      "category": "belief"
+    },
+    {
+      "text": "Sometimes even to live is an act of courage.",
+      "author": "Seneca",
+      "category": "courage"
+    },
+    {
+      "text": "If a man knows not to which port he sails, no wind is favorable.",
+      "author": "Seneca",
+      "category": "wisdom"
+    },
+    {
+      "text": "What does love look like? It has the hands to help others. It has the feet to hasten to the poor and needy.",
+      "author": "St. Augustine",
+      "category": "love"
+    },
+    {
+      "text": "No man is free who is not master of himself.",
+      "author": "Marcus Aurelius",
+      "category": "freedom"
+    },
+    {
+      "text": "There are two ways to get enough. One is to continue to accumulate more and more. The other is to desire less.",
+      "author": "G.K. Chesterton",
+      "source": "Collected Works",
+      "category": "humility"
+    },
+    {
+      "text": "Civilization is always in danger when those who have never learned to obey are given the right to command.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "society"
+    },
+    {
+      "text": "Do every act of your life as though it were the very last act of your life.",
+      "author": "Marcus Aurelius",
+      "category": "duty"
+    },
+    {
+      "text": "Bless you prison, bless you for being in my life. For there, lying upon the rotting prison straw, I came to realize that the object of life is not prosperity as we are made to believe, but the maturity of the human soul.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "soul"
+    },
+    {
+      "text": "I wisely started with a map.",
+      "author": "J.R.R. Tolkien",
+      "category": "wisdom"
+    },
+    {
+      "text": "Humility is not thinking less of yourself, but thinking of yourself less.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "humility"
+    },
+    {
+      "text": "God is always trying to give good things to us, but our hands are too full to receive them.",
+      "author": "St. Augustine",
+      "category": "grace"
+    },
+    {
+      "text": "Our life is what our thoughts make it.",
+      "author": "Marcus Aurelius",
+      "category": "perspective"
+    },
+    {
+      "text": "The Bible tells us to love our neighbors, and also to love our enemies; probably because they are generally the same people.",
+      "author": "G.K. Chesterton",
+      "source": "Illustrated London News",
+      "category": "humor"
+    },
+    {
+      "text": "To go wrong in one's own way is better than to go right in someone else's.",
+      "author": "Fyodor Dostoevsky",
+      "category": "freedom"
+    },
+    {
+      "text": "The man who has no imagination has no wings.",
+      "author": "Muhammad Ali",
+      "category": "imagination"
+    },
+    {
+      "text": "A children's story that can only be enjoyed by children is not a good children's story in the slightest.",
+      "author": "C.S. Lewis",
+      "source": "On Three Ways of Writing for Children",
+      "category": "imagination"
+    },
+    {
+      "text": "The degree of civilization in a society can be judged by entering its prisons.",
+      "author": "Fyodor Dostoevsky",
+      "category": "justice"
+    },
+    {
+      "text": "A good plan violently executed now is better than a perfect plan executed next week.",
+      "author": "George S. Patton",
+      "category": "action"
+    },
+    {
+      "text": "Resentment is like drinking poison and waiting for the other person to die.",
+      "author": "St. Augustine",
+      "category": "mercy"
+    },
+    {
+      "text": "Love is a mutual self-giving which ends in self-recovery.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "love"
+    },
+    {
+      "text": "A good novel tells us the truth about its hero; but a bad novel tells us the truth about its author.",
+      "author": "G.K. Chesterton",
+      "source": "Heretics",
+      "category": "truth"
+    },
+    {
+      "text": "Right is right even if no one is doing it; wrong is wrong even if everyone is doing it.",
+      "author": "St. Augustine",
+      "category": "truth"
+    },
+    {
+      "text": "Some day you will be old enough to start reading fairy tales again.",
+      "author": "C.S. Lewis",
+      "source": "The Chronicles of Narnia",
+      "category": "imagination"
+    },
+    {
+      "text": "Energy and persistence conquer all things.",
+      "author": "Benjamin Franklin",
+      "category": "perseverance"
+    },
+    {
+      "text": "To every soul that knows how to pray, life is worth living.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "prayer"
+    },
+    {
+      "text": "What we do now echoes in eternity.",
+      "author": "Marcus Aurelius",
+      "category": "action"
+    },
+    {
+      "text": "Patience is bitter, but its fruit is sweet.",
+      "author": "Aristotle",
+      "category": "virtue"
+    },
+    {
+      "text": "Justice is a certain rectitude of mind whereby a man does what he ought to do in the circumstances confronting him.",
+      "author": "St. Thomas Aquinas",
+      "category": "virtue"
+    },
+    {
+      "text": "Saints are sinners who kept on going.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "virtue"
+    },
+    {
+      "text": "You must remember to love people and use things, rather than to love things and use people.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "love"
+    },
+    {
+      "text": "Dwell on the beauty of life. Watch the stars, and see yourself running with them.",
+      "author": "Marcus Aurelius",
+      "category": "acceptance"
+    },
+    {
+      "text": "Associate with people who are likely to improve you.",
+      "author": "Seneca",
+      "category": "wisdom"
+    },
+    {
+      "text": "The pain I feel now is the happiness I had before. That's the deal.",
+      "author": "C.S. Lewis",
+      "source": "A Grief Observed",
+      "category": "grief"
+    },
+    {
+      "text": "Only the educated are free.",
+      "author": "Epictetus",
+      "category": "freedom"
+    },
+    {
+      "text": "Pain and suffering are always inevitable for a large intelligence and a deep heart.",
+      "author": "Fyodor Dostoevsky",
+      "category": "suffering"
+    },
+    {
+      "text": "The simple step of a courageous individual is not to take part in the lie.",
+      "author": "Aleksandr Solzhenitsyn",
+      "category": "courage"
+    },
+    {
+      "text": "If you mind your own business, you won't be minding mine.",
+      "author": "Hank Williams Jr.",
+      "category": "wisdom"
+    },
+    {
+      "text": "The only man who never makes mistakes is the man who never does anything.",
+      "author": "Theodore Roosevelt",
+      "category": "action"
+    },
+    {
+      "text": "If the highest aim of a captain were to preserve his ship, he would keep it in port forever.",
+      "author": "St. Thomas Aquinas",
+      "category": "courage"
+    },
+    {
+      "text": "Let your religion be less of a theory and more of a love affair.",
+      "author": "G.K. Chesterton",
+      "source": "Collected Works",
+      "category": "faith"
+    },
+    {
+      "text": "He who has overcome his fears will truly be free.",
+      "author": "Aristotle",
+      "category": "freedom"
+    },
+    {
+      "text": "You are never too old to set another goal or to dream a new dream.",
+      "author": "C.S. Lewis",
+      "source": "Collected Letters",
+      "category": "hope"
+    },
+    {
+      "text": "I am a hobbit in all but size.",
+      "author": "J.R.R. Tolkien",
+      "category": "wisdom"
+    },
+    {
+      "text": "Do not follow the crowd in doing wrong.",
+      "author": "St. Augustine",
+      "category": "virtue"
+    },
+    {
+      "text": "No great mind has ever existed without a touch of madness.",
+      "author": "Aristotle",
+      "category": "character"
+    },
+    {
+      "text": "He who is not courageous enough to take risks will accomplish nothing in life.",
+      "author": "Muhammad Ali",
+      "category": "courage"
+    },
+    {
+      "text": "Man is not worried by real problems so much as by his imagined anxieties about real problems.",
+      "author": "Epictetus",
+      "category": "perspective"
+    },
+    {
+      "text": "All we have to decide is what to do with the time that is given us.",
+      "author": "J.R.R. Tolkien",
+      "category": "wisdom"
+    },
+    {
+      "text": "Isn't it funny how day by day nothing changes, but when you look back, everything is different.",
+      "author": "C.S. Lewis",
+      "source": "Prince Caspian",
+      "category": "wonder"
+    },
+    {
+      "text": "The world is indeed full of peril, and in it there are many dark places; but still there is much that is fair, and though in all lands love is now mingled with grief, it grows perhaps the greater.",
+      "author": "J.R.R. Tolkien",
+      "category": "hope"
+    },
+    {
+      "text": "Faith is to believe what you do not see; the reward of this faith is to see what you believe.",
+      "author": "St. Augustine",
+      "category": "faith"
+    },
+    {
+      "text": "Joy is not the same as pleasure or happiness. A wicked and evil man may have pleasure, while any ordinary mortal is capable of being happy. Pleasure generally comes from things, and always through the senses; happiness comes from humans through fellowship. Joy comes from loving God and neighbor.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "joy"
+    },
+    {
+      "text": "Miracles are not contrary to nature, but only contrary to what we know about nature.",
+      "author": "St. Augustine",
+      "category": "truth"
+    },
+    {
+      "text": "Hope is a waking dream.",
+      "author": "Aristotle",
+      "category": "hope"
+    },
+    {
+      "text": "Perfection of moral virtue does not wholly take away the passions, but regulates them.",
+      "author": "St. Thomas Aquinas",
+      "category": "virtue"
+    },
+    {
+      "text": "You can never get a cup of tea large enough or a book long enough to suit me.",
+      "author": "C.S. Lewis",
+      "source": "Collected Letters",
+      "category": "joy"
+    },
+    {
+      "text": "To love someone means to see them as God intended them.",
+      "author": "Fyodor Dostoevsky",
+      "category": "love"
+    },
+    {
+      "text": "In this hour, I do not believe that any darkness will endure.",
+      "author": "J.R.R. Tolkien",
+      "category": "hope"
+    },
+    {
+      "text": "The measure of love is to love without measure.",
+      "author": "St. Augustine",
+      "category": "love"
+    },
+    {
+      "text": "Man cannot live without joy; therefore when he is deprived of true spiritual joys it is necessary that he become addicted to carnal pleasures.",
+      "author": "St. Thomas Aquinas",
+      "category": "joy"
+    },
+    {
+      "text": "You have power over your mind — not outside events. Realize this, and you will find strength.",
+      "author": "Marcus Aurelius",
+      "category": "discipline"
+    },
+    {
+      "text": "It may be hard for an egg to turn into a bird: it would be a jolly sight harder for a bird to learn to fly while remaining an egg.",
+      "author": "C.S. Lewis",
+      "source": "Mere Christianity",
+      "category": "paradox"
+    },
+    {
+      "text": "The energy of the mind is the essence of life.",
+      "author": "Aristotle",
+      "category": "knowledge"
+    },
+    {
+      "text": "Better to illuminate than merely to shine, to deliver to others contemplated truths than merely to contemplate.",
+      "author": "St. Thomas Aquinas",
+      "category": "service"
+    },
+    {
+      "text": "I would maintain that thanks are the highest form of thought; and that gratitude is happiness doubled by wonder.",
+      "author": "G.K. Chesterton",
+      "source": "A Short History of England",
+      "category": "joy"
+    },
+    {
+      "text": "There are not one hundred people in the United States who hate the Catholic Church, but there are millions who hate what they wrongly perceive the Catholic Church to be.",
+      "author": "Archbishop Fulton Sheen",
+      "category": "truth"
+    },
+    {
+      "text": "Caution is the confidant of wisdom.",
+      "author": "Epictetus",
+      "category": "wisdom"
+    },
+    {
+      "text": "Waste no more time arguing about what a good man should be. Be one.",
+      "author": "Marcus Aurelius",
+      "category": "action"
+    },
+    {
+      "text": "Do what you can, with what you have, where you are.",
+      "author": "Theodore Roosevelt",
+      "category": "action"
     }
   ]
 }

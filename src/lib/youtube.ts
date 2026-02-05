@@ -37,8 +37,11 @@ async function fetchVideoForChannel(
     const item = data.items?.[0];
     if (!item) return null;
 
+    // PlaylistItems API nests the video ID under snippet.resourceId
+    const videoId = item.snippet.resourceId.videoId;
+
     return {
-      videoId: item.id.videoId,
+      videoId,
       title: item.snippet.title,
       channelName: channel.name,
       category: channel.category,
@@ -47,7 +50,7 @@ async function fetchVideoForChannel(
         item.snippet.thumbnails.medium?.url ||
         item.snippet.thumbnails.default?.url,
       publishedAt: item.snippet.publishedAt,
-      youtubeUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
+      youtubeUrl: `https://www.youtube.com/watch?v=${videoId}`,
     };
   } catch {
     return null;
