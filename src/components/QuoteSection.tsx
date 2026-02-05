@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import quotesData from "../../data/quotes.json";
 
 interface Quote {
@@ -9,32 +9,42 @@ interface Quote {
   category: string;
 }
 
-function getQuoteOfTheDay(): Quote {
+const quotes = quotesData.quotes;
+
+function getStartIndex(): number {
   const now = new Date();
   const start = new Date(now.getFullYear(), 0, 0);
   const diff = now.getTime() - start.getTime();
   const oneDay = 1000 * 60 * 60 * 24;
   const dayOfYear = Math.floor(diff / oneDay);
-  const index = dayOfYear % quotesData.quotes.length;
-  return quotesData.quotes[index];
+  return dayOfYear % quotes.length;
 }
 
 export default function QuoteSection() {
-  const [quote, setQuote] = useState<Quote | null>(null);
+  const [index, setIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    setQuote(getQuoteOfTheDay());
+    setIndex(getStartIndex());
   }, []);
 
-  if (!quote) return null;
+  const nextQuote = useCallback(() => {
+    setIndex((prev) => (prev !== null ? (prev + 1) % quotes.length : 0));
+  }, []);
+
+  if (index === null) return null;
+
+  const quote: Quote = quotes[index];
 
   return (
-    <div className="card">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-accent text-xl">&ldquo;</span>
-        <h2 className="text-accent font-semibold text-sm uppercase tracking-wider">
-          Quote of the Day
-        </h2>
+    <div className="card cursor-pointer select-none active:scale-[0.98] transition-transform" onClick={nextQuote}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-accent text-xl">&ldquo;</span>
+          <h2 className="text-accent font-semibold text-sm uppercase tracking-wider">
+            Quote of the Day
+          </h2>
+        </div>
+        <span className="text-gray-600 text-xs">tap for next</span>
       </div>
       <blockquote className="text-xl md:text-2xl font-light leading-relaxed text-gray-100 mb-4">
         &ldquo;{quote.text}&rdquo;

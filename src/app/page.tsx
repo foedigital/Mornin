@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import QuoteSection from "@/components/QuoteSection";
+import BattleSection from "@/components/BattleSection";
+import GospelSection from "@/components/GospelSection";
+import SaintSection from "@/components/SaintSection";
+import ArtSection from "@/components/ArtSection";
 import { getToday } from "@/lib/dates";
 
 export default function Home() {
@@ -34,20 +38,10 @@ export default function Home() {
       {/* Content Sections */}
       <div className="space-y-6">
         <QuoteSection />
-
-        {/* Placeholder cards for future sections */}
-        <div className="card opacity-40 text-center py-8">
-          <p className="text-gray-500 text-sm">Battle of the Day — coming soon</p>
-        </div>
-        <div className="card opacity-40 text-center py-8">
-          <p className="text-gray-500 text-sm">Daily Gospel — coming soon</p>
-        </div>
-        <div className="card opacity-40 text-center py-8">
-          <p className="text-gray-500 text-sm">Saint of the Day — coming soon</p>
-        </div>
-        <div className="card opacity-40 text-center py-8">
-          <p className="text-gray-500 text-sm">Featured Art — coming soon</p>
-        </div>
+        <BattleSection />
+        <GospelSection />
+        <SaintSection />
+        <ArtSection />
       </div>
 
       <footer className="text-center mt-12 mb-4">
