@@ -46,9 +46,34 @@
       "category": "podcast"
     },
     {
-      "id": "UCGeBogGDZ9W3dsGx-mWQGJA",
-      "name": "Jordan Peterson",
-      "category": "podcast"
+      "id": "UC3cpN6gcJQqcCM6mxRUo_dA",
+      "name": "Wendigoon",
+      "category": "educational"
+    },
+    {
+      "id": "UCpJBMoySJfuTfhGWQQrX4oQ",
+      "name": "Chubby Behemoth",
+      "category": "comedy"
+    },
+    {
+      "id": "UC4fZeoNxAXfbIpT3swsVh9w",
+      "name": "Matt and Shane's Secret Podcast",
+      "category": "comedy"
+    },
+    {
+      "id": "UCbbU6V8nL2vtFBte7lPAm4A",
+      "name": "Mike Birbiglia",
+      "category": "comedy"
+    },
+    {
+      "id": "UCaPOHjHoCbbnxZLHu9wgRRw",
+      "name": "Are You Garbage",
+      "category": "comedy"
+    },
+    {
+      "id": "UCvPXiKxH-eH9xq-80vpgmKQ",
+      "name": "Epic History TV",
+      "category": "educational"
     }
   ]
 }
