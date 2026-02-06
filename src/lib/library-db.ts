@@ -160,6 +160,22 @@ export async function getTotalAudioCacheSize(): Promise<number> {
   return totalSize;
 }
 
+/** Get total cached audio size for a specific book in bytes */
+export async function getBookAudioCacheSize(bookId: string): Promise<number> {
+  const db = await getDB();
+  const tx = db.transaction("audioCache", "readonly");
+  const store = tx.objectStore("audioCache");
+  const allKeys = await store.getAllKeys();
+  let size = 0;
+  for (const key of allKeys) {
+    if (typeof key === "string" && key.startsWith(`${bookId}-`)) {
+      const entry = await store.get(key);
+      if (entry) size += entry.blob.size;
+    }
+  }
+  return size;
+}
+
 /** Delete all cached audio for a book (all voices). Returns bytes freed. */
 export async function deleteBookAudioCache(bookId: string): Promise<number> {
   const db = await getDB();

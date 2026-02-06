@@ -7,6 +7,7 @@ import {
   getProgress,
   getBookCachedChapterCount,
   getTotalAudioCacheSize,
+  getBookAudioCacheSize,
   deleteBookAudioCache,
   setCachedAudio,
   audioCacheKey,
@@ -32,6 +33,7 @@ export default function LibraryPage() {
   const [downloadStatusMap, setDownloadStatusMap] = useState<Record<string, DownloadStatus>>({});
   const [downloadProgressMap, setDownloadProgressMap] = useState<Record<string, { done: number; total: number }>>({});
   const [totalStorageUsed, setTotalStorageUsed] = useState(0);
+  const [bookSizeMap, setBookSizeMap] = useState<Record<string, number>>({});
   const downloadAbortRef = useRef<Record<string, boolean>>({});
 
   const { currentBookId, currentChapter, playChapter } = useLibraryAudio();
@@ -42,15 +44,20 @@ export default function LibraryPage() {
 
     const progMap: Record<string, BookProgress> = {};
     const dlMap: Record<string, DownloadStatus> = {};
+    const sizeMap: Record<string, number> = {};
     for (const book of allBooks) {
       const prog = await getProgress(book.id);
       if (prog) progMap[book.id] = prog;
 
       const cached = await getBookCachedChapterCount(book.id, book.chapters.length);
       dlMap[book.id] = cached >= book.chapters.length ? "downloaded" : "none";
+
+      const size = await getBookAudioCacheSize(book.id);
+      sizeMap[book.id] = size;
     }
     setProgressMap(progMap);
     setDownloadStatusMap(dlMap);
+    setBookSizeMap(sizeMap);
 
     const storageUsed = await getTotalAudioCacheSize();
     setTotalStorageUsed(storageUsed);
@@ -177,6 +184,8 @@ export default function LibraryPage() {
         return next;
       });
       setTotalStorageUsed(runningStorage);
+      const bookSize = await getBookAudioCacheSize(bookId);
+      setBookSizeMap((prev) => ({ ...prev, [bookId]: bookSize }));
     },
     [books, totalStorageUsed]
   );
@@ -185,6 +194,7 @@ export default function LibraryPage() {
     downloadAbortRef.current[bookId] = true;
     const freed = await deleteBookAudioCache(bookId);
     setDownloadStatusMap((prev) => ({ ...prev, [bookId]: "none" }));
+    setBookSizeMap((prev) => ({ ...prev, [bookId]: 0 }));
     setTotalStorageUsed((prev) => Math.max(0, prev - freed));
   }, []);
 
@@ -247,6 +257,7 @@ export default function LibraryPage() {
               downloadProgress={downloadProgressMap[book.id] ?? null}
               onDownload={handleDownload}
               onRemoveDownload={handleRemoveDownload}
+              storageSize={bookSizeMap[book.id] ?? 0}
             />
           ))}
         </div>

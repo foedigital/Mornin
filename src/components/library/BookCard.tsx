@@ -17,6 +17,19 @@ interface BookCardProps {
   downloadProgress: { done: number; total: number } | null;
   onDownload: (bookId: string) => void;
   onRemoveDownload: (bookId: string) => void;
+  storageSize: number; // actual cached bytes, 0 if not downloaded
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+/** Estimate audio size from total word count: 96kbps @ ~150 wpm ≈ 4.8 KB/word */
+function estimateSize(book: Book): number {
+  const totalWords = book.chapters.reduce((sum, ch) => sum + ch.wordCount, 0);
+  return Math.round(totalWords * 4.8 * 1024);
 }
 
 // Generate a deterministic accent color from the book id
@@ -47,6 +60,7 @@ export default function BookCard({
   downloadProgress,
   onDownload,
   onRemoveDownload,
+  storageSize,
 }: BookCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -121,6 +135,12 @@ export default function BookCard({
           <p className="text-xs text-gray-500 mt-0.5 truncate">{book.author}</p>
           <p className="text-xs text-gray-600 mt-1">
             {totalChapters} ch{totalChapters !== 1 ? "s" : ""}
+            {" · "}
+            {storageSize > 0 ? (
+              <span className="text-green-500/70">{formatSize(storageSize)}</span>
+            ) : (
+              <span title="Estimated">~{formatSize(estimateSize(book))}</span>
+            )}
             {progress && !progress.completed && ` · Ch. ${completedChapters + 1}`}
             {progress?.completed && " · Complete"}
           </p>
