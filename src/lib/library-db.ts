@@ -128,3 +128,52 @@ export async function saveProgress(progress: BookProgress): Promise<void> {
   const db = await getDB();
   await db.put("progress", progress);
 }
+
+// --- Downloads ---
+
+export const DOWNLOAD_VOICE_ID = "en-US-AndrewMultilingualNeural";
+export const MAX_DOWNLOAD_BYTES = 20 * 1024 * 1024 * 1024; // 20 GB
+
+/** Count how many chapters of a book are cached for the download voice */
+export async function getBookCachedChapterCount(bookId: string, totalChapters: number): Promise<number> {
+  const db = await getDB();
+  let count = 0;
+  for (let i = 0; i < totalChapters; i++) {
+    const key = audioCacheKey(bookId, i, DOWNLOAD_VOICE_ID);
+    const entry = await db.get("audioCache", key);
+    if (entry) count++;
+  }
+  return count;
+}
+
+/** Get total size of all cached audio blobs in bytes */
+export async function getTotalAudioCacheSize(): Promise<number> {
+  const db = await getDB();
+  const tx = db.transaction("audioCache", "readonly");
+  const store = tx.objectStore("audioCache");
+  let totalSize = 0;
+  let cursor = await store.openCursor();
+  while (cursor) {
+    totalSize += cursor.value.blob.size;
+    cursor = await cursor.continue();
+  }
+  return totalSize;
+}
+
+/** Delete all cached audio for a book (all voices). Returns bytes freed. */
+export async function deleteBookAudioCache(bookId: string): Promise<number> {
+  const db = await getDB();
+  const tx = db.transaction("audioCache", "readwrite");
+  const store = tx.objectStore("audioCache");
+  const allKeys = await store.getAllKeys();
+  let freedBytes = 0;
+  for (const key of allKeys) {
+    if (typeof key === "string" && key.startsWith(`${bookId}-`)) {
+      const entry = await store.get(key);
+      if (entry) freedBytes += entry.blob.size;
+      await store.delete(key);
+    }
+  }
+  await tx.done;
+  return freedBytes;
+}

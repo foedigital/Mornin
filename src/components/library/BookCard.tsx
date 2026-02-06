@@ -4,6 +4,8 @@ import { useState } from "react";
 import type { Book, BookProgress } from "@/lib/library-db";
 import ChapterList from "@/components/library/ChapterList";
 
+export type DownloadStatus = "none" | "downloading" | "downloaded";
+
 interface BookCardProps {
   book: Book;
   progress: BookProgress | null;
@@ -11,6 +13,10 @@ interface BookCardProps {
   onPlayChapter: (bookId: string, chapterIndex: number) => void;
   currentlyPlayingBookId: string | null;
   currentlyPlayingChapter: number | null;
+  downloadStatus: DownloadStatus;
+  downloadProgress: { done: number; total: number } | null;
+  onDownload: (bookId: string) => void;
+  onRemoveDownload: (bookId: string) => void;
 }
 
 // Generate a deterministic accent color from the book id
@@ -37,9 +43,14 @@ export default function BookCard({
   onPlayChapter,
   currentlyPlayingBookId,
   currentlyPlayingChapter,
+  downloadStatus,
+  downloadProgress,
+  onDownload,
+  onRemoveDownload,
 }: BookCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [confirmRemoveDl, setConfirmRemoveDl] = useState(false);
 
   const totalChapters = book.chapters.length;
   const completedChapters = progress ? progress.currentChapter : 0;
@@ -132,6 +143,50 @@ export default function BookCard({
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
+
+          {/* Download button */}
+          {downloadStatus === "downloading" ? (
+            <div className="p-2 flex items-center gap-1" title={downloadProgress ? `${downloadProgress.done}/${downloadProgress.total}` : "Downloading..."}>
+              <svg className="w-4 h-4 text-accent animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {downloadProgress && (
+                <span className="text-[10px] text-accent font-medium">{downloadProgress.done}/{downloadProgress.total}</span>
+              )}
+            </div>
+          ) : downloadStatus === "downloaded" ? (
+            <button
+              onClick={() => {
+                if (confirmRemoveDl) {
+                  onRemoveDownload(book.id);
+                  setConfirmRemoveDl(false);
+                } else {
+                  setConfirmRemoveDl(true);
+                  setTimeout(() => setConfirmRemoveDl(false), 3000);
+                }
+              }}
+              className={`p-2 transition-colors ${confirmRemoveDl ? "text-red-400" : "text-green-400 hover:text-green-300"}`}
+              aria-label={confirmRemoveDl ? "Tap again to remove download" : "Downloaded (tap to remove)"}
+              title={confirmRemoveDl ? "Tap again to remove" : "Downloaded"}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </button>
+          ) : (
+            <button
+              onClick={() => onDownload(book.id)}
+              className="p-2 text-gray-600 hover:text-gray-400 transition-colors"
+              aria-label="Download for offline"
+              title="Download"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </button>
+          )}
+
           <button
             onClick={handleDelete}
             className={`p-2 transition-colors ${

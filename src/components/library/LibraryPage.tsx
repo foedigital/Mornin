@@ -1,15 +1,38 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { getAllBooks, deleteBook, getProgress, type Book, type BookProgress } from "@/lib/library-db";
+import { useEffect, useState, useCallback, useRef } from "react";
+import {
+  getAllBooks,
+  deleteBook,
+  getProgress,
+  getBookCachedChapterCount,
+  getTotalAudioCacheSize,
+  deleteBookAudioCache,
+  setCachedAudio,
+  audioCacheKey,
+  DOWNLOAD_VOICE_ID,
+  MAX_DOWNLOAD_BYTES,
+  type Book,
+  type BookProgress,
+} from "@/lib/library-db";
 import AddBookForm from "@/components/library/AddBookForm";
-import BookCard from "@/components/library/BookCard";
+import BookCard, { type DownloadStatus } from "@/components/library/BookCard";
 import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
 
 export default function LibraryPage() {
   const [books, setBooks] = useState<Book[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, BookProgress>>({});
   const [loaded, setLoaded] = useState(false);
+  const [downloadStatusMap, setDownloadStatusMap] = useState<Record<string, DownloadStatus>>({});
+  const [downloadProgressMap, setDownloadProgressMap] = useState<Record<string, { done: number; total: number }>>({});
+  const [totalStorageUsed, setTotalStorageUsed] = useState(0);
+  const downloadAbortRef = useRef<Record<string, boolean>>({});
 
   const { currentBookId, currentChapter, playChapter } = useLibraryAudio();
 
@@ -18,11 +41,19 @@ export default function LibraryPage() {
     setBooks(allBooks);
 
     const progMap: Record<string, BookProgress> = {};
+    const dlMap: Record<string, DownloadStatus> = {};
     for (const book of allBooks) {
       const prog = await getProgress(book.id);
       if (prog) progMap[book.id] = prog;
+
+      const cached = await getBookCachedChapterCount(book.id, book.chapters.length);
+      dlMap[book.id] = cached >= book.chapters.length ? "downloaded" : "none";
     }
     setProgressMap(progMap);
+    setDownloadStatusMap(dlMap);
+
+    const storageUsed = await getTotalAudioCacheSize();
+    setTotalStorageUsed(storageUsed);
     setLoaded(true);
   }, []);
 
@@ -44,9 +75,11 @@ export default function LibraryPage() {
 
   const handleBookAdded = useCallback((book: Book) => {
     setBooks((prev) => [book, ...prev]);
+    setDownloadStatusMap((prev) => ({ ...prev, [book.id]: "none" }));
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
+    downloadAbortRef.current[id] = true;
     await deleteBook(id);
     setBooks((prev) => prev.filter((b) => b.id !== id));
     setProgressMap((prev) => {
@@ -54,6 +87,13 @@ export default function LibraryPage() {
       delete next[id];
       return next;
     });
+    setDownloadStatusMap((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+    const storageUsed = await getTotalAudioCacheSize();
+    setTotalStorageUsed(storageUsed);
   }, []);
 
   const handlePlayChapter = useCallback(
@@ -65,7 +105,86 @@ export default function LibraryPage() {
     [books, playChapter]
   );
 
+  const handleDownload = useCallback(
+    async (bookId: string) => {
+      const book = books.find((b) => b.id === bookId);
+      if (!book) return;
+
+      // Check storage cap
+      if (totalStorageUsed >= MAX_DOWNLOAD_BYTES) {
+        alert(`Storage limit reached (${formatBytes(MAX_DOWNLOAD_BYTES)}). Remove some downloads to free space.`);
+        return;
+      }
+
+      downloadAbortRef.current[bookId] = false;
+      setDownloadStatusMap((prev) => ({ ...prev, [bookId]: "downloading" }));
+      setDownloadProgressMap((prev) => ({ ...prev, [bookId]: { done: 0, total: book.chapters.length } }));
+
+      let runningStorage = totalStorageUsed;
+
+      for (let i = 0; i < book.chapters.length; i++) {
+        if (downloadAbortRef.current[bookId]) break;
+
+        const cacheKey = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
+
+        // Skip if already cached
+        const { getCachedAudio } = await import("@/lib/library-db");
+        const existing = await getCachedAudio(cacheKey);
+        if (existing) {
+          setDownloadProgressMap((prev) => ({ ...prev, [bookId]: { done: i + 1, total: book.chapters.length } }));
+          continue;
+        }
+
+        // Check cap before each chapter
+        if (runningStorage >= MAX_DOWNLOAD_BYTES) {
+          alert(`Storage limit reached during download. Downloaded ${i} of ${book.chapters.length} chapters.`);
+          break;
+        }
+
+        try {
+          const res = await fetch("/api/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: book.chapters[i].text, voice: DOWNLOAD_VOICE_ID }),
+          });
+          if (!res.ok) throw new Error("TTS failed");
+          const blob = await res.blob();
+          await setCachedAudio(cacheKey, blob);
+          runningStorage += blob.size;
+        } catch {
+          // Skip failed chapter, continue with rest
+        }
+
+        setDownloadProgressMap((prev) => ({ ...prev, [bookId]: { done: i + 1, total: book.chapters.length } }));
+      }
+
+      // Check final status
+      const finalCached = await getBookCachedChapterCount(bookId, book.chapters.length);
+      setDownloadStatusMap((prev) => ({
+        ...prev,
+        [bookId]: finalCached >= book.chapters.length ? "downloaded" : "none",
+      }));
+      setDownloadProgressMap((prev) => {
+        const next = { ...prev };
+        delete next[bookId];
+        return next;
+      });
+      setTotalStorageUsed(runningStorage);
+    },
+    [books, totalStorageUsed]
+  );
+
+  const handleRemoveDownload = useCallback(async (bookId: string) => {
+    downloadAbortRef.current[bookId] = true;
+    const freed = await deleteBookAudioCache(bookId);
+    setDownloadStatusMap((prev) => ({ ...prev, [bookId]: "none" }));
+    setTotalStorageUsed((prev) => Math.max(0, prev - freed));
+  }, []);
+
   if (!loaded) return null;
+
+  const storagePercent = Math.min(100, (totalStorageUsed / MAX_DOWNLOAD_BYTES) * 100);
+  const downloadedCount = Object.values(downloadStatusMap).filter((s) => s === "downloaded").length;
 
   return (
     <main className="min-h-screen px-4 py-8 pb-36 max-w-lg mx-auto">
@@ -75,6 +194,28 @@ export default function LibraryPage() {
       </header>
 
       <AddBookForm onBookAdded={handleBookAdded} />
+
+      {/* Storage bar */}
+      {books.length > 0 && (
+        <div className="mb-4 px-1">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+            <span>
+              {formatBytes(totalStorageUsed)} / {formatBytes(MAX_DOWNLOAD_BYTES)}
+            </span>
+            <span>
+              {downloadedCount} downloaded
+            </span>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                storagePercent > 90 ? "bg-red-500" : storagePercent > 70 ? "bg-amber-500" : "bg-green-500"
+              }`}
+              style={{ width: `${Math.max(storagePercent, 0.5)}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {books.length === 0 ? (
         <div className="text-center py-16">
@@ -95,6 +236,10 @@ export default function LibraryPage() {
               onPlayChapter={handlePlayChapter}
               currentlyPlayingBookId={currentBookId}
               currentlyPlayingChapter={currentChapter}
+              downloadStatus={downloadStatusMap[book.id] ?? "none"}
+              downloadProgress={downloadProgressMap[book.id] ?? null}
+              onDownload={handleDownload}
+              onRemoveDownload={handleRemoveDownload}
             />
           ))}
         </div>
