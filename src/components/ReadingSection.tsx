@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import readingsData from "../../data/readings.json";
+import LiteraturePlayButton from "@/components/LiteraturePlayButton";
 
 interface Reading {
   title: string;
@@ -149,9 +150,18 @@ export default function ReadingSection() {
           </div>
         </div>
 
-        <h3 className={`text-xl font-semibold mb-2 leading-snug ${isRead ? "text-gray-500 line-through" : "text-gray-100"}`}>
-          {reading.title}
-        </h3>
+        <div className="flex items-start gap-3 mb-2">
+          <h3 className={`text-xl font-semibold leading-snug flex-1 ${isRead ? "text-gray-500 line-through" : "text-gray-100"}`}>
+            {reading.title}
+          </h3>
+          <LiteraturePlayButton
+            text={reading.excerpt}
+            contentId={readingKey(reading)}
+            title={reading.title}
+            author={reading.author}
+            isPoetry={reading.type === "poem"}
+          />
+        </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-4 italic">
           &ldquo;{reading.excerpt}&rdquo;
