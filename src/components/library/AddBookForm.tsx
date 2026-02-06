@@ -26,12 +26,16 @@ export default function AddBookForm({ onBookAdded }: AddBookFormProps) {
         body: JSON.stringify({ url: url.trim() }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to extract content");
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Server returned an invalid response. The URL may be unreachable or blocked.");
       }
 
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to extract content");
+      }
 
       const book: Book = {
         id: crypto.randomUUID(),

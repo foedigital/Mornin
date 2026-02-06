@@ -13,6 +13,23 @@ interface BookCardProps {
   currentlyPlayingChapter: number | null;
 }
 
+// Generate a deterministic accent color from the book id
+function bookColor(id: string): string {
+  const colors = [
+    "from-orange-600 to-amber-800",
+    "from-blue-600 to-indigo-800",
+    "from-emerald-600 to-teal-800",
+    "from-rose-600 to-pink-800",
+    "from-violet-600 to-purple-800",
+    "from-cyan-600 to-sky-800",
+  ];
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) | 0;
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export default function BookCard({
   book,
   progress,
@@ -28,6 +45,7 @@ export default function BookCard({
   const completedChapters = progress ? progress.currentChapter : 0;
   const progressPercent = totalChapters > 0 ? (completedChapters / totalChapters) * 100 : 0;
   const isThisBookPlaying = currentlyPlayingBookId === book.id;
+  const gradient = bookColor(book.id);
 
   const handleDelete = () => {
     if (confirmDelete) {
@@ -42,31 +60,56 @@ export default function BookCard({
     <div className="card">
       {/* Header row */}
       <div className="flex items-start gap-3">
-        {/* Play button */}
+        {/* Book cover icon */}
         <button
           onClick={() => onPlayChapter(book.id, progress?.currentChapter ?? 0)}
-          className="flex-shrink-0 w-12 h-12 rounded-xl bg-accent/20 hover:bg-accent/30 transition-colors flex items-center justify-center mt-0.5"
+          className={`flex-shrink-0 w-14 h-[72px] rounded-lg bg-gradient-to-br ${gradient} shadow-lg flex flex-col items-center justify-center relative overflow-hidden group`}
         >
+          {/* Spine line */}
+          <div className="absolute left-0 top-0 bottom-0 w-1 bg-black/20" />
+
           {isThisBookPlaying ? (
-            <svg className="w-6 h-6 text-accent" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-white/90 drop-shadow" fill="currentColor" viewBox="0 0 24 24">
               <rect x="6" y="4" width="4" height="16" rx="1" />
               <rect x="14" y="4" width="4" height="16" rx="1" />
             </svg>
           ) : (
-            <svg className="w-6 h-6 text-accent ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+            <>
+              {/* Book icon */}
+              <svg className="w-6 h-6 text-white/80 group-hover:hidden" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              {/* Play icon on hover */}
+              <svg className="w-6 h-6 text-white/90 hidden group-hover:block drop-shadow" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </>
+          )}
+
+          {/* Progress fill from bottom */}
+          {progressPercent > 0 && progressPercent < 100 && (
+            <div
+              className="absolute bottom-0 left-0 right-0 bg-white/15"
+              style={{ height: `${progressPercent}%` }}
+            />
+          )}
+          {progress?.completed && (
+            <div className="absolute top-1 right-1">
+              <svg className="w-3 h-3 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </div>
           )}
         </button>
 
         {/* Title + author */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 py-0.5">
           <h3 className="text-sm font-semibold text-gray-100 leading-tight line-clamp-2">
             {book.title}
           </h3>
           <p className="text-xs text-gray-500 mt-0.5 truncate">{book.author}</p>
           <p className="text-xs text-gray-600 mt-1">
-            {totalChapters} chapter{totalChapters !== 1 ? "s" : ""}
+            {totalChapters} ch{totalChapters !== 1 ? "s" : ""}
             {progress && !progress.completed && ` · Ch. ${completedChapters + 1}`}
             {progress?.completed && " · Complete"}
           </p>
@@ -101,14 +144,6 @@ export default function BookCard({
             </svg>
           </button>
         </div>
-      </div>
-
-      {/* Progress bar */}
-      <div className="mt-3 h-1 bg-gray-700/50 rounded-full overflow-hidden">
-        <div
-          className="h-full bg-accent/60 rounded-full transition-all duration-300"
-          style={{ width: `${progressPercent}%` }}
-        />
       </div>
 
       {/* Expandable chapter list */}
