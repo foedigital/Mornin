@@ -3,11 +3,57 @@ import * as cheerio from "cheerio";
 import { Readability } from "@mozilla/readability";
 import { parseHTML } from "linkedom";
 import { chunkIntoChapters } from "@/lib/chunker";
+import { readFileSync } from "fs";
+import { join } from "path";
 
 export const maxDuration = 60;
 
 const BROWSER_UA =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+
+// ---------------------------------------------------------------------------
+// Local poem fallback — instant, no fetch needed
+// ---------------------------------------------------------------------------
+
+interface PoemFallback {
+  title: string;
+  author: string;
+  type: string;
+  text: string;
+}
+
+let poemFallbackCache: Record<string, PoemFallback> | null = null;
+
+function loadPoemFallback(): Record<string, PoemFallback> {
+  if (poemFallbackCache) return poemFallbackCache;
+  try {
+    const filePath = join(process.cwd(), "data", "poems-fallback.json");
+    const raw = readFileSync(filePath, "utf-8");
+    poemFallbackCache = JSON.parse(raw);
+    return poemFallbackCache!;
+  } catch {
+    return {};
+  }
+}
+
+function lookupPoemFallback(url: string): ExtractResult | null {
+  const fallback = loadPoemFallback();
+  // Build lookup key from URL: strip protocol + www, trailing slashes
+  const key = url
+    .replace(/^https?:\/\/(www\.)?/, "")
+    .replace(/\/$/, "");
+
+  const entry = fallback[key];
+  if (entry) {
+    return {
+      title: entry.title,
+      author: entry.author,
+      text: entry.text,
+      type: entry.type as ContentType,
+    };
+  }
+  return null;
+}
 
 type ContentType = "poem" | "story" | "speech" | "essay" | "novella" | "article";
 
@@ -59,7 +105,7 @@ function cleanPoetry(text: string): string {
     .trim();
 }
 
-/** Fetch a URL with timeout and realistic headers */
+/** Fetch a URL with timeout and realistic browser headers */
 async function fetchUrl(
   url: string,
   accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
@@ -67,12 +113,19 @@ async function fetchUrl(
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
   try {
+    const headers: Record<string, string> = {
+      "User-Agent": BROWSER_UA,
+      Accept: accept,
+      "Accept-Language": "en-US,en;q=0.9",
+      "Cache-Control": "no-cache",
+      Referer: "https://www.google.com/",
+      "Sec-Fetch-Dest": "document",
+      "Sec-Fetch-Mode": "navigate",
+      "Sec-Fetch-Site": "cross-site",
+    };
+
     const res = await fetch(url, {
-      headers: {
-        "User-Agent": BROWSER_UA,
-        Accept: accept,
-        "Accept-Language": "en-US,en;q=0.9",
-      },
+      headers,
       signal: controller.signal,
       redirect: "follow",
     });
@@ -565,7 +618,11 @@ export async function POST(req: NextRequest) {
     const source = detectSource(url);
     let result: ExtractResult;
 
-    if (source === "gutenberg") {
+    // 1. Check local poem fallback first (instant, most reliable)
+    const fallbackResult = lookupPoemFallback(url);
+    if (fallbackResult) {
+      result = fallbackResult;
+    } else if (source === "gutenberg") {
       // Gutenberg handles its own fetching (txt vs html)
       result = await parseGutenberg(url);
     } else {
@@ -582,6 +639,19 @@ export async function POST(req: NextRequest) {
       }
 
       if (!res.ok) {
+        // For poetry sites that block us, give a helpful error
+        if (
+          res.status === 403 &&
+          (source === "poetryfoundation" || source === "poetsorg")
+        ) {
+          return NextResponse.json(
+            {
+              error:
+                "This poem isn't in our local library yet and the site blocked our request. Try a Project Gutenberg or American Literature link instead.",
+            },
+            { status: 502 }
+          );
+        }
         return NextResponse.json(
           { error: `Site returned error ${res.status}. It may require login or block scrapers.` },
           { status: 502 }
