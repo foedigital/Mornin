@@ -117,7 +117,6 @@ export default function LibraryPage() {
       const book = books.find((b) => b.id === bookId);
       if (!book) return;
 
-      // Check storage cap
       if (totalStorageUsed >= MAX_DOWNLOAD_BYTES) {
         alert(`Storage limit reached (${formatBytes(MAX_DOWNLOAD_BYTES)}). Remove some downloads to free space.`);
         return;
@@ -127,49 +126,75 @@ export default function LibraryPage() {
       setDownloadStatusMap((prev) => ({ ...prev, [bookId]: "downloading" }));
       setDownloadProgressMap((prev) => ({ ...prev, [bookId]: { done: 0, total: book.chapters.length } }));
 
-      let runningStorage = totalStorageUsed;
-      let completedCount = 0;
-      const PARALLEL = 3;
+      // Check which chapters are already cached
+      const { getCachedAudio } = await import("@/lib/library-db");
+      const skipIndices: number[] = [];
+      for (let i = 0; i < book.chapters.length; i++) {
+        const key = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
+        const existing = await getCachedAudio(key);
+        if (existing) skipIndices.push(i);
+      }
 
-      // Process chapters in parallel batches of 3
-      for (let batch = 0; batch < book.chapters.length; batch += PARALLEL) {
-        if (downloadAbortRef.current[bookId]) break;
-        if (runningStorage >= MAX_DOWNLOAD_BYTES) {
-          alert(`Storage limit reached during download. Downloaded ${completedCount} of ${book.chapters.length} chapters.`);
-          break;
+      // If all cached already, mark as downloaded
+      if (skipIndices.length >= book.chapters.length) {
+        setDownloadStatusMap((prev) => ({ ...prev, [bookId]: "downloaded" }));
+        setDownloadProgressMap((prev) => { const n = { ...prev }; delete n[bookId]; return n; });
+        return;
+      }
+
+      setDownloadProgressMap((prev) => ({
+        ...prev,
+        [bookId]: { done: skipIndices.length, total: book.chapters.length },
+      }));
+
+      try {
+        // Single batch request — all chapters processed server-side in parallel
+        const res = await fetch("/api/tts-batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            texts: book.chapters.map((ch) => ch.text),
+            voice: DOWNLOAD_VOICE_ID,
+            skip: skipIndices,
+          }),
+        });
+
+        if (!res.ok) throw new Error("Batch TTS failed");
+        const data = await res.json();
+        const chapters: (string | null)[] = data.chapters;
+
+        // Store each chapter's audio in IndexedDB
+        let runningStorage = totalStorageUsed;
+        let storedCount = skipIndices.length;
+
+        for (let i = 0; i < chapters.length; i++) {
+          if (downloadAbortRef.current[bookId]) break;
+          if (!chapters[i]) {
+            if (skipIndices.includes(i)) storedCount = storedCount; // already counted
+            continue;
+          }
+
+          if (runningStorage >= MAX_DOWNLOAD_BYTES) break;
+
+          const binary = atob(chapters[i]!);
+          const bytes = new Uint8Array(binary.length);
+          for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+          const blob = new Blob([bytes], { type: "audio/mpeg" });
+
+          const cacheKey = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
+          await setCachedAudio(cacheKey, blob);
+          runningStorage += blob.size;
+          storedCount++;
+
+          setDownloadProgressMap((prev) => ({
+            ...prev,
+            [bookId]: { done: storedCount, total: book.chapters.length },
+          }));
         }
 
-        const batchIndices = [];
-        for (let j = batch; j < Math.min(batch + PARALLEL, book.chapters.length); j++) {
-          batchIndices.push(j);
-        }
-
-        const results = await Promise.allSettled(
-          batchIndices.map(async (i) => {
-            const cacheKey = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
-
-            // Skip if already cached
-            const { getCachedAudio } = await import("@/lib/library-db");
-            const existing = await getCachedAudio(cacheKey);
-            if (existing) return 0;
-
-            const res = await fetch("/api/tts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ text: book.chapters[i].text, voice: DOWNLOAD_VOICE_ID }),
-            });
-            if (!res.ok) throw new Error("TTS failed");
-            const blob = await res.blob();
-            await setCachedAudio(cacheKey, blob);
-            return blob.size;
-          })
-        );
-
-        for (const r of results) {
-          if (r.status === "fulfilled") runningStorage += r.value;
-        }
-        completedCount += batchIndices.length;
-        setDownloadProgressMap((prev) => ({ ...prev, [bookId]: { done: completedCount, total: book.chapters.length } }));
+        setTotalStorageUsed(runningStorage);
+      } catch (err) {
+        console.error("Download failed:", err);
       }
 
       // Check final status
@@ -183,7 +208,6 @@ export default function LibraryPage() {
         delete next[bookId];
         return next;
       });
-      setTotalStorageUsed(runningStorage);
       const bookSize = await getBookAudioCacheSize(bookId);
       setBookSizeMap((prev) => ({ ...prev, [bookId]: bookSize }));
     },

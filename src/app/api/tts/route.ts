@@ -17,8 +17,8 @@ const VALID_VOICES = [
 
 const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 
-const MAX_CHUNK_CHARS = 5000;
-const MAX_TOTAL_CHARS = 50000; // ~7500 words safety cap
+const MAX_CHUNK_CHARS = 12000; // Edge TTS handles 10-15k well; fewer chunks = faster
+const MAX_TOTAL_CHARS = 100000; // ~15k words safety cap
 
 /** Clean text for natural TTS reading — removes artifacts that cause pauses/choppiness */
 function normalizeForTTS(text: string): string {
@@ -131,9 +131,9 @@ export async function POST(req: NextRequest) {
     // Safety cap, then normalize for clean TTS reading
     const normalizedText = normalizeForTTS(text.slice(0, MAX_TOTAL_CHARS));
 
-    // Split long text into chunks and synthesize in parallel (up to 4 at once)
+    // Split long text into chunks and synthesize in parallel (up to 6 at once)
     const textChunks = splitTextForTTS(normalizedText);
-    const CONCURRENCY = 4;
+    const CONCURRENCY = 6;
     const audioBuffers: Buffer[] = new Array(textChunks.length);
 
     for (let batch = 0; batch < textChunks.length; batch += CONCURRENCY) {
