@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import readingsData from "../../data/readings.json";
 import LiteraturePlayButton from "@/components/LiteraturePlayButton";
+import { getAllBooks, addBook, type Book } from "@/lib/library-db";
 
 interface Reading {
   title: string;
@@ -55,12 +56,61 @@ function readingKey(r: Reading): string {
   return `${r.title}::${r.author}`;
 }
 
+/** Add a single reading to the library if it doesn't already exist */
+async function ensureBookInLibrary(reading: Reading, existingUrls: Set<string>): Promise<boolean> {
+  if (existingUrls.has(reading.url)) return false;
+
+  try {
+    const res = await fetch("/api/extract", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: reading.url }),
+    });
+
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      return false;
+    }
+    if (!res.ok) return false;
+
+    const bookId = `reading-${readingKey(reading).replace(/[^a-zA-Z0-9]/g, "-")}-${Date.now()}`;
+    const book: Book = {
+      id: bookId,
+      url: reading.url,
+      title: data.title || reading.title,
+      author: data.author || reading.author,
+      chapters: data.chapters,
+      dateAdded: Date.now(),
+      lastPlayed: 0,
+    };
+
+    await addBook(book);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Sync completed readings to library one at a time */
+async function syncReadingsToLibrary(readings: Reading[]) {
+  if (readings.length === 0) return;
+  const allBooks = await getAllBooks();
+  const existingUrls = new Set(allBooks.map((b) => b.url));
+
+  for (const reading of readings) {
+    await ensureBookInLibrary(reading, existingUrls);
+  }
+}
+
 export default function ReadingSection() {
   const [index, setIndex] = useState<number | null>(null);
   const [shuffled, setShuffled] = useState<Reading[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showArchive, setShowArchive] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const syncedRef = useRef(false);
 
   useEffect(() => {
     const now = new Date();
@@ -74,6 +124,16 @@ export default function ReadingSection() {
     setCompleted(loadCompleted());
   }, []);
 
+  // Sync completed archive readings to library on mount
+  useEffect(() => {
+    if (syncedRef.current || completed.size === 0 || shuffled.length === 0) return;
+    syncedRef.current = true;
+
+    const allReadings = readingsData.readings as Reading[];
+    const completedReadings = allReadings.filter((r) => completed.has(readingKey(r)));
+    syncReadingsToLibrary(completedReadings);
+  }, [completed, shuffled]);
+
   const toggleCompleted = useCallback(
     (reading: Reading) => {
       setCompleted((prev) => {
@@ -83,6 +143,11 @@ export default function ReadingSection() {
           next.delete(key);
         } else {
           next.add(key);
+          // Sync newly completed reading to library in background
+          getAllBooks().then((books) => {
+            const existingUrls = new Set(books.map((b) => b.url));
+            ensureBookInLibrary(reading, existingUrls);
+          });
         }
         saveCompleted(next);
         return next;
