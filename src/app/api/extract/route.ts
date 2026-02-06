@@ -88,12 +88,34 @@ function decodeEntities(text: string): string {
 }
 
 function cleanProse(text: string): string {
-  return decodeEntities(text)
-    .replace(/\r\n/g, "\n")
-    .replace(/\t/g, " ")
-    .replace(/ {2,}/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  let t = decodeEntities(text);
+
+  // Remove editorial/Gutenberg artifacts
+  t = t.replace(/\[Illustration[^\]]*\]/gi, "");
+  t = t.replace(/\[Footnote[^\]]*\]/gi, "");
+  t = t.replace(/\[Transcriber'?s? [Nn]ote[^\]]*\]/gi, "");
+  t = t.replace(/\[Editor'?s? [Nn]ote[^\]]*\]/gi, "");
+  t = t.replace(/\[pg \d+\]/gi, "");
+  t = t.replace(/\[\d+\]/g, ""); // footnote numbers like [1]
+
+  // Normalize line endings
+  t = t.replace(/\r\n/g, "\n");
+  t = t.replace(/\t/g, " ");
+
+  // Collapse single newlines to spaces (preserve paragraph breaks)
+  t = t.replace(/\n{2,}/g, "\n\n");  // normalize multi-newlines to double
+  t = t.replace(/(?<!\n)\n(?!\n)/g, " "); // single newline → space
+
+  // Clean up whitespace
+  t = t.replace(/ {2,}/g, " ");
+
+  // Paragraph breaks → period + space for clean sentence flow
+  t = t.replace(/\n\n/g, ". ");
+  // Clean up double periods from conversion
+  t = t.replace(/\.\s*\.\s*/g, ". ");
+  t = t.replace(/[!?]\s*\.\s/g, (m) => m[0] + " ");
+
+  return t.trim();
 }
 
 function cleanPoetry(text: string): string {
@@ -135,11 +157,21 @@ async function fetchUrl(
   }
 }
 
-/** Extract text from a cheerio element, preserving line breaks */
+/** Extract text from a cheerio element with clean sentence boundaries */
 function extractTextWithBreaks($: cheerio.CheerioAPI, el: ReturnType<cheerio.CheerioAPI>): string {
-  // Replace <br> with newline markers before getting text
+  // Replace <br> with space
+  el.find("br").replaceWith(" ");
+  // Add sentence-boundary space after block elements
+  el.find("p, div, h1, h2, h3, h4, h5, h6, li, blockquote").each((_, e) => {
+    const $e = $(e);
+    $e.append(" ");
+  });
+  return el.text();
+}
+
+/** Extract text preserving line breaks — for poetry only */
+function extractTextForPoetry($: cheerio.CheerioAPI, el: ReturnType<cheerio.CheerioAPI>): string {
   el.find("br").replaceWith("\n");
-  // Add double newlines after block elements
   el.find("p, div, h1, h2, h3, h4, h5, h6, li, blockquote").each((_, e) => {
     const $e = $(e);
     $e.append("\n\n");
@@ -276,7 +308,7 @@ async function parsePoetryFoundation(url: string, html: string): Promise<Extract
   let text = "";
 
   if (poemEl && poemEl.length) {
-    text = extractTextWithBreaks($, poemEl);
+    text = extractTextForPoetry($, poemEl);
   }
 
   // JSON-LD fallback
@@ -289,7 +321,7 @@ async function parsePoetryFoundation(url: string, html: string): Promise<Extract
   if (!text || text.trim().length < 20) {
     const article = $("article").first();
     if (article.length) {
-      text = extractTextWithBreaks($, article);
+      text = extractTextForPoetry($, article);
     }
   }
 
@@ -324,7 +356,7 @@ async function parsePoetsOrg(url: string, html: string): Promise<ExtractResult> 
   for (const sel of selectors) {
     const el = $(sel).first();
     if (el.length && el.text().trim().length > 20) {
-      text = extractTextWithBreaks($, el);
+      text = extractTextForPoetry($, el);
       break;
     }
   }
@@ -337,7 +369,7 @@ async function parsePoetsOrg(url: string, html: string): Promise<ExtractResult> 
   if (!text || text.trim().length < 20) {
     const article = $("article").first();
     if (article.length) {
-      text = extractTextWithBreaks($, article);
+      text = extractTextForPoetry($, article);
     }
   }
 

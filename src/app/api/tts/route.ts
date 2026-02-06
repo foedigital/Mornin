@@ -20,6 +20,46 @@ const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 const MAX_CHUNK_CHARS = 5000;
 const MAX_TOTAL_CHARS = 50000; // ~7500 words safety cap
 
+/** Clean text for natural TTS reading — removes artifacts that cause pauses/choppiness */
+function normalizeForTTS(text: string): string {
+  let t = text;
+
+  // Remove Gutenberg/editorial artifacts
+  t = t.replace(/\[Illustration[^\]]*\]/gi, "");
+  t = t.replace(/\[Footnote[^\]]*\]/gi, "");
+  t = t.replace(/\[Transcriber'?s? [Nn]ote[^\]]*\]/gi, "");
+  t = t.replace(/\[Editor'?s? [Nn]ote[^\]]*\]/gi, "");
+  t = t.replace(/\[pg \d+\]/gi, "");
+  t = t.replace(/\*\*\*/g, "");
+  t = t.replace(/_{3,}/g, "");
+  t = t.replace(/-{3,}/g, " — ");
+
+  // Normalize line breaks: replace single newlines with spaces (prose flow)
+  // but preserve paragraph breaks (double newline → single period-space pause)
+  t = t.replace(/\r\n/g, "\n");
+  t = t.replace(/\n{2,}/g, " \n\n ");  // mark paragraph breaks
+  t = t.replace(/\n/g, " ");            // single newlines → space
+  t = t.replace(/ \n\n /g, ". ");       // paragraph breaks → gentle sentence pause
+  // Clean up double periods from paragraph break conversion
+  t = t.replace(/\.\s*\.\s*/g, ". ");
+  t = t.replace(/[.!?]\s*\.\s+/g, (m) => m.replace(/\.\s+$/, " "));
+
+  // Normalize whitespace
+  t = t.replace(/\t/g, " ");
+  t = t.replace(/ {2,}/g, " ");
+
+  // Fix common OCR/encoding artifacts
+  t = t.replace(/—/g, " — ");
+  t = t.replace(/\s+—\s+/g, " — ");
+  t = t.replace(/\.{3,}/g, "...");
+
+  // Remove stray brackets/formatting markers
+  t = t.replace(/\[\d+\]/g, "");        // footnote numbers like [1]
+  t = t.replace(/\{[^}]*\}/g, "");      // stray curly brace content
+
+  return t.trim();
+}
+
 /** Split text into chunks at sentence boundaries, each under MAX_CHUNK_CHARS */
 function splitTextForTTS(text: string): string[] {
   if (text.length <= MAX_CHUNK_CHARS) return [text];
@@ -88,11 +128,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid voice" }, { status: 400 });
     }
 
-    // Safety cap to prevent abuse
-    const trimmedText = text.slice(0, MAX_TOTAL_CHARS);
+    // Safety cap, then normalize for clean TTS reading
+    const normalizedText = normalizeForTTS(text.slice(0, MAX_TOTAL_CHARS));
 
     // Split long text into chunks and synthesize in parallel (up to 4 at once)
-    const textChunks = splitTextForTTS(trimmedText);
+    const textChunks = splitTextForTTS(normalizedText);
     const CONCURRENCY = 4;
     const audioBuffers: Buffer[] = new Array(textChunks.length);
 
