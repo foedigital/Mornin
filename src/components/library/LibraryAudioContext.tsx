@@ -28,10 +28,14 @@ const SILENT_MP3 =
   "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwMHAAAAAAD/+1DEAAAH+AV1UAAAIAAADSAAAABBCQ0Z2QkAALBkDg4sGQOD4ICARB8H38QBAEwfB8HwQdwfygIAgc/lAQBAEAQOD/ygIAgCAIHB///KAgCAIA//5QEAff/+UBAEAf/KAg7///5QEAQB///KD///8oCDv///lAQBAEAQBA5///8=";
 
 export const LIBRARY_VOICES = [
-  { id: "en-US-GuyNeural", name: "Guy", desc: "Male, calm" },
+  { id: "en-US-AndrewMultilingualNeural", name: "Andrew", desc: "Male, warm & natural" },
+  { id: "en-US-AvaMultilingualNeural", name: "Ava", desc: "Female, smooth & clear" },
+  { id: "en-US-BrianMultilingualNeural", name: "Brian", desc: "Male, deep & steady" },
   { id: "en-US-ChristopherNeural", name: "Christopher", desc: "Male, clear" },
   { id: "en-US-JennyNeural", name: "Jenny", desc: "Female, natural" },
   { id: "en-US-AriaNeural", name: "Aria", desc: "Female, expressive" },
+  { id: "en-US-GuyNeural", name: "Guy", desc: "Male, calm" },
+  { id: "en-GB-SoniaNeural", name: "Sonia", desc: "British female" },
   { id: "en-GB-RyanNeural", name: "Ryan", desc: "British male" },
 ] as const;
 
@@ -185,12 +189,11 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     const nextChapterData = book.chapters[nextIdx];
     if (!nextChapterData) return;
 
-    const cacheKey = audioCacheKey(book.id, nextIdx);
+    const cacheKey = audioCacheKey(book.id, nextIdx, voice.id);
 
     // Check cache, if missing start pre-fetching
     getCachedAudio(cacheKey).then((cached) => {
       if (cached) return; // already cached
-      console.log(`Pre-generating audio for chapter ${nextIdx + 1}...`);
       fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -198,12 +201,9 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       })
         .then((res) => (res.ok ? res.blob() : null))
         .then((blob) => {
-          if (blob) {
-            setCachedAudio(cacheKey, blob);
-            console.log(`Pre-generated chapter ${nextIdx + 1} audio cached`);
-          }
+          if (blob) setCachedAudio(cacheKey, blob);
         })
-        .catch(() => {}); // silent fail — will retry when actually needed
+        .catch(() => {});
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPlaying, currentChapter, voice.id]);
@@ -282,7 +282,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
         audio.src = SILENT_MP3;
         await audio.play().catch(() => {});
 
-        const cacheKey = audioCacheKey(book.id, chapterIndex);
+        const cacheKey = audioCacheKey(book.id, chapterIndex, voice.id);
         let blob = await getCachedAudio(cacheKey);
 
         if (!blob) {

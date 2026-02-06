@@ -4,12 +4,18 @@ import { EdgeTTS } from "@andresaya/edge-tts";
 export const maxDuration = 60;
 
 const VALID_VOICES = [
-  "en-US-GuyNeural",
+  "en-US-AndrewMultilingualNeural",
+  "en-US-AvaMultilingualNeural",
+  "en-US-BrianMultilingualNeural",
   "en-US-ChristopherNeural",
   "en-US-JennyNeural",
   "en-US-AriaNeural",
+  "en-US-GuyNeural",
+  "en-GB-SoniaNeural",
   "en-GB-RyanNeural",
 ];
+
+const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 
 const MAX_CHUNK_CHARS = 5000;
 const MAX_TOTAL_CHARS = 50000; // ~7500 words safety cap
@@ -59,10 +65,10 @@ function splitTextForTTS(text: string): string[] {
   return chunks.filter((c) => c.length > 0);
 }
 
-/** Synthesize a single text chunk to MP3 audio buffer */
+/** Synthesize a single text chunk to MP3 audio buffer at high quality */
 async function synthesizeChunk(text: string, voice: string): Promise<Buffer> {
   const tts = new EdgeTTS();
-  await tts.synthesize(text, voice);
+  await tts.synthesize(text, voice, { outputFormat: AUDIO_FORMAT });
   const buf = tts.toBuffer();
   if (!buf || buf.byteLength === 0) {
     throw new Error("No audio generated for chunk");
@@ -72,7 +78,7 @@ async function synthesizeChunk(text: string, voice: string): Promise<Buffer> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voice = "en-US-GuyNeural" } = await req.json();
+    const { text, voice = "en-US-AndrewMultilingualNeural" } = await req.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });

@@ -99,7 +99,10 @@ export async function updateBookLastPlayed(id: string): Promise<void> {
 
 // --- Audio Cache ---
 
-export function audioCacheKey(bookId: string, chapterIndex: number): string {
+export function audioCacheKey(bookId: string, chapterIndex: number, voiceId?: string): string {
+  if (voiceId) {
+    return `${bookId}-${chapterIndex}-${voiceId}`;
+  }
   return `${bookId}-${chapterIndex}`;
 }
 
