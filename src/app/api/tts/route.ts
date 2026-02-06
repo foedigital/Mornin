@@ -91,13 +91,19 @@ export async function POST(req: NextRequest) {
     // Safety cap to prevent abuse
     const trimmedText = text.slice(0, MAX_TOTAL_CHARS);
 
-    // Split long text into chunks and synthesize each
+    // Split long text into chunks and synthesize in parallel (up to 4 at once)
     const textChunks = splitTextForTTS(trimmedText);
-    const audioBuffers: Buffer[] = [];
+    const CONCURRENCY = 4;
+    const audioBuffers: Buffer[] = new Array(textChunks.length);
 
-    for (const chunk of textChunks) {
-      const buf = await synthesizeChunk(chunk, voice);
-      audioBuffers.push(buf);
+    for (let batch = 0; batch < textChunks.length; batch += CONCURRENCY) {
+      const slice = textChunks.slice(batch, batch + CONCURRENCY);
+      const results = await Promise.all(
+        slice.map((chunk) => synthesizeChunk(chunk, voice))
+      );
+      for (let j = 0; j < results.length; j++) {
+        audioBuffers[batch + j] = results[j];
+      }
     }
 
     if (audioBuffers.length === 0) {
