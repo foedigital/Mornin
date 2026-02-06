@@ -9,8 +9,6 @@ import ArtSection from "@/components/ArtSection";
 import MediaSection from "@/components/MediaSection";
 import WorkoutSection from "@/components/WorkoutSection";
 import ReadingSection from "@/components/ReadingSection";
-import AudioPlayerBar from "@/components/AudioPlayerBar";
-import { TTSProvider } from "@/components/TTSContext";
 import { getToday } from "@/lib/dates";
 
 export default function Home() {
@@ -28,36 +26,33 @@ export default function Home() {
   if (!date) return null;
 
   return (
-    <TTSProvider>
-      <main className="min-h-screen px-4 py-8 pb-32 max-w-lg mx-auto">
-        {/* Date Header */}
-        <header className="mb-8 text-center">
-          <p className="text-accent font-medium text-sm uppercase tracking-widest mb-1">
-            {date.dayOfWeek}
-          </p>
-          <h1 className="text-4xl font-bold text-gray-100">
-            {date.month} {date.day}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">{date.year}</p>
-        </header>
+    <main className="min-h-screen px-4 py-8 pb-36 max-w-lg mx-auto">
+      {/* Date Header */}
+      <header className="mb-8 text-center">
+        <p className="text-accent font-medium text-sm uppercase tracking-widest mb-1">
+          {date.dayOfWeek}
+        </p>
+        <h1 className="text-4xl font-bold text-gray-100">
+          {date.month} {date.day}
+        </h1>
+        <p className="text-gray-500 text-sm mt-1">{date.year}</p>
+      </header>
 
-        {/* Content Sections */}
-        <div className="space-y-6">
-          <QuoteSection />
-          <MediaSection />
-          <WorkoutSection />
-          <ReadingSection />
-          <BattleSection />
-          <GospelSection />
-          <SaintSection />
-          <ArtSection />
-        </div>
+      {/* Content Sections */}
+      <div className="space-y-6">
+        <QuoteSection />
+        <MediaSection />
+        <WorkoutSection />
+        <ReadingSection />
+        <BattleSection />
+        <GospelSection />
+        <SaintSection />
+        <ArtSection />
+      </div>
 
-        <footer className="text-center mt-12 mb-4">
-          <p className="text-gray-600 text-xs">Morning Motivation</p>
-        </footer>
-      </main>
-      <AudioPlayerBar />
-    </TTSProvider>
+      <footer className="text-center mt-12 mb-4">
+        <p className="text-gray-600 text-xs">Morning Motivation</p>
+      </footer>
+    </main>
   );
 }

@@ -42,7 +42,7 @@ export default function AudioPlayerBar() {
 
   return (
     <div
-      className={`fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ease-out ${
+      className={`fixed bottom-14 left-0 right-0 z-50 transition-transform duration-300 ease-out ${
         isVisible ? "translate-y-0" : "translate-y-full"
       }`}
     >

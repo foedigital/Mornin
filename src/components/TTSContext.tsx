@@ -184,6 +184,7 @@ export function TTSProvider({ children }: { children: ReactNode }) {
     };
 
     window.speechSynthesis.speak(utterance);
+    window.dispatchEvent(new CustomEvent("speechsynthesis-play"));
   }, []);
 
   // Start playing — MUST be called from user click handler for iOS
@@ -337,6 +338,21 @@ export function TTSProvider({ children }: { children: ReactNode }) {
         window.speechSynthesis.cancel();
       }
     };
+  }, []);
+
+  // Mutual exclusion: pause speechSynthesis when library audio starts
+  useEffect(() => {
+    const handler = () => {
+      if (isPlayingRef.current) {
+        isPlayingRef.current = false;
+        window.speechSynthesis.cancel();
+        setIsPlaying(false);
+        setIsPaused(false);
+        savePosition(contentIdRef.current, currentIndexRef.current);
+      }
+    };
+    window.addEventListener("library-audio-play", handler);
+    return () => window.removeEventListener("library-audio-play", handler);
   }, []);
 
   const value: TTSContextValue = {
