@@ -9,6 +9,66 @@ export interface Chapter {
 }
 
 export function chunkIntoChapters(text: string): Chapter[] {
+  const totalWords = text.split(/\s+/).length;
+
+  // Short texts (poems, short essays): single chapter
+  if (totalWords < MIN_WORDS * 2) {
+    return [
+      {
+        index: 0,
+        title: "Full Text",
+        text,
+        wordCount: totalWords,
+      },
+    ];
+  }
+
+  // Check for explicit chapter markers in the text
+  const chapterPattern = /\n\s*(CHAPTER|Chapter|PART|Part|BOOK|Book|ACT|Act|SECTION|Section)\s+([IVXLCDM\d]+[.:)  ]*.*)/g;
+  const markers: { index: number; label: string }[] = [];
+  let match;
+  while ((match = chapterPattern.exec(text)) !== null) {
+    markers.push({ index: match.index, label: match[0].trim() });
+  }
+
+  // If we found chapter markers, split on them
+  if (markers.length >= 2) {
+    const chapters: Chapter[] = [];
+    for (let i = 0; i < markers.length; i++) {
+      const start = markers[i].index;
+      const end = i + 1 < markers.length ? markers[i + 1].index : text.length;
+      const chapterText = text.slice(start, end).trim();
+      const wordCount = chapterText.split(/\s+/).length;
+      if (wordCount > 20) {
+        chapters.push({
+          index: chapters.length,
+          title: markers[i].label.slice(0, 80),
+          text: chapterText,
+          wordCount,
+        });
+      }
+    }
+    // Prepend any text before the first marker as a "Preface" if substantial
+    if (markers[0].index > 0) {
+      const preface = text.slice(0, markers[0].index).trim();
+      const prefaceWords = preface.split(/\s+/).length;
+      if (prefaceWords > 50) {
+        chapters.unshift({
+          index: 0,
+          title: "Preface",
+          text: preface,
+          wordCount: prefaceWords,
+        });
+        // Re-index
+        for (let i = 1; i < chapters.length; i++) {
+          chapters[i].index = i;
+        }
+      }
+    }
+    if (chapters.length >= 2) return chapters;
+  }
+
+  // Default: split by paragraph boundaries at ~750 words
   const paragraphs = text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
