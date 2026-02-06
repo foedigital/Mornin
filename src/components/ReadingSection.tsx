@@ -159,6 +159,7 @@ export default function ReadingSection() {
             contentId={readingKey(reading)}
             title={reading.title}
             author={reading.author}
+            url={reading.url}
             isPoetry={reading.type === "poem"}
           />
         </div>
