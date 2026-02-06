@@ -8,6 +8,10 @@ const pwaConfig = withPWA({
 });
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ["@andresaya/edge-tts", "ws"],
+  },
+};
 
 export default pwaConfig(nextConfig);

@@ -20,6 +20,10 @@ import {
 } from "@/lib/library-db";
 
 const VOICE_KEY = "mornin-library-voice";
+const SPEED_KEY = "mornin-library-speed";
+const SPEED_OPTIONS = [1, 1.25, 1.5, 1.75, 2] as const;
+export type PlaybackSpeed = (typeof SPEED_OPTIONS)[number];
+export { SPEED_OPTIONS };
 const SILENT_MP3 =
   "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwMHAAAAAAD/+1DEAAAH+AV1UAAAIAAADSAAAABBCQ0Z2QkAALBkDg4sGQOD4ICARB8H38QBAEwfB8HwQdwfygIAgc/lAQBAEAQOD/ygIAgCAIHB///KAgCAIA//5QEAff/+UBAEAf/KAg7///5QEAQB///KD///8oCDv///lAQBAEAQBA5///8=";
 
@@ -45,6 +49,7 @@ interface LibraryAudioState {
   duration: number;
   currentTime: number;
   voice: LibraryVoice;
+  speed: PlaybackSpeed;
 }
 
 interface LibraryAudioContextValue extends LibraryAudioState {
@@ -55,6 +60,7 @@ interface LibraryAudioContextValue extends LibraryAudioState {
   prevChapter: () => void;
   seekTo: (time: number) => void;
   setVoice: (voice: LibraryVoice) => void;
+  setSpeed: (speed: PlaybackSpeed) => void;
   close: () => void;
 }
 
@@ -76,6 +82,15 @@ function loadSavedVoice(): LibraryVoice {
   }
 }
 
+function loadSavedSpeed(): PlaybackSpeed {
+  try {
+    const s = parseFloat(localStorage.getItem(SPEED_KEY) || "1");
+    return (SPEED_OPTIONS as readonly number[]).includes(s) ? (s as PlaybackSpeed) : 1;
+  } catch {
+    return 1;
+  }
+}
+
 export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const [isActive, setIsActive] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -88,14 +103,16 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [voice, setVoiceState] = useState<LibraryVoice>(LIBRARY_VOICES[0]);
+  const [speed, setSpeedState] = useState<PlaybackSpeed>(1);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bookRef = useRef<Book | null>(null);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Load saved voice on mount
+  // Load saved voice and speed on mount
   useEffect(() => {
     setVoiceState(loadSavedVoice());
+    setSpeedState(loadSavedSpeed());
   }, []);
 
   // Create audio element
@@ -156,6 +173,40 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new CustomEvent("library-audio-play"));
     }
   }, [isPlaying]);
+
+  // Pre-generate next chapter audio in background
+  useEffect(() => {
+    if (!isPlaying || currentChapter === null) return;
+    const book = bookRef.current;
+    if (!book) return;
+    const nextIdx = currentChapter + 1;
+    if (nextIdx >= book.chapters.length) return;
+
+    const nextChapterData = book.chapters[nextIdx];
+    if (!nextChapterData) return;
+
+    const cacheKey = audioCacheKey(book.id, nextIdx);
+
+    // Check cache, if missing start pre-fetching
+    getCachedAudio(cacheKey).then((cached) => {
+      if (cached) return; // already cached
+      console.log(`Pre-generating audio for chapter ${nextIdx + 1}...`);
+      fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: nextChapterData.text, voice: voice.id }),
+      })
+        .then((res) => (res.ok ? res.blob() : null))
+        .then((blob) => {
+          if (blob) {
+            setCachedAudio(cacheKey, blob);
+            console.log(`Pre-generated chapter ${nextIdx + 1} audio cached`);
+          }
+        })
+        .catch(() => {}); // silent fail — will retry when actually needed
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isPlaying, currentChapter, voice.id]);
 
   // Listen for speechSynthesis starting — pause library audio
   useEffect(() => {
@@ -321,6 +372,23 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, []);
 
+  const setSpeed = useCallback((s: PlaybackSpeed) => {
+    setSpeedState(s);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = s;
+    }
+    try {
+      localStorage.setItem(SPEED_KEY, String(s));
+    } catch {}
+  }, []);
+
+  // Apply speed whenever it changes or audio source changes
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = speed;
+    }
+  }, [speed, currentChapter]);
+
   const close = useCallback(() => {
     const audio = audioRef.current;
     if (audio) {
@@ -355,6 +423,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     duration,
     currentTime,
     voice,
+    speed,
     playChapter,
     pause,
     resume,
@@ -362,6 +431,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     prevChapter,
     seekTo,
     setVoice,
+    setSpeed,
     close,
   };
 

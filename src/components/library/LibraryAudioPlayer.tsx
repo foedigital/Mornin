@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { useLibraryAudio, LIBRARY_VOICES } from "@/components/library/LibraryAudioContext";
+import { useLibraryAudio, LIBRARY_VOICES, SPEED_OPTIONS } from "@/components/library/LibraryAudioContext";
+import type { PlaybackSpeed } from "@/components/library/LibraryAudioContext";
 
 function formatTime(seconds: number): string {
   if (!isFinite(seconds) || seconds < 0) return "0:00";
@@ -22,12 +23,14 @@ export default function LibraryAudioPlayer() {
     currentTime,
     currentChapter,
     voice,
+    speed,
     pause,
     resume,
     nextChapter,
     prevChapter,
     seekTo,
     setVoice,
+    setSpeed,
     close,
   } = useLibraryAudio();
 
@@ -154,10 +157,22 @@ export default function LibraryAudioPlayer() {
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <span className="text-xs text-gray-500 w-10 text-right tabular-nums">
                 {formatTime(duration)}
               </span>
+              {/* Speed control */}
+              <button
+                onClick={() => {
+                  const idx = SPEED_OPTIONS.indexOf(speed);
+                  const next = SPEED_OPTIONS[(idx + 1) % SPEED_OPTIONS.length];
+                  setSpeed(next);
+                }}
+                className="px-1.5 py-0.5 text-xs font-medium text-gray-400 hover:text-accent bg-white/5 hover:bg-white/10 rounded transition-colors min-w-[2.5rem]"
+                aria-label={`Playback speed: ${speed}x`}
+              >
+                {speed}x
+              </button>
               <button
                 onClick={() => setShowVoices((v) => !v)}
                 className="p-1 text-gray-500 hover:text-gray-300 transition-colors"

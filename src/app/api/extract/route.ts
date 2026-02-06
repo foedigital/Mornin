@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as cheerio from "cheerio";
+import { Readability } from "@mozilla/readability";
+import { parseHTML } from "linkedom";
 import { chunkIntoChapters } from "@/lib/chunker";
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const BROWSER_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
@@ -385,18 +387,37 @@ async function parsePresidency(url: string, html: string): Promise<ExtractResult
 }
 
 // ---------------------------------------------------------------------------
-// Generic fallback parser
+// Generic fallback parser — uses Mozilla Readability (powers Firefox Reader)
 // ---------------------------------------------------------------------------
 
 function parseGeneric(url: string, html: string): ExtractResult {
+  // First try Mozilla Readability — the industry-standard article extractor
+  try {
+    const { document } = parseHTML(html);
+    const reader = new Readability(document as unknown as Document);
+    const article = reader.parse();
+
+    if (article && article.textContent && article.textContent.trim().length > 200) {
+      const text = cleanProse(article.textContent);
+      const title = article.title || "Untitled";
+      const author = article.byline || "Unknown author";
+      const wordCount = text.split(/\s+/).length;
+      let type: ContentType = "article";
+      if (wordCount > 30000) type = "novella";
+      else if (wordCount > 5000) type = "story";
+      return { title, author, text, type };
+    }
+  } catch (e) {
+    console.warn("Readability failed, falling back to cheerio:", e);
+  }
+
+  // Fallback: cheerio-based extraction for pages Readability can't handle
   const $ = cheerio.load(html);
 
-  // Remove noise
   $("script, style, nav, header, footer, aside, iframe, .sidebar, .ad, .advertisement, .nav, .menu, .comments, #comments, .share, .social").remove();
 
   let text = "";
 
-  // Priority: article > main > .content > .entry-content > .post-content > body paragraphs
   const selectors = [
     "article",
     "main",
@@ -415,7 +436,6 @@ function parseGeneric(url: string, html: string): ExtractResult {
     }
   }
 
-  // Last resort: grab all <p> tags
   if (!text || text.trim().length < 200) {
     const paragraphs: string[] = [];
     $("body p").each((_, el) => {
@@ -425,7 +445,6 @@ function parseGeneric(url: string, html: string): ExtractResult {
     text = paragraphs.join("\n\n");
   }
 
-  // JSON-LD fallback
   if (!text || text.trim().length < 100) {
     const ld = extractJsonLd($);
     if (ld.text) text = ld.text;
@@ -436,18 +455,80 @@ function parseGeneric(url: string, html: string): ExtractResult {
   let title = extractTitle($);
   let author = extractAuthor($) || "Unknown author";
 
-  // Also check JSON-LD for metadata
   const ld = extractJsonLd($);
   if (ld.title && title === "Untitled") title = ld.title;
   if (ld.author && author === "Unknown author") author = ld.author;
 
-  // Infer type
   const wordCount = text.split(/\s+/).length;
   let type: ContentType = "article";
   if (wordCount > 30000) type = "novella";
   else if (wordCount > 5000) type = "story";
 
   return { title, author, text, type };
+}
+
+// ---------------------------------------------------------------------------
+// Jina Reader API fallback for JS-rendered sites
+// ---------------------------------------------------------------------------
+
+async function fetchViaJinaReader(url: string): Promise<ExtractResult | null> {
+  try {
+    const jinaUrl = `https://r.jina.ai/${url}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 20000);
+
+    const res = await fetch(jinaUrl, {
+      headers: {
+        Accept: "text/plain",
+        "X-Return-Format": "text",
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) return null;
+
+    const raw = await res.text();
+    if (!raw || raw.trim().length < 100) return null;
+
+    // Jina returns markdown — extract title from first # heading if present
+    const lines = raw.split("\n");
+    let title = "Untitled";
+    let textStart = 0;
+
+    if (lines[0]?.startsWith("Title:")) {
+      title = lines[0].replace(/^Title:\s*/, "").trim();
+      textStart = 1;
+    } else if (lines[0]?.startsWith("# ")) {
+      title = lines[0].replace(/^#\s*/, "").trim();
+      textStart = 1;
+    }
+
+    // Look for author in early metadata lines
+    let author = "Unknown author";
+    for (let i = textStart; i < Math.min(textStart + 5, lines.length); i++) {
+      if (lines[i]?.startsWith("Author:") || lines[i]?.startsWith("By ")) {
+        author = lines[i].replace(/^(Author:|By)\s*/i, "").trim();
+        textStart = i + 1;
+        break;
+      }
+    }
+
+    // Skip any URL: or Source: metadata lines
+    while (textStart < lines.length && /^(URL|Source|Date|Published):/.test(lines[textStart] || "")) {
+      textStart++;
+    }
+
+    const text = cleanProse(lines.slice(textStart).join("\n"));
+    const wordCount = text.split(/\s+/).length;
+    let type: ContentType = "article";
+    if (wordCount > 30000) type = "novella";
+    else if (wordCount > 5000) type = "story";
+
+    return { title, author, text, type };
+  } catch {
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -531,6 +612,15 @@ export async function POST(req: NextRequest) {
           break;
         default:
           result = parseGeneric(url, html);
+      }
+    }
+
+    // If primary extraction got too little text, try Jina Reader (handles JS-rendered sites)
+    if (!result.text || result.text.length < 100) {
+      console.log("Primary extraction insufficient, trying Jina Reader...");
+      const jinaResult = await fetchViaJinaReader(url);
+      if (jinaResult && jinaResult.text.length >= 100) {
+        result = jinaResult;
       }
     }
 
