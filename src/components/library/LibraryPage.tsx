@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import {
   getAllBooks,
+  addBook,
   deleteBook,
   getProgress,
   getBookCachedChapterCount,
@@ -16,9 +17,29 @@ import {
   type Book,
   type BookProgress,
 } from "@/lib/library-db";
+import readingsData from "../../../data/readings.json";
 import AddBookForm from "@/components/library/AddBookForm";
 import BookCard, { type DownloadStatus } from "@/components/library/BookCard";
 import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
+
+interface ImportState {
+  active: boolean;
+  phase: "extracting" | "audio" | "done";
+  total: number;
+  done: number;
+  failed: number;
+  currentTitle: string;
+}
+
+const TYPE_PRIORITY: Record<string, number> = {
+  poem: 0,
+  speech: 1,
+  essay: 1,
+  "short story": 2,
+  philosophy: 3,
+  novella: 4,
+  "short story collection": 5,
+};
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
@@ -35,6 +56,8 @@ export default function LibraryPage() {
   const [totalStorageUsed, setTotalStorageUsed] = useState(0);
   const [bookSizeMap, setBookSizeMap] = useState<Record<string, number>>({});
   const downloadAbortRef = useRef<Record<string, boolean>>({});
+  const [importState, setImportState] = useState<ImportState | null>(null);
+  const importAbortRef = useRef(false);
 
   const { currentBookId, currentChapter, playChapter } = useLibraryAudio();
 
@@ -222,6 +245,156 @@ export default function LibraryPage() {
     setTotalStorageUsed((prev) => Math.max(0, prev - freed));
   }, []);
 
+  const handleImportArchive = useCallback(async () => {
+    if (importState?.active) return;
+    importAbortRef.current = false;
+
+    // Get existing book URLs to skip duplicates
+    const existingBooks = await getAllBooks();
+    const existingUrls = new Set(existingBooks.map((b) => b.url));
+
+    // Filter and sort readings by priority (short content first)
+    const toImport = (readingsData.readings as { title: string; author: string; type: string; url: string }[])
+      .filter((r) => !existingUrls.has(r.url))
+      .sort((a, b) => (TYPE_PRIORITY[a.type] ?? 99) - (TYPE_PRIORITY[b.type] ?? 99));
+
+    if (toImport.length === 0) return;
+
+    setImportState({
+      active: true,
+      phase: "extracting",
+      total: toImport.length,
+      done: 0,
+      failed: 0,
+      currentTitle: toImport[0].title,
+    });
+
+    // Phase 1: Extract all readings, 3 concurrent
+    const EXTRACT_CONCURRENCY = 3;
+    const importedBooks: Book[] = [];
+    let doneCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < toImport.length; i += EXTRACT_CONCURRENCY) {
+      if (importAbortRef.current) break;
+
+      const batch = toImport.slice(i, i + EXTRACT_CONCURRENCY);
+      const results = await Promise.allSettled(
+        batch.map(async (reading) => {
+          const res = await fetch("/api/extract", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: reading.url }),
+          });
+          if (!res.ok) throw new Error("Extract failed");
+          const data = await res.json();
+          const book: Book = {
+            id: crypto.randomUUID(),
+            url: reading.url,
+            title: data.title || reading.title,
+            author: data.author || reading.author,
+            chapters: data.chapters,
+            dateAdded: Date.now() - (toImport.indexOf(reading)), // preserve sort order
+            lastPlayed: 0,
+          };
+          await addBook(book);
+          return book;
+        })
+      );
+
+      for (const r of results) {
+        if (r.status === "fulfilled") {
+          importedBooks.push(r.value);
+          doneCount++;
+          // Add to UI immediately
+          setBooks((prev) => {
+            if (prev.some((b) => b.url === r.value.url)) return prev;
+            return [r.value, ...prev];
+          });
+          setDownloadStatusMap((prev) => ({ ...prev, [r.value.id]: "none" }));
+        } else {
+          failCount++;
+          doneCount++;
+        }
+      }
+
+      const nextTitle = i + EXTRACT_CONCURRENCY < toImport.length
+        ? toImport[i + EXTRACT_CONCURRENCY].title
+        : "";
+      setImportState({
+        active: true,
+        phase: "extracting",
+        total: toImport.length,
+        done: doneCount,
+        failed: failCount,
+        currentTitle: nextTitle,
+      });
+    }
+
+    if (importAbortRef.current || importedBooks.length === 0) {
+      setImportState(null);
+      return;
+    }
+
+    // Phase 2: Pre-generate Ch.1 audio one at a time
+    setImportState({
+      active: true,
+      phase: "audio",
+      total: importedBooks.length,
+      done: 0,
+      failed: failCount,
+      currentTitle: importedBooks[0].title,
+    });
+
+    let audioDone = 0;
+    for (const book of importedBooks) {
+      if (importAbortRef.current) break;
+      if (!book.chapters[0]) continue;
+
+      setImportState((prev) => prev ? { ...prev, currentTitle: book.title, done: audioDone } : prev);
+
+      try {
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: book.chapters[0].text,
+            voice: DOWNLOAD_VOICE_ID,
+          }),
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const key = audioCacheKey(book.id, 0, DOWNLOAD_VOICE_ID);
+          await setCachedAudio(key, blob);
+        }
+      } catch {
+        // Non-critical, skip
+      }
+      audioDone++;
+      setImportState((prev) => prev ? { ...prev, done: audioDone } : prev);
+    }
+
+    setImportState({ active: false, phase: "done", total: toImport.length, done: doneCount, failed: failCount, currentTitle: "" });
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => setImportState(null), 5000);
+
+    // Refresh storage stats
+    const storageUsed = await getTotalAudioCacheSize();
+    setTotalStorageUsed(storageUsed);
+  }, [importState]);
+
+  const handleCancelImport = useCallback(() => {
+    importAbortRef.current = true;
+    setImportState(null);
+  }, []);
+
+  // Count importable readings
+  const importableCount = loaded
+    ? readingsData.readings.filter(
+        (r) => !books.some((b) => b.url === r.url)
+      ).length
+    : 0;
+
   if (!loaded) return null;
 
   const storagePercent = Math.min(100, (totalStorageUsed / MAX_DOWNLOAD_BYTES) * 100);
@@ -235,6 +408,68 @@ export default function LibraryPage() {
       </header>
 
       <AddBookForm onBookAdded={handleBookAdded} />
+
+      {/* Import from archive */}
+      {importState?.active ? (
+        <div className="card mb-6 border border-accent/20">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-accent animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              <span className="text-sm font-medium text-gray-200">
+                {importState.phase === "extracting"
+                  ? "Importing books..."
+                  : "Pre-generating audio..."}
+              </span>
+            </div>
+            <button
+              onClick={handleCancelImport}
+              className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden mb-2">
+            <div
+              className="h-full bg-accent rounded-full transition-all duration-300"
+              style={{ width: `${Math.max((importState.done / importState.total) * 100, 2)}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-xs text-gray-500">
+            <span className="truncate mr-2">{importState.currentTitle}</span>
+            <span className="flex-shrink-0">
+              {importState.done}/{importState.total}
+              {importState.failed > 0 && (
+                <span className="text-red-400 ml-1">({importState.failed} failed)</span>
+              )}
+            </span>
+          </div>
+        </div>
+      ) : importState?.phase === "done" ? (
+        <div className="card mb-6 border border-green-500/20">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-sm text-green-300">
+              Library ready! {importState.done - importState.failed} books imported.
+              {importState.failed > 0 && ` (${importState.failed} failed)`}
+            </span>
+          </div>
+        </div>
+      ) : importableCount > 0 ? (
+        <button
+          onClick={handleImportArchive}
+          className="w-full card mb-6 flex items-center justify-center gap-2 py-3 text-sm text-accent hover:bg-white/5 transition-colors"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
+          Import {importableCount} books from Reading Archive
+        </button>
+      ) : null}
 
       {/* Storage bar */}
       {books.length > 0 && (
