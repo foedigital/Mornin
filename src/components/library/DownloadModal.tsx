@@ -10,6 +10,7 @@ import {
   DOWNLOAD_VOICE_ID,
   type Book,
 } from "@/lib/library-db";
+import { preprocessForTTS, aggressiveCleanup } from "@/lib/tts-preprocessor";
 
 interface DownloadModalProps {
   url: string;
@@ -37,6 +38,7 @@ export default function DownloadModal({
   const [chaptersTotal, setChaptersTotal] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
   const [currentChapterTitle, setCurrentChapterTitle] = useState("");
+  const [placeholderCount, setPlaceholderCount] = useState(0);
   const [bookTitle, setBookTitle] = useState(title);
   const [bookAuthor, setBookAuthor] = useState(author);
   const abortRef = useRef(false);
@@ -115,42 +117,82 @@ export default function DownloadModal({
         return;
       }
 
-      // Process chapters sequentially with retries
+      // Process chapters sequentially with retries + fallback + placeholder
       let doneCount = alreadyCached;
+      let placeholderCount = 0;
       const bookForClosure = book;
 
       for (const chIdx of toGenerate) {
         if (abortRef.current) return;
 
-        setCurrentChapterTitle(bookForClosure.chapters[chIdx].title);
+        const chTitle = bookForClosure.chapters[chIdx].title;
+        setCurrentChapterTitle(chTitle);
 
-        let success = false;
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        const rawText = bookForClosure.chapters[chIdx].text;
+        const preprocessed = preprocessForTTS(rawText);
+        let generated = false;
+
+        // Attempt 1: preprocessed text, up to MAX_RETRIES
+        for (let attempt = 1; attempt <= MAX_RETRIES && !generated; attempt++) {
           try {
             const res = await fetch("/api/tts", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                text: bookForClosure.chapters[chIdx].text,
-                voice: DOWNLOAD_VOICE_ID,
-              }),
+              body: JSON.stringify({ text: preprocessed, voice: DOWNLOAD_VOICE_ID }),
             });
             if (!res.ok) throw new Error("TTS failed");
             const blob = await res.blob();
             const key = audioCacheKey(bookForClosure.id, chIdx, DOWNLOAD_VOICE_ID);
             await setCachedAudio(key, blob);
-            success = true;
-            break;
+            generated = true;
           } catch (err) {
-            console.warn(`Ch ${chIdx} attempt ${attempt}/${MAX_RETRIES} failed:`, err);
+            console.warn(`Ch ${chIdx} preprocessed attempt ${attempt}/${MAX_RETRIES} failed:`, err);
             if (attempt < MAX_RETRIES) {
               await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
             }
           }
         }
 
-        if (!success) {
-          throw new Error(`Failed to generate chapter "${bookForClosure.chapters[chIdx].title}" after ${MAX_RETRIES} attempts`);
+        // Attempt 2: aggressive cleanup, one more try
+        if (!generated) {
+          console.warn(`Ch ${chIdx} trying aggressive cleanup...`);
+          const stripped = aggressiveCleanup(rawText);
+          try {
+            const res = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: stripped, voice: DOWNLOAD_VOICE_ID }),
+            });
+            if (res.ok) {
+              const blob = await res.blob();
+              const key = audioCacheKey(bookForClosure.id, chIdx, DOWNLOAD_VOICE_ID);
+              await setCachedAudio(key, blob);
+              generated = true;
+            }
+          } catch {
+            // will fall through to placeholder
+          }
+        }
+
+        // Attempt 3: generate placeholder audio
+        if (!generated) {
+          console.warn(`Ch ${chIdx} generating placeholder...`);
+          const placeholderText = `Chapter ${chIdx + 1} could not be generated. The text may contain content that is not supported by the audio reader. Please read this section in text mode.`;
+          try {
+            const res = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ text: placeholderText, voice: DOWNLOAD_VOICE_ID }),
+            });
+            if (res.ok) {
+              const blob = await res.blob();
+              const key = audioCacheKey(bookForClosure.id, chIdx, DOWNLOAD_VOICE_ID);
+              await setCachedAudio(key, blob);
+            }
+          } catch {
+            // Even placeholder failed — skip this chapter entirely
+          }
+          placeholderCount++;
         }
 
         doneCount++;
@@ -164,6 +206,7 @@ export default function DownloadModal({
 
       if (abortRef.current) return;
 
+      setPlaceholderCount(placeholderCount);
       setPhase("done");
       onComplete(bookForClosure);
     } catch (err) {
@@ -241,7 +284,14 @@ export default function DownloadModal({
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-sm text-green-300 mb-6">Audiobook ready!</p>
+            {placeholderCount > 0 ? (
+              <p className="text-sm text-amber-300 mb-6">
+                Download complete! {chaptersTotal - placeholderCount}/{chaptersTotal} chapters generated.{" "}
+                {placeholderCount} chapter{placeholderCount > 1 ? "s have" : " has"} limited audio.
+              </p>
+            ) : (
+              <p className="text-sm text-green-300 mb-6">Audiobook ready!</p>
+            )}
             <button
               onClick={onClose}
               className="w-full py-3 bg-accent hover:bg-accent-light text-dark-bg font-medium rounded-xl transition-colors"

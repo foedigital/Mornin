@@ -22,6 +22,7 @@ import readingsData from "../../../data/readings.json";
 import AddBookForm from "@/components/library/AddBookForm";
 import BookCard, { type DownloadStatus } from "@/components/library/BookCard";
 import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
+import { preprocessForTTS, aggressiveCleanup } from "@/lib/tts-preprocessor";
 
 interface ImportState {
   active: boolean;
@@ -184,23 +185,23 @@ export default function LibraryPage() {
         for (const chIdx of toGenerate) {
           if (downloadAbortRef.current[bookId]) break;
 
-          let success = false;
-          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          const rawText = book.chapters[chIdx].text;
+          const preprocessed = preprocessForTTS(rawText);
+          let generated = false;
+
+          // Attempt 1: preprocessed text, up to MAX_RETRIES
+          for (let attempt = 1; attempt <= MAX_RETRIES && !generated; attempt++) {
             try {
               const res = await fetch("/api/tts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  text: book.chapters[chIdx].text,
-                  voice: DOWNLOAD_VOICE_ID,
-                }),
+                body: JSON.stringify({ text: preprocessed, voice: DOWNLOAD_VOICE_ID }),
               });
               if (!res.ok) throw new Error("TTS failed");
               const blob = await res.blob();
               const key = audioCacheKey(book.id, chIdx, DOWNLOAD_VOICE_ID);
               await setCachedAudio(key, blob);
-              success = true;
-              break;
+              generated = true;
             } catch (err) {
               console.warn(`Ch ${chIdx} attempt ${attempt}/${MAX_RETRIES} failed:`, err);
               if (attempt < MAX_RETRIES) {
@@ -209,7 +210,42 @@ export default function LibraryPage() {
             }
           }
 
-          if (success) doneCount++;
+          // Attempt 2: aggressive cleanup
+          if (!generated) {
+            const stripped = aggressiveCleanup(rawText);
+            try {
+              const res = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: stripped, voice: DOWNLOAD_VOICE_ID }),
+              });
+              if (res.ok) {
+                const blob = await res.blob();
+                const key = audioCacheKey(book.id, chIdx, DOWNLOAD_VOICE_ID);
+                await setCachedAudio(key, blob);
+                generated = true;
+              }
+            } catch { /* fall through to placeholder */ }
+          }
+
+          // Attempt 3: placeholder audio
+          if (!generated) {
+            const placeholderText = `Chapter ${chIdx + 1} could not be generated. The text may contain content that is not supported by the audio reader. Please read this section in text mode.`;
+            try {
+              const res = await fetch("/api/tts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: placeholderText, voice: DOWNLOAD_VOICE_ID }),
+              });
+              if (res.ok) {
+                const blob = await res.blob();
+                const key = audioCacheKey(book.id, chIdx, DOWNLOAD_VOICE_ID);
+                await setCachedAudio(key, blob);
+              }
+            } catch { /* skip entirely */ }
+          }
+
+          doneCount++;
           setDownloadProgressMap((prev) => ({
             ...prev,
             [bookId]: { done: doneCount, total: book.chapters.length },
@@ -360,11 +396,12 @@ export default function LibraryPage() {
       setImportState((prev) => prev ? { ...prev, currentTitle: book.title, done: audioDone } : prev);
 
       try {
+        const preprocessed = preprocessForTTS(book.chapters[0].text);
         const res = await fetch("/api/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            text: book.chapters[0].text,
+            text: preprocessed,
             voice: DOWNLOAD_VOICE_ID,
           }),
         });
