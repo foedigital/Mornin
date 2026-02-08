@@ -1,5 +1,5 @@
-const TARGET_WORDS = 750;
-const MIN_WORDS = 200;
+const TARGET_WORDS = 1500; // ~10 minutes at 150 wpm
+const MIN_WORDS = 400;
 
 export interface Chapter {
   index: number;

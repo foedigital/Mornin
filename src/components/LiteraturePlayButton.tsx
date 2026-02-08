@@ -55,6 +55,19 @@ export default function LiteraturePlayButton({
     return () => window.removeEventListener("library-audio-play", handler);
   }, []);
 
+  // Pause when another sample preview starts playing
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail !== contentId && audioRef.current) {
+        audioRef.current.pause();
+        setPlaying(false);
+      }
+    };
+    window.addEventListener("sample-audio-play", handler);
+    return () => window.removeEventListener("sample-audio-play", handler);
+  }, [contentId]);
+
   const handleClick = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -71,6 +84,7 @@ export default function LiteraturePlayButton({
       if (audioRef.current && audioRef.current.src && audioRef.current.paused && audioRef.current.currentTime > 0) {
         audioRef.current.play();
         setPlaying(true);
+        window.dispatchEvent(new CustomEvent("sample-audio-play", { detail: contentId }));
         return;
       }
 
@@ -109,8 +123,9 @@ export default function LiteraturePlayButton({
         audio.onplay = () => setPlaying(true);
 
         await audio.play();
-        // Dispatch event to pause other audio systems
+        // Dispatch events to pause other audio systems and other sample buttons
         window.dispatchEvent(new CustomEvent("speechsynthesis-play"));
+        window.dispatchEvent(new CustomEvent("sample-audio-play", { detail: contentId }));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed");
         setTimeout(() => setError(""), 3000);
