@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EdgeTTS } from "@andresaya/edge-tts";
 
-export const maxDuration = 60;
+export const maxDuration = 30;
 
 const VALID_VOICES = [
   "en-US-AndrewMultilingualNeural",
@@ -19,6 +19,9 @@ const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 
 const MAX_CHUNK_CHARS = 12000; // Edge TTS handles 10-15k well; fewer chunks = faster
 const MAX_TOTAL_CHARS = 100000; // ~15k words safety cap
+const MAX_WORDS = 600; // Reject requests over this to keep synthesis fast and reliable
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 2000;
 
 /** Clean text for natural TTS reading — removes artifacts that cause pauses/choppiness */
 function normalizeForTTS(text: string): string {
@@ -116,6 +119,23 @@ async function synthesizeChunk(text: string, voice: string): Promise<Buffer> {
   return buf;
 }
 
+/** Retry wrapper: attempts synthesis up to MAX_RETRIES times with delay between */
+async function synthesizeWithRetry(text: string, voice: string): Promise<Buffer> {
+  let lastError: Error | null = null;
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await synthesizeChunk(text, voice);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`TTS attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+      }
+    }
+  }
+  throw lastError ?? new Error("TTS synthesis failed after retries");
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { text, voice = "en-US-AndrewMultilingualNeural" } = await req.json();
@@ -128,22 +148,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid voice" }, { status: 400 });
     }
 
+    // Reject overly long requests — chapters should be ≤450 words
+    const wordCount = text.split(/\s+/).length;
+    if (wordCount > MAX_WORDS) {
+      return NextResponse.json(
+        { error: `Text too long (${wordCount} words, max ${MAX_WORDS}). Split into smaller chapters.` },
+        { status: 400 }
+      );
+    }
+
     // Safety cap, then normalize for clean TTS reading
     const normalizedText = normalizeForTTS(text.slice(0, MAX_TOTAL_CHARS));
 
-    // Split long text into chunks and synthesize in parallel (up to 6 at once)
+    // Split long text into chunks and synthesize with retries
     const textChunks = splitTextForTTS(normalizedText);
-    const CONCURRENCY = 6;
-    const audioBuffers: Buffer[] = new Array(textChunks.length);
+    const audioBuffers: Buffer[] = [];
 
-    for (let batch = 0; batch < textChunks.length; batch += CONCURRENCY) {
-      const slice = textChunks.slice(batch, batch + CONCURRENCY);
-      const results = await Promise.all(
-        slice.map((chunk) => synthesizeChunk(chunk, voice))
-      );
-      for (let j = 0; j < results.length; j++) {
-        audioBuffers[batch + j] = results[j];
-      }
+    for (const chunk of textChunks) {
+      const buf = await synthesizeWithRetry(chunk, voice);
+      audioBuffers.push(buf);
     }
 
     if (audioBuffers.length === 0) {

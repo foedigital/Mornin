@@ -21,7 +21,9 @@ interface DownloadModalProps {
 
 type Phase = "extracting" | "generating" | "done" | "error";
 
-const TTS_CONCURRENCY = 3;
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 2000;
+const CHAPTER_DELAY_MS = 500;
 
 export default function DownloadModal({
   url,
@@ -34,6 +36,7 @@ export default function DownloadModal({
   const [chaptersDone, setChaptersDone] = useState(0);
   const [chaptersTotal, setChaptersTotal] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const [currentChapterTitle, setCurrentChapterTitle] = useState("");
   const [bookTitle, setBookTitle] = useState(title);
   const [bookAuthor, setBookAuthor] = useState(author);
   const abortRef = useRef(false);
@@ -112,16 +115,18 @@ export default function DownloadModal({
         return;
       }
 
-      // Process chapters with concurrency
+      // Process chapters sequentially with retries
       let doneCount = alreadyCached;
       const bookForClosure = book;
 
-      for (let batch = 0; batch < toGenerate.length; batch += TTS_CONCURRENCY) {
+      for (const chIdx of toGenerate) {
         if (abortRef.current) return;
 
-        const batchIndices = toGenerate.slice(batch, batch + TTS_CONCURRENCY);
-        const results = await Promise.allSettled(
-          batchIndices.map(async (chIdx) => {
+        setCurrentChapterTitle(bookForClosure.chapters[chIdx].title);
+
+        let success = false;
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          try {
             const res = await fetch("/api/tts", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -134,13 +139,27 @@ export default function DownloadModal({
             const blob = await res.blob();
             const key = audioCacheKey(bookForClosure.id, chIdx, DOWNLOAD_VOICE_ID);
             await setCachedAudio(key, blob);
-          })
-        );
-
-        for (const r of results) {
-          if (r.status === "fulfilled") doneCount++;
+            success = true;
+            break;
+          } catch (err) {
+            console.warn(`Ch ${chIdx} attempt ${attempt}/${MAX_RETRIES} failed:`, err);
+            if (attempt < MAX_RETRIES) {
+              await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+            }
+          }
         }
+
+        if (!success) {
+          throw new Error(`Failed to generate chapter "${bookForClosure.chapters[chIdx].title}" after ${MAX_RETRIES} attempts`);
+        }
+
+        doneCount++;
         setChaptersDone(doneCount);
+
+        // Brief delay between chapters to avoid overwhelming the server
+        if (chIdx !== toGenerate[toGenerate.length - 1]) {
+          await new Promise((r) => setTimeout(r, CHAPTER_DELAY_MS));
+        }
       }
 
       if (abortRef.current) return;
@@ -198,15 +217,20 @@ export default function DownloadModal({
             <div className="flex items-center justify-between text-sm mb-2">
               <span className="text-gray-400">Generating audio</span>
               <span className="text-gray-400 tabular-nums">
-                Ch {chaptersDone}/{chaptersTotal}
+                {chaptersDone}/{chaptersTotal}
               </span>
             </div>
-            <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-4">
+            <div className="h-2 bg-white/5 rounded-full overflow-hidden mb-2">
               <div
                 className="h-full bg-accent rounded-full transition-all duration-300"
                 style={{ width: `${Math.max(progress * 100, 2)}%` }}
               />
             </div>
+            {currentChapterTitle && (
+              <p className="text-xs text-gray-500 truncate">
+                {currentChapterTitle}
+              </p>
+            )}
           </div>
         )}
 

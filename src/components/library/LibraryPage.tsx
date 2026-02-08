@@ -176,15 +176,17 @@ export default function LibraryPage() {
         [bookId]: { done: doneCount, total: book.chapters.length },
       }));
 
-      const DL_CONCURRENCY = 3;
+      const MAX_RETRIES = 3;
+      const RETRY_DELAY_MS = 2000;
+      const CHAPTER_DELAY_MS = 500;
 
       try {
-        for (let batch = 0; batch < toGenerate.length; batch += DL_CONCURRENCY) {
+        for (const chIdx of toGenerate) {
           if (downloadAbortRef.current[bookId]) break;
 
-          const batchIndices = toGenerate.slice(batch, batch + DL_CONCURRENCY);
-          const results = await Promise.allSettled(
-            batchIndices.map(async (chIdx) => {
+          let success = false;
+          for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
               const res = await fetch("/api/tts", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -197,16 +199,26 @@ export default function LibraryPage() {
               const blob = await res.blob();
               const key = audioCacheKey(book.id, chIdx, DOWNLOAD_VOICE_ID);
               await setCachedAudio(key, blob);
-            })
-          );
-
-          for (const r of results) {
-            if (r.status === "fulfilled") doneCount++;
+              success = true;
+              break;
+            } catch (err) {
+              console.warn(`Ch ${chIdx} attempt ${attempt}/${MAX_RETRIES} failed:`, err);
+              if (attempt < MAX_RETRIES) {
+                await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
+              }
+            }
           }
+
+          if (success) doneCount++;
           setDownloadProgressMap((prev) => ({
             ...prev,
             [bookId]: { done: doneCount, total: book.chapters.length },
           }));
+
+          // Brief delay between chapters
+          if (chIdx !== toGenerate[toGenerate.length - 1]) {
+            await new Promise((r) => setTimeout(r, CHAPTER_DELAY_MS));
+          }
         }
       } catch (err) {
         console.error("Download failed:", err);

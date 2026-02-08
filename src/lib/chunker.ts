@@ -1,5 +1,5 @@
-const TARGET_WORDS = 1500; // ~10 minutes at 150 wpm
-const MIN_WORDS = 400;
+const TARGET_WORDS = 450; // ~3 minutes at 150 wpm
+const MIN_WORDS = 150;
 
 export interface Chapter {
   index: number;
@@ -12,7 +12,7 @@ export function chunkIntoChapters(text: string): Chapter[] {
   const totalWords = text.split(/\s+/).length;
 
   // Short texts (poems, short essays): single chapter
-  if (totalWords < MIN_WORDS * 2) {
+  if (totalWords <= 550) {
     return [
       {
         index: 0,
@@ -68,7 +68,7 @@ export function chunkIntoChapters(text: string): Chapter[] {
     if (chapters.length >= 2) return chapters;
   }
 
-  // Default: split by paragraph boundaries at ~750 words
+  // Default: split by paragraph boundaries at ~450 words
   const paragraphs = text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
