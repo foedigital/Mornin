@@ -1,8 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
-import { addBook, getAllBooks, type Book } from "@/lib/library-db";
+import { useCallback, useState, useRef, useEffect } from "react";
 
 interface LiteraturePlayButtonProps {
   text: string;
@@ -13,98 +11,128 @@ interface LiteraturePlayButtonProps {
   isPoetry?: boolean;
 }
 
+const SAMPLE_VOICE = "en-US-AndrewMultilingualNeural";
+
+function first75Words(text: string): string {
+  const words = text.split(/\s+/);
+  return words.slice(0, 75).join(" ");
+}
+
+// In-memory cache so repeated taps don't re-generate
+const sampleCache = new Map<string, Blob>();
+
 export default function LiteraturePlayButton({
+  text,
   contentId,
   title,
-  url,
 }: LiteraturePlayButtonProps) {
-  const { playChapter, isPlaying, isLoading: audioLoading, currentBookId, pause } = useLibraryAudio();
-  const [extracting, setExtracting] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const [error, setError] = useState("");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const urlRef = useRef<string | null>(null);
 
-  // Check if this reading is the one currently playing
-  const isThisPlaying = isPlaying && currentBookId?.startsWith("reading-");
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+    };
+  }, []);
 
-  // We use a deterministic ID based on the contentId so we can find it again
-  const bookIdPrefix = `reading-${contentId.replace(/[^a-zA-Z0-9]/g, "-")}`;
+  // Pause when library audio starts
+  useEffect(() => {
+    const handler = () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        setPlaying(false);
+      }
+    };
+    window.addEventListener("library-audio-play", handler);
+    return () => window.removeEventListener("library-audio-play", handler);
+  }, []);
 
   const handleClick = useCallback(
     async (e: React.MouseEvent) => {
       e.stopPropagation();
       setError("");
 
-      // If this reading is currently playing, pause it
-      if (isThisPlaying) {
-        pause();
+      // If currently playing, pause
+      if (playing && audioRef.current) {
+        audioRef.current.pause();
+        setPlaying(false);
         return;
       }
 
-      setExtracting(true);
+      // If we already have audio loaded, resume
+      if (audioRef.current && audioRef.current.src && audioRef.current.paused && audioRef.current.currentTime > 0) {
+        audioRef.current.play();
+        setPlaying(true);
+        return;
+      }
+
+      setLoading(true);
 
       try {
-        // Check if we already have this book in the library
-        const allBooks = await getAllBooks();
-        let book = allBooks.find((b) => b.url === url);
+        const cacheKey = contentId;
+        let blob = sampleCache.get(cacheKey);
 
-        if (!book) {
-          // Extract content from URL
-          const res = await fetch("/api/extract", {
+        if (!blob) {
+          const sampleText = first75Words(text);
+          const res = await fetch("/api/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url }),
+            body: JSON.stringify({ text: sampleText, voice: SAMPLE_VOICE }),
           });
-
-          let data;
-          try {
-            data = await res.json();
-          } catch {
-            throw new Error("Failed to reach server");
-          }
-
-          if (!res.ok) {
-            throw new Error(data.error || "Failed to extract");
-          }
-
-          // Create the book
-          book = {
-            id: `${bookIdPrefix}-${Date.now()}`,
-            url,
-            title: data.title || title,
-            author: data.author || "Unknown",
-            chapters: data.chapters,
-            dateAdded: Date.now(),
-            lastPlayed: 0,
-          };
-
-          await addBook(book);
+          if (!res.ok) throw new Error("TTS failed");
+          blob = await res.blob();
+          sampleCache.set(cacheKey, blob);
         }
 
-        // Start playing chapter 0
-        playChapter(book, 0);
+        // Revoke old URL
+        if (urlRef.current) URL.revokeObjectURL(urlRef.current);
+        const url = URL.createObjectURL(blob);
+        urlRef.current = url;
+
+        if (!audioRef.current) {
+          audioRef.current = new Audio();
+        }
+        const audio = audioRef.current;
+        audio.src = url;
+        audio.currentTime = 0;
+
+        audio.onended = () => setPlaying(false);
+        audio.onpause = () => setPlaying(false);
+        audio.onplay = () => setPlaying(true);
+
+        await audio.play();
+        // Dispatch event to pause other audio systems
+        window.dispatchEvent(new CustomEvent("speechsynthesis-play"));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed");
         setTimeout(() => setError(""), 3000);
       } finally {
-        setExtracting(false);
+        setLoading(false);
       }
     },
-    [url, title, bookIdPrefix, playChapter, pause, isThisPlaying]
+    [text, contentId, playing]
   );
-
-  const loading = extracting || audioLoading;
 
   return (
     <button
       onClick={handleClick}
       disabled={loading}
       className={`relative flex items-center justify-center w-9 h-9 rounded-full transition-colors flex-shrink-0 ${
-        isThisPlaying
+        playing
           ? "bg-accent text-dark-bg"
           : error
           ? "bg-red-500/20 text-red-400"
           : "bg-white/10 text-gray-300 hover:bg-accent/20 hover:text-accent"
       } ${loading ? "opacity-70" : ""}`}
-      aria-label={isThisPlaying ? `Now playing ${title}` : `Listen to ${title}`}
+      aria-label={playing ? `Now playing ${title}` : `Listen to ${title}`}
       title={error || undefined}
     >
       {loading ? (
@@ -112,7 +140,7 @@ export default function LiteraturePlayButton({
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
-      ) : isThisPlaying ? (
+      ) : playing ? (
         <div className="flex items-center gap-0.5">
           <span className="w-0.5 h-3 bg-dark-bg rounded-full animate-pulse" />
           <span className="w-0.5 h-4 bg-dark-bg rounded-full animate-pulse [animation-delay:150ms]" />

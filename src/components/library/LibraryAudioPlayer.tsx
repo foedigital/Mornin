@@ -28,13 +28,20 @@ export default function LibraryAudioPlayer() {
     resume,
     nextChapter,
     prevChapter,
+    skipForward,
+    skipBack,
     seekTo,
     setVoice,
     setSpeed,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    seekToBookmark,
     close,
   } = useLibraryAudio();
 
   const [showVoices, setShowVoices] = useState(false);
+  const [showBookmarks, setShowBookmarks] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const progressRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +114,7 @@ export default function LibraryAudioPlayer() {
               {formatTime(currentTime)}
             </span>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* Prev chapter */}
               <button
                 onClick={prevChapter}
@@ -117,6 +124,18 @@ export default function LibraryAudioPlayer() {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM4.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0011 16V8a1 1 0 00-1.6-.8l-5.334 4z" />
                 </svg>
+              </button>
+
+              {/* Back 15s */}
+              <button
+                onClick={skipBack}
+                className="p-1 text-gray-400 hover:text-gray-200 transition-colors relative"
+                aria-label="Back 15 seconds"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold mt-0.5">15</span>
               </button>
 
               {/* Play/Pause */}
@@ -140,6 +159,18 @@ export default function LibraryAudioPlayer() {
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 )}
+              </button>
+
+              {/* Forward 15s */}
+              <button
+                onClick={skipForward}
+                className="p-1 text-gray-400 hover:text-gray-200 transition-colors relative"
+                aria-label="Forward 15 seconds"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold mt-0.5">15</span>
               </button>
 
               {/* Next chapter */}
@@ -173,6 +204,19 @@ export default function LibraryAudioPlayer() {
               >
                 {speed}x
               </button>
+              {/* Bookmark button */}
+              <button
+                onClick={() => {
+                  addBookmark();
+                  setShowBookmarks(true);
+                }}
+                className="p-1 text-gray-500 hover:text-accent transition-colors"
+                aria-label="Add bookmark"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+              </button>
               <button
                 onClick={() => setShowVoices((v) => !v)}
                 className="p-1 text-gray-500 hover:text-gray-300 transition-colors"
@@ -189,6 +233,43 @@ export default function LibraryAudioPlayer() {
             </div>
           </div>
         </div>
+
+        {/* Bookmarks panel */}
+        {showBookmarks && bookmarks.length > 0 && (
+          <div className="px-4 pb-3 border-t border-white/5">
+            <div className="flex items-center justify-between py-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Bookmarks</p>
+              <button
+                onClick={() => setShowBookmarks(false)}
+                className="text-xs text-gray-600 hover:text-gray-400"
+              >
+                Hide
+              </button>
+            </div>
+            {bookmarks.map((bm) => (
+              <div
+                key={bm.id}
+                className="flex items-center gap-2 py-1.5 group"
+              >
+                <button
+                  onClick={() => seekToBookmark(bm)}
+                  className="flex-1 text-left text-sm text-gray-300 hover:text-accent transition-colors truncate"
+                >
+                  {bm.label}
+                </button>
+                <button
+                  onClick={() => removeBookmark(bm.id)}
+                  className="p-1 text-gray-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                  aria-label="Delete bookmark"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Voice selector */}
         {showVoices && (

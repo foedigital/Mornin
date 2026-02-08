@@ -16,7 +16,11 @@ import {
   saveProgress,
   getProgress,
   updateBookLastPlayed,
+  saveBookmark,
+  getBookmarks,
+  deleteBookmark as deleteBookmarkDB,
   type Book,
+  type Bookmark,
 } from "@/lib/library-db";
 
 const VOICE_KEY = "mornin-library-voice";
@@ -54,6 +58,7 @@ interface LibraryAudioState {
   currentTime: number;
   voice: LibraryVoice;
   speed: PlaybackSpeed;
+  bookmarks: Bookmark[];
 }
 
 interface LibraryAudioContextValue extends LibraryAudioState {
@@ -62,9 +67,14 @@ interface LibraryAudioContextValue extends LibraryAudioState {
   resume: () => void;
   nextChapter: () => void;
   prevChapter: () => void;
+  skipForward: () => void;
+  skipBack: () => void;
   seekTo: (time: number) => void;
   setVoice: (voice: LibraryVoice) => void;
   setSpeed: (speed: PlaybackSpeed) => void;
+  addBookmark: () => void;
+  removeBookmark: (id: string) => void;
+  seekToBookmark: (bookmark: Bookmark) => void;
   close: () => void;
 }
 
@@ -95,6 +105,12 @@ function loadSavedSpeed(): PlaybackSpeed {
   }
 }
 
+function formatTimeLabel(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const [isActive, setIsActive] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -108,6 +124,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const [currentTime, setCurrentTime] = useState(0);
   const [voice, setVoiceState] = useState<LibraryVoice>(LIBRARY_VOICES[0]);
   const [speed, setSpeedState] = useState<PlaybackSpeed>(1);
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bookRef = useRef<Book | null>(null);
@@ -170,6 +187,29 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
     };
   }, [isPlaying, currentBookId, currentChapter]);
+
+  // Save progress on visibilitychange and beforeunload
+  useEffect(() => {
+    const saveNow = () => {
+      const audio = audioRef.current;
+      if (!audio || !currentBookId || currentChapter === null) return;
+      saveProgress({
+        bookId: currentBookId,
+        currentChapter,
+        currentTime: audio.currentTime,
+        completed: false,
+      });
+    };
+    const onVisChange = () => {
+      if (document.visibilityState === "hidden") saveNow();
+    };
+    document.addEventListener("visibilitychange", onVisChange);
+    window.addEventListener("beforeunload", saveNow);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisChange);
+      window.removeEventListener("beforeunload", saveNow);
+    };
+  }, [currentBookId, currentChapter]);
 
   // Dispatch event when library audio starts to pause speechSynthesis
   useEffect(() => {
@@ -365,6 +405,20 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const skipForward = useCallback(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = Math.min(audio.currentTime + 15, audio.duration || Infinity);
+    }
+  }, []);
+
+  const skipBack = useCallback(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.currentTime = Math.max(audio.currentTime - 15, 0);
+    }
+  }, []);
+
   const setVoice = useCallback((v: LibraryVoice) => {
     setVoiceState(v);
     try {
@@ -389,6 +443,57 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     }
   }, [speed, currentChapter]);
 
+  // Load bookmarks when book changes
+  useEffect(() => {
+    if (currentBookId) {
+      getBookmarks(currentBookId).then(setBookmarks).catch(() => {});
+    } else {
+      setBookmarks([]);
+    }
+  }, [currentBookId]);
+
+  const addBookmark = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentBookId || currentChapter === null) return;
+    const time = audio.currentTime;
+    const label = `Ch. ${currentChapter + 1} — ${formatTimeLabel(time)}`;
+    const bm: Bookmark = {
+      id: crypto.randomUUID(),
+      bookId: currentBookId,
+      chapterIndex: currentChapter,
+      time,
+      label,
+      createdAt: Date.now(),
+    };
+    saveBookmark(bm).then(() => {
+      setBookmarks((prev) => [...prev, bm]);
+    });
+  }, [currentBookId, currentChapter]);
+
+  const removeBookmark = useCallback((id: string) => {
+    deleteBookmarkDB(id).then(() => {
+      setBookmarks((prev) => prev.filter((b) => b.id !== id));
+    });
+  }, []);
+
+  const seekToBookmark = useCallback(
+    (bm: Bookmark) => {
+      const book = bookRef.current;
+      if (!book) return;
+      if (bm.chapterIndex !== currentChapter) {
+        // Need to load a different chapter first, then seek
+        loadAndPlayChapter(book, bm.chapterIndex).then(() => {
+          setTimeout(() => {
+            if (audioRef.current) audioRef.current.currentTime = bm.time;
+          }, 500);
+        });
+      } else {
+        if (audioRef.current) audioRef.current.currentTime = bm.time;
+      }
+    },
+    [currentChapter, loadAndPlayChapter]
+  );
+
   const close = useCallback(() => {
     const audio = audioRef.current;
     if (audio) {
@@ -411,6 +516,40 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     bookRef.current = null;
   }, [currentBookId, currentChapter]);
 
+  // Media Session API — lock screen / notification controls
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    if (!isActive) {
+      navigator.mediaSession.metadata = null;
+      return;
+    }
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: chapterTitle,
+      artist: bookTitle,
+      album: "Mornin Library",
+    });
+
+    navigator.mediaSession.setActionHandler("play", () => audioRef.current?.play());
+    navigator.mediaSession.setActionHandler("pause", () => audioRef.current?.pause());
+    navigator.mediaSession.setActionHandler("previoustrack", () => prevChapter());
+    navigator.mediaSession.setActionHandler("nexttrack", () => nextChapter());
+    navigator.mediaSession.setActionHandler("seekbackward", () => skipBack());
+    navigator.mediaSession.setActionHandler("seekforward", () => skipForward());
+
+    return () => {
+      if ("mediaSession" in navigator) {
+        navigator.mediaSession.metadata = null;
+        navigator.mediaSession.setActionHandler("play", null);
+        navigator.mediaSession.setActionHandler("pause", null);
+        navigator.mediaSession.setActionHandler("previoustrack", null);
+        navigator.mediaSession.setActionHandler("nexttrack", null);
+        navigator.mediaSession.setActionHandler("seekbackward", null);
+        navigator.mediaSession.setActionHandler("seekforward", null);
+      }
+    };
+  }, [isActive, bookTitle, chapterTitle, prevChapter, nextChapter, skipBack, skipForward]);
+
   const value: LibraryAudioContextValue = {
     isActive,
     isPlaying,
@@ -429,9 +568,15 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     resume,
     nextChapter,
     prevChapter,
+    skipForward,
+    skipBack,
     seekTo,
     setVoice,
     setSpeed,
+    bookmarks,
+    addBookmark,
+    removeBookmark,
+    seekToBookmark,
     close,
   };
 

@@ -3,6 +3,24 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import readingsData from "../../data/readings.json";
 import LiteraturePlayButton from "@/components/LiteraturePlayButton";
+import DownloadModal from "@/components/library/DownloadModal";
+import type { Book } from "@/lib/library-db";
+
+const CONVERTED_KEY = "mornin-converted-audiobooks";
+
+function loadConverted(): Set<string> {
+  try {
+    const raw = localStorage.getItem(CONVERTED_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {}
+  return new Set();
+}
+
+function saveConverted(urls: Set<string>) {
+  try {
+    localStorage.setItem(CONVERTED_KEY, JSON.stringify(Array.from(urls)));
+  } catch {}
+}
 
 interface Reading {
   title: string;
@@ -60,6 +78,8 @@ export default function ReadingSection() {
   const [shuffled, setShuffled] = useState<Reading[]>([]);
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [showArchive, setShowArchive] = useState(false);
+  const [converted, setConverted] = useState<Set<string>>(new Set());
+  const [downloadTarget, setDownloadTarget] = useState<Reading | null>(null);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -72,6 +92,7 @@ export default function ReadingSection() {
     setShuffled(readings);
     setIndex(dayOfYear % readings.length);
     setCompleted(loadCompleted());
+    setConverted(loadConverted());
   }, []);
 
   const toggleCompleted = useCallback(
@@ -119,6 +140,25 @@ export default function ReadingSection() {
     next();
   }, [next]);
 
+  const handleStartDownload = useCallback((r: Reading) => {
+    setDownloadTarget(r);
+  }, []);
+
+  const handleDownloadComplete = useCallback((_book: Book) => {
+    if (downloadTarget) {
+      setConverted((prev) => {
+        const next = new Set(prev);
+        next.add(downloadTarget.url);
+        saveConverted(next);
+        return next;
+      });
+    }
+  }, [downloadTarget]);
+
+  const handleDownloadClose = useCallback(() => {
+    setDownloadTarget(null);
+  }, []);
+
   if (index === null || shuffled.length === 0) return null;
 
   const reading = shuffled[index];
@@ -154,14 +194,40 @@ export default function ReadingSection() {
           <h3 className={`text-xl font-semibold leading-snug flex-1 ${isRead ? "text-gray-500 line-through" : "text-gray-100"}`}>
             {reading.title}
           </h3>
-          <LiteraturePlayButton
-            text={reading.excerpt}
-            contentId={readingKey(reading)}
-            title={reading.title}
-            author={reading.author}
-            url={reading.url}
-            isPoetry={reading.type === "poem"}
-          />
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <LiteraturePlayButton
+              text={reading.excerpt}
+              contentId={readingKey(reading)}
+              title={reading.title}
+              author={reading.author}
+              url={reading.url}
+              isPoetry={reading.type === "poem"}
+            />
+            {/* Convert to audiobook button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!converted.has(reading.url)) handleStartDownload(reading);
+              }}
+              className={`flex items-center justify-center w-9 h-9 rounded-full transition-colors ${
+                converted.has(reading.url)
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20"
+              }`}
+              aria-label={converted.has(reading.url) ? "In library" : "Download as audiobook"}
+              title={converted.has(reading.url) ? "In library" : "Download as audiobook"}
+            >
+              {converted.has(reading.url) ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
 
         <p className="text-gray-400 text-sm leading-relaxed mb-4 italic">
@@ -299,14 +365,50 @@ export default function ReadingSection() {
                       {r.author} &middot; {r.type} &middot; {r.readTime}
                     </p>
                   </div>
-                  <span className="text-xs text-gray-600 bg-white/5 px-2 py-0.5 rounded-full flex-shrink-0">
-                    {TYPE_ICONS[r.type] || "\u{1F4D6}"}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!converted.has(r.url)) handleStartDownload(r);
+                      }}
+                      className={`flex items-center justify-center w-7 h-7 rounded-full transition-colors ${
+                        converted.has(r.url)
+                          ? "bg-green-500/20 text-green-400"
+                          : "bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20"
+                      }`}
+                      aria-label={converted.has(r.url) ? "In library" : "Download as audiobook"}
+                      title={converted.has(r.url) ? "In library" : "Download as audiobook"}
+                    >
+                      {converted.has(r.url) ? (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                      )}
+                    </button>
+                    <span className="text-xs text-gray-600 bg-white/5 px-2 py-0.5 rounded-full">
+                      {TYPE_ICONS[r.type] || "\u{1F4D6}"}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           )}
         </div>
+      )}
+
+      {/* Download Modal */}
+      {downloadTarget && (
+        <DownloadModal
+          url={downloadTarget.url}
+          title={downloadTarget.title}
+          author={downloadTarget.author}
+          onClose={handleDownloadClose}
+          onComplete={handleDownloadComplete}
+        />
       )}
     </>
   );

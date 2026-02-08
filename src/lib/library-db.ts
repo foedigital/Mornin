@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from "idb";
 import type { Chapter } from "@/lib/chunker";
 
 const DB_NAME = "mornin-library";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export interface Book {
   id: string;
@@ -21,6 +21,15 @@ export interface BookProgress {
   completed: boolean;
 }
 
+export interface Bookmark {
+  id: string;
+  bookId: string;
+  chapterIndex: number;
+  time: number;
+  label: string;
+  createdAt: number;
+}
+
 interface LibraryDB {
   books: {
     key: string;
@@ -35,6 +44,11 @@ interface LibraryDB {
     key: string;
     value: BookProgress;
   };
+  bookmarks: {
+    key: string;
+    value: Bookmark;
+    indexes: { "by-book": string };
+  };
 }
 
 let dbPromise: Promise<IDBPDatabase<LibraryDB>> | null = null;
@@ -42,11 +56,17 @@ let dbPromise: Promise<IDBPDatabase<LibraryDB>> | null = null;
 function getDB(): Promise<IDBPDatabase<LibraryDB>> {
   if (!dbPromise) {
     dbPromise = openDB<LibraryDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        const bookStore = db.createObjectStore("books", { keyPath: "id" });
-        bookStore.createIndex("by-date", "dateAdded");
-        db.createObjectStore("audioCache", { keyPath: "key" });
-        db.createObjectStore("progress", { keyPath: "bookId" });
+      upgrade(db, oldVersion) {
+        if (oldVersion < 1) {
+          const bookStore = db.createObjectStore("books", { keyPath: "id" });
+          bookStore.createIndex("by-date", "dateAdded");
+          db.createObjectStore("audioCache", { keyPath: "key" });
+          db.createObjectStore("progress", { keyPath: "bookId" });
+        }
+        if (oldVersion < 2) {
+          const bmStore = db.createObjectStore("bookmarks", { keyPath: "id" });
+          bmStore.createIndex("by-book", "bookId");
+        }
       },
     });
   }
@@ -192,4 +212,22 @@ export async function deleteBookAudioCache(bookId: string): Promise<number> {
   }
   await tx.done;
   return freedBytes;
+}
+
+// --- Bookmarks ---
+
+export async function saveBookmark(bookmark: Bookmark): Promise<void> {
+  const db = await getDB();
+  await db.put("bookmarks", bookmark);
+}
+
+export async function getBookmarks(bookId: string): Promise<Bookmark[]> {
+  const db = await getDB();
+  const all = await db.getAllFromIndex("bookmarks", "by-book", bookId);
+  return all.sort((a, b) => a.createdAt - b.createdAt);
+}
+
+export async function deleteBookmark(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete("bookmarks", id);
 }
