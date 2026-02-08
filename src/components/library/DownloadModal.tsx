@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import {
   addBook,
   getAllBooks,
+  getCachedAudio,
   setCachedAudio,
   audioCacheKey,
   DOWNLOAD_VOICE_ID,
@@ -19,6 +20,8 @@ interface DownloadModalProps {
 }
 
 type Phase = "extracting" | "generating" | "done" | "error";
+
+const TTS_CONCURRENCY = 3;
 
 export default function DownloadModal({
   url,
@@ -85,44 +88,65 @@ export default function DownloadModal({
 
       if (abortRef.current) return;
 
-      // Phase 2: Generate TTS for all chapters
+      // Phase 2: Generate TTS per chapter with concurrency
       setPhase("generating");
       setChaptersTotal(book.chapters.length);
-      setChaptersDone(0);
 
-      const res = await fetch("/api/tts-batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          texts: book.chapters.map((ch) => ch.text),
-          voice: DOWNLOAD_VOICE_ID,
-        }),
-      });
+      // Check which chapters are already cached
+      const toGenerate: number[] = [];
+      let alreadyCached = 0;
+      for (let i = 0; i < book.chapters.length; i++) {
+        const key = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
+        const cached = await getCachedAudio(key);
+        if (cached) {
+          alreadyCached++;
+        } else {
+          toGenerate.push(i);
+        }
+      }
+      setChaptersDone(alreadyCached);
 
-      if (abortRef.current) return;
-      if (!res.ok) throw new Error("Batch TTS failed");
+      if (toGenerate.length === 0) {
+        setPhase("done");
+        onComplete(book);
+        return;
+      }
 
-      const batchData = await res.json();
-      const chapters: (string | null)[] = batchData.chapters;
+      // Process chapters with concurrency
+      let doneCount = alreadyCached;
+      const bookForClosure = book;
 
-      for (let i = 0; i < chapters.length; i++) {
+      for (let batch = 0; batch < toGenerate.length; batch += TTS_CONCURRENCY) {
         if (abortRef.current) return;
-        if (!chapters[i]) continue;
 
-        const binary = atob(chapters[i]!);
-        const bytes = new Uint8Array(binary.length);
-        for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
-        const blob = new Blob([bytes], { type: "audio/mpeg" });
+        const batchIndices = toGenerate.slice(batch, batch + TTS_CONCURRENCY);
+        const results = await Promise.allSettled(
+          batchIndices.map(async (chIdx) => {
+            const res = await fetch("/api/tts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                text: bookForClosure.chapters[chIdx].text,
+                voice: DOWNLOAD_VOICE_ID,
+              }),
+            });
+            if (!res.ok) throw new Error("TTS failed");
+            const blob = await res.blob();
+            const key = audioCacheKey(bookForClosure.id, chIdx, DOWNLOAD_VOICE_ID);
+            await setCachedAudio(key, blob);
+          })
+        );
 
-        const cacheKey = audioCacheKey(book.id, i, DOWNLOAD_VOICE_ID);
-        await setCachedAudio(cacheKey, blob);
-        setChaptersDone(i + 1);
+        for (const r of results) {
+          if (r.status === "fulfilled") doneCount++;
+        }
+        setChaptersDone(doneCount);
       }
 
       if (abortRef.current) return;
 
       setPhase("done");
-      onComplete(book);
+      onComplete(bookForClosure);
     } catch (err) {
       if (abortRef.current) return;
       setPhase("error");
