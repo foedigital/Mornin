@@ -129,6 +129,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const bookRef = useRef<Book | null>(null);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isLoadingChapterRef = useRef(false);
 
   // Load saved voice and speed on mount
   useEffect(() => {
@@ -150,10 +151,6 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       if (audio.duration && isFinite(audio.duration)) {
         setDuration(audio.duration);
       }
-    });
-
-    audio.addEventListener("ended", () => {
-      handleChapterEnd();
     });
 
     audio.addEventListener("play", () => setIsPlaying(true));
@@ -258,6 +255,9 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const handleChapterEnd = useCallback(() => {
+    // Ignore ended events from SILENT_MP3 or during chapter loading
+    if (isLoadingChapterRef.current) return;
+
     const book = bookRef.current;
     if (!book || currentChapter === null) return;
 
@@ -308,6 +308,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       const chapter = book.chapters[chapterIndex];
       if (!chapter) return;
 
+      isLoadingChapterRef.current = true;
       setIsLoading(true);
       setCurrentBookId(book.id);
       setCurrentChapter(chapterIndex);
@@ -351,6 +352,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         console.error("Library audio error:", err);
       } finally {
+        isLoadingChapterRef.current = false;
         setIsLoading(false);
       }
     },
