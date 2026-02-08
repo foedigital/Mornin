@@ -31,6 +31,19 @@ export default function LiteraturePlayButton({
   const [error, setError] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const urlRef = useRef<string | null>(null);
+  const loadedContentIdRef = useRef<string | null>(null);
+
+  // Reset audio when the reading changes (user swiped to a different book)
+  useEffect(() => {
+    if (loadedContentIdRef.current && loadedContentIdRef.current !== contentId) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      setPlaying(false);
+      loadedContentIdRef.current = null;
+    }
+  }, [contentId]);
 
   // Clean up on unmount
   useEffect(() => {
@@ -80,8 +93,11 @@ export default function LiteraturePlayButton({
         return;
       }
 
-      // If we already have audio loaded, resume
-      if (audioRef.current && audioRef.current.src && audioRef.current.paused && audioRef.current.currentTime > 0) {
+      // If we already have audio loaded for THIS content, resume
+      if (
+        loadedContentIdRef.current === contentId &&
+        audioRef.current && audioRef.current.src && audioRef.current.paused && audioRef.current.currentTime > 0
+      ) {
         audioRef.current.play();
         setPlaying(true);
         window.dispatchEvent(new CustomEvent("sample-audio-play", { detail: contentId }));
@@ -122,6 +138,7 @@ export default function LiteraturePlayButton({
         audio.onpause = () => setPlaying(false);
         audio.onplay = () => setPlaying(true);
 
+        loadedContentIdRef.current = contentId;
         await audio.play();
         // Dispatch events to pause other audio systems and other sample buttons
         window.dispatchEvent(new CustomEvent("speechsynthesis-play"));
