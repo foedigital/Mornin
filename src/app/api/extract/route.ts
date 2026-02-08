@@ -106,14 +106,17 @@ function cleanProse(text: string): string {
   t = t.replace(/\n{2,}/g, "\n\n");  // normalize multi-newlines to double
   t = t.replace(/(?<!\n)\n(?!\n)/g, " "); // single newline → space
 
-  // Clean up whitespace
+  // Clean up whitespace within lines (preserve paragraph breaks for chunker)
   t = t.replace(/ {2,}/g, " ");
 
-  // Paragraph breaks → period + space for clean sentence flow
-  t = t.replace(/\n\n/g, ". ");
-  // Clean up double periods from conversion
-  t = t.replace(/\.\s*\.\s*/g, ". ");
-  t = t.replace(/[!?]\s*\.\s/g, (m) => m[0] + " ");
+  // Trim whitespace on each line but keep paragraph structure
+  t = t
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n");
+
+  // Normalize paragraph breaks (2+ newlines → exactly 2)
+  t = t.replace(/\n{3,}/g, "\n\n");
 
   return t.trim();
 }
@@ -157,14 +160,14 @@ async function fetchUrl(
   }
 }
 
-/** Extract text from a cheerio element with clean sentence boundaries */
+/** Extract text from a cheerio element with paragraph breaks for chunking */
 function extractTextWithBreaks($: cheerio.CheerioAPI, el: ReturnType<cheerio.CheerioAPI>): string {
-  // Replace <br> with space
-  el.find("br").replaceWith(" ");
-  // Add sentence-boundary space after block elements
+  // Replace <br> with newline
+  el.find("br").replaceWith("\n");
+  // Add paragraph break after block elements so chunker can split
   el.find("p, div, h1, h2, h3, h4, h5, h6, li, blockquote").each((_, e) => {
     const $e = $(e);
-    $e.append(" ");
+    $e.append("\n\n");
   });
   return el.text();
 }

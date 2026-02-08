@@ -65,57 +65,153 @@ export function chunkIntoChapters(text: string): Chapter[] {
         }
       }
     }
-    if (chapters.length >= 2) return chapters;
+    if (chapters.length >= 2) return enforceMaxChapterSize(chapters);
   }
 
-  // Default: split by paragraph boundaries at ~450 words
+  // Try paragraph-based splitting first
   const paragraphs = text
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter((p) => p.length > 0);
 
-  if (paragraphs.length === 0) return [];
+  // If text has paragraph breaks, split by paragraphs at ~450 words
+  if (paragraphs.length >= 2) {
+    const chapters: Chapter[] = [];
+    let currentParagraphs: string[] = [];
+    let currentWordCount = 0;
 
+    for (const para of paragraphs) {
+      const paraWords = para.split(/\s+/).length;
+
+      if (currentWordCount + paraWords > TARGET_WORDS && currentWordCount >= MIN_WORDS) {
+        chapters.push({
+          index: chapters.length,
+          title: `Chapter ${chapters.length + 1}`,
+          text: currentParagraphs.join("\n\n"),
+          wordCount: currentWordCount,
+        });
+        currentParagraphs = [para];
+        currentWordCount = paraWords;
+      } else {
+        currentParagraphs.push(para);
+        currentWordCount += paraWords;
+      }
+    }
+
+    // Flush remaining
+    if (currentParagraphs.length > 0) {
+      if (currentWordCount < MIN_WORDS && chapters.length > 0) {
+        const last = chapters[chapters.length - 1];
+        last.text += "\n\n" + currentParagraphs.join("\n\n");
+        last.wordCount += currentWordCount;
+      } else {
+        chapters.push({
+          index: chapters.length,
+          title: `Chapter ${chapters.length + 1}`,
+          text: currentParagraphs.join("\n\n"),
+          wordCount: currentWordCount,
+        });
+      }
+    }
+
+    if (chapters.length >= 2) return enforceMaxChapterSize(chapters);
+  }
+
+  // Fallback: split on sentence boundaries when no paragraph breaks exist
+  const sentences = text.split(/(?<=[.!?])\s+/);
   const chapters: Chapter[] = [];
-  let currentParagraphs: string[] = [];
+  let currentSentences: string[] = [];
   let currentWordCount = 0;
 
-  for (const para of paragraphs) {
-    const paraWords = para.split(/\s+/).length;
+  for (const sentence of sentences) {
+    const sentenceWords = sentence.split(/\s+/).length;
 
-    if (currentWordCount + paraWords > TARGET_WORDS && currentWordCount >= MIN_WORDS) {
+    if (currentWordCount + sentenceWords > TARGET_WORDS && currentWordCount >= MIN_WORDS) {
       chapters.push({
         index: chapters.length,
         title: `Chapter ${chapters.length + 1}`,
-        text: currentParagraphs.join("\n\n"),
+        text: currentSentences.join(" "),
         wordCount: currentWordCount,
       });
-      currentParagraphs = [para];
-      currentWordCount = paraWords;
+      currentSentences = [sentence];
+      currentWordCount = sentenceWords;
     } else {
-      currentParagraphs.push(para);
-      currentWordCount += paraWords;
+      currentSentences.push(sentence);
+      currentWordCount += sentenceWords;
     }
   }
 
   // Flush remaining
-  if (currentParagraphs.length > 0) {
-    // If the last chunk is too small, merge with previous chapter
+  if (currentSentences.length > 0) {
     if (currentWordCount < MIN_WORDS && chapters.length > 0) {
       const last = chapters[chapters.length - 1];
-      last.text += "\n\n" + currentParagraphs.join("\n\n");
+      last.text += " " + currentSentences.join(" ");
       last.wordCount += currentWordCount;
     } else {
       chapters.push({
         index: chapters.length,
         title: `Chapter ${chapters.length + 1}`,
-        text: currentParagraphs.join("\n\n"),
+        text: currentSentences.join(" "),
         wordCount: currentWordCount,
       });
     }
   }
 
-  return chapters;
+  return enforceMaxChapterSize(chapters);
+}
+
+const MAX_CHAPTER_WORDS = 580; // Hard cap — must stay under TTS 600-word limit
+
+/** Split any oversized chapter at sentence boundaries */
+function enforceMaxChapterSize(chapters: Chapter[]): Chapter[] {
+  const result: Chapter[] = [];
+
+  for (const ch of chapters) {
+    if (ch.wordCount <= MAX_CHAPTER_WORDS) {
+      result.push({ ...ch, index: result.length });
+      continue;
+    }
+
+    // Split this chapter at sentence boundaries
+    const sentences = ch.text.split(/(?<=[.!?])\s+/);
+    let current: string[] = [];
+    let currentWords = 0;
+
+    for (const sentence of sentences) {
+      const sentenceWords = sentence.split(/\s+/).length;
+
+      if (currentWords + sentenceWords > TARGET_WORDS && currentWords >= MIN_WORDS) {
+        result.push({
+          index: result.length,
+          title: `Chapter ${result.length + 1}`,
+          text: current.join(" "),
+          wordCount: currentWords,
+        });
+        current = [sentence];
+        currentWords = sentenceWords;
+      } else {
+        current.push(sentence);
+        currentWords += sentenceWords;
+      }
+    }
+
+    if (current.length > 0) {
+      if (currentWords < MIN_WORDS && result.length > 0) {
+        const last = result[result.length - 1];
+        last.text += " " + current.join(" ");
+        last.wordCount += currentWords;
+      } else {
+        result.push({
+          index: result.length,
+          title: `Chapter ${result.length + 1}`,
+          text: current.join(" "),
+          wordCount: currentWords,
+        });
+      }
+    }
+  }
+
+  return result;
 }
 
 export function estimateChapterDuration(wordCount: number): number {
