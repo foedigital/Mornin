@@ -84,7 +84,7 @@ export default function BookCard({
   return (
     <div className="card">
       {/* Header row */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-4">
         {/* Book cover icon */}
         <button
           onClick={() => onPlayChapter(book.id, progress?.currentChapter ?? 0)}
@@ -128,12 +128,12 @@ export default function BookCard({
         </button>
 
         {/* Title + author */}
-        <div className="flex-1 min-w-0 py-0.5">
-          <h3 className="text-sm font-semibold text-gray-100 leading-tight line-clamp-2">
+        <div className="flex-1 min-w-0 py-1">
+          <h3 className="text-sm font-semibold text-gray-100 leading-snug line-clamp-2">
             {book.title}
           </h3>
-          <p className="text-xs text-gray-500 mt-0.5 truncate">{book.author}</p>
-          <p className="text-xs text-gray-600 mt-1">
+          <p className="text-xs text-gray-500 mt-1 truncate">{book.author}</p>
+          <p className="text-xs text-gray-600 mt-1.5">
             {totalChapters} ch{totalChapters !== 1 ? "s" : ""}
             {" · "}
             {storageSize > 0 ? (
@@ -147,7 +147,7 @@ export default function BookCard({
         </div>
 
         {/* Actions */}
-        <div className="flex-shrink-0 flex items-center gap-1">
+        <div className="flex-shrink-0 flex items-center gap-2">
           <button
             onClick={() => setExpanded(!expanded)}
             className="p-2 text-gray-500 hover:text-gray-300 transition-colors"
@@ -222,6 +222,9 @@ export default function BookCard({
       </div>
 
       {/* Expandable chapter list */}
+      {expanded && (
+        <div className="mt-4 pt-4 border-t border-white/5" />
+      )}
       {expanded && (
         <ChapterList
           bookId={book.id}

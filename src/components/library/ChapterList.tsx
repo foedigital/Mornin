@@ -28,7 +28,7 @@ export default function ChapterList({
   const completedUpTo = progress?.currentChapter ?? -1;
 
   return (
-    <div className="mt-3 space-y-1">
+    <div className="space-y-1.5">
       {chapters.map((chapter) => {
         const isComplete = chapter.index < completedUpTo;
         const isCurrent = chapter.index === completedUpTo;
@@ -39,7 +39,7 @@ export default function ChapterList({
           <button
             key={chapter.index}
             onClick={() => onPlayChapter(bookId, chapter.index)}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors ${
               isPlaying
                 ? "bg-accent/20 text-accent"
                 : "hover:bg-white/5 text-gray-300"
