@@ -290,24 +290,6 @@
       "readTime": "35 min"
     },
     {
-      "title": "The Lottery",
-      "author": "Shirley Jackson",
-      "type": "short story",
-      "year": 1948,
-      "excerpt": "The morning of June 27th was clear and sunny, with the fresh warmth of a full-summer day.",
-      "url": "https://americanliterature.com/author/shirley-jackson/short-story/the-lottery",
-      "readTime": "12 min"
-    },
-    {
-      "title": "A Good Man Is Hard to Find",
-      "author": "Flannery O'Connor",
-      "type": "short story",
-      "year": 1953,
-      "excerpt": "The grandmother didn't want to go to Florida. She wanted to visit some of her connections in east Tennessee.",
-      "url": "https://americanliterature.com/author/flannery-oconnor/short-story/a-good-man-is-hard-to-find",
-      "readTime": "20 min"
-    },
-    {
       "title": "The Open Boat",
       "author": "Stephen Crane",
       "type": "short story",
@@ -453,16 +435,6 @@
       "url": "https://www.gutenberg.org/ebooks/2500",
       "readTime": "3 hours"
     },
-    {
-      "title": "Animal Farm",
-      "author": "George Orwell",
-      "type": "novella",
-      "year": 1945,
-      "excerpt": "Mr. Jones, of the Manor Farm, had locked the hen-houses for the night, but was too drunk to remember to shut the pop-holes.",
-      "url": "https://www.gutenberg.net.au/ebooks/FR100039.html",
-      "readTime": "3 hours"
-    },
-
     {
       "title": "The Trial",
       "author": "Franz Kafka",
@@ -707,7 +679,7 @@
       "type": "essay",
       "year": 1849,
       "excerpt": "That government is best which governs least.",
-      "url": "https://americanliterature.com/author/henry-david-thoreau/essay/civil-disobedience",
+      "url": "https://americanliterature.com/author/henry-david-thoreau/essay/on-civil-disobedience",
       "readTime": "30 min"
     },
 
@@ -735,7 +707,7 @@
       "type": "speech",
       "year": 1865,
       "excerpt": "At this second appearing to take the oath of the Presidential office there is less occasion for an extended address than there was at the first.",
-      "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-42",
+      "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-35",
       "readTime": "3 min"
     },
     {
@@ -780,7 +752,7 @@
       "type": "speech",
       "year": 1940,
       "excerpt": "We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields and in the streets; we shall never surrender.",
-      "url": "https://www.americanrhetoric.com/speeches/winstonchurchillweshallfiightonthebeaches.htm",
+      "url": "https://www.americanrhetoric.com/speeches/winstonchurchillweshallfightonthebeaches.htm",
       "readTime": "15 min"
     },
     {
@@ -798,7 +770,7 @@
       "type": "speech",
       "year": 1962,
       "excerpt": "Duty, Honor, Country — those three hallowed words reverently dictate what you ought to be, what you can be, what you will be.",
-      "url": "https://www.americanrhetoric.com/speeches/douglasmacarthurthabornconcede.htm",
+      "url": "https://www.americanrhetoric.com/speeches/douglasmacarthurthayeraward.html",
       "readTime": "15 min"
     }
   ]
