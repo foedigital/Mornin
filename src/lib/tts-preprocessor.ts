@@ -13,7 +13,7 @@
 
 /** Unicode ranges for scripts that are NOT basic Latin / English */
 const NON_LATIN_RE =
-  /[\u0370-\u03FF\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0B00-\u0B7F\u0C00-\u0C7F\u0D00-\u0D7F\u0E00-\u0E7F\u1000-\u109F\u1100-\u11FF\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]/;
+  /[\u0370-\u03FF\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0B00-\u0B7F\u0C00-\u0C7F\u0D00-\u0D7F\u0E00-\u0E7F\u1000-\u109F\u1100-\u11FF\u1F00-\u1FFF\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]/;
 
 /** Extended Latin characters used in French, German, Spanish, Italian, etc. */
 const EXTENDED_LATIN_RE = /[À-ÖØ-öø-ÿĀ-žƀ-ɏ]/;
@@ -62,6 +62,40 @@ function replaceNonEnglishBlocks(text: string): string {
   }
 
   return result.join("\n");
+}
+
+/**
+ * Replace inline non-Latin characters/words within English text.
+ * Handles cases where Greek, Cyrillic, Arabic, CJK etc. words are embedded
+ * in otherwise English sentences.
+ * E.g., "to live consistently (ὁμολογουμένος ζῆν)" → "to live consistently"
+ */
+function replaceInlineNonLatinChars(text: string): string {
+  let t = text;
+
+  // Non-Latin script character class including Greek Extended (U+1F00-1FFF)
+  const NL = "\u0370-\u03FF\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0B00-\u0B7F\u0C00-\u0C7F\u0D00-\u0D7F\u0E00-\u0E7F\u1000-\u109F\u1100-\u11FF\u1F00-\u1FFF\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF";
+  const nlDetect = new RegExp(`[${NL}]`);
+  const nlSequence = new RegExp(`[${NL}]+`, "g");
+
+  // Remove parenthetical foreign text: (Greek words) or [Greek words]
+  t = t.replace(new RegExp(`\\([^)]*[${NL}][^)]*\\)`, "g"), "");
+  t = t.replace(new RegExp(`\\[[^\\]]*[${NL}][^\\]]*\\]`, "g"), "");
+
+  // Replace any remaining sequences of non-Latin script characters
+  t = t.replace(nlSequence, "");
+
+  // Remove emoji and miscellaneous symbols
+  // Use surrogate pair ranges since target may not support 'u' flag
+  t = t.replace(/[\u2600-\u26FF\u2700-\u27BF]/g, "");
+  t = t.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]/g, "");
+
+  // Clean up leftover empty parens/brackets and double spaces
+  t = t.replace(/\(\s*\)/g, "");
+  t = t.replace(/\[\s*\]/g, "");
+  t = t.replace(/ {2,}/g, " ");
+
+  return t;
 }
 
 // ── Special character cleaning ─────────────────────────────────────────
@@ -149,16 +183,20 @@ function cleanPoetryFormatting(text: string): string {
 export function preprocessForTTS(text: string): string {
   let t = text;
 
-  // Step 1: Replace non-English blocks
+  // Step 1: Replace full non-English blocks (lines that are >40% non-Latin)
   t = replaceNonEnglishBlocks(t);
 
-  // Step 2: Clean special characters
+  // Step 2: Replace inline non-Latin chars within English text
+  // (catches Greek/Cyrillic/etc. words embedded in English sentences)
+  t = replaceInlineNonLatinChars(t);
+
+  // Step 3: Clean special characters
   t = cleanSpecialCharacters(t);
 
-  // Step 3: Clean poetry/formatting
+  // Step 4: Clean poetry/formatting
   t = cleanPoetryFormatting(t);
 
-  // Step 4: Final whitespace normalization
+  // Step 5: Final whitespace normalization
   t = t.replace(/ {2,}/g, " ");
   t = t.trim();
 
