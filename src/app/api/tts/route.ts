@@ -11,6 +11,9 @@ const VALID_VOICES = [
   "en-US-JennyNeural",
   "en-US-AriaNeural",
   "en-US-GuyNeural",
+  "en-US-RogerNeural",
+  "en-US-SteffanNeural",
+  "en-US-EricNeural",
   "en-GB-SoniaNeural",
   "en-GB-RyanNeural",
 ];
@@ -109,9 +112,17 @@ function splitTextForTTS(text: string): string[] {
 }
 
 /** Synthesize a single text chunk to MP3 audio buffer at high quality */
-async function synthesizeChunk(text: string, voice: string): Promise<Buffer> {
+async function synthesizeChunk(
+  text: string,
+  voice: string,
+  prosody?: { rate?: string; pitch?: string }
+): Promise<Buffer> {
   const tts = new EdgeTTS();
-  await tts.synthesize(text, voice, { outputFormat: AUDIO_FORMAT });
+  await tts.synthesize(text, voice, {
+    outputFormat: AUDIO_FORMAT,
+    ...(prosody?.rate && { rate: prosody.rate }),
+    ...(prosody?.pitch && { pitch: prosody.pitch }),
+  });
   const buf = tts.toBuffer();
   if (!buf || buf.byteLength === 0) {
     throw new Error("No audio generated for chunk");
@@ -120,11 +131,15 @@ async function synthesizeChunk(text: string, voice: string): Promise<Buffer> {
 }
 
 /** Retry wrapper: attempts synthesis up to MAX_RETRIES times with delay between */
-async function synthesizeWithRetry(text: string, voice: string): Promise<Buffer> {
+async function synthesizeWithRetry(
+  text: string,
+  voice: string,
+  prosody?: { rate?: string; pitch?: string }
+): Promise<Buffer> {
   let lastError: Error | null = null;
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      return await synthesizeChunk(text, voice);
+      return await synthesizeChunk(text, voice, prosody);
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
       console.warn(`TTS attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
@@ -138,7 +153,7 @@ async function synthesizeWithRetry(text: string, voice: string): Promise<Buffer>
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voice = "en-US-AndrewMultilingualNeural" } = await req.json();
+    const { text, voice = "en-US-AndrewMultilingualNeural", rate, pitch } = await req.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -146,6 +161,15 @@ export async function POST(req: NextRequest) {
 
     if (!VALID_VOICES.includes(voice)) {
       return NextResponse.json({ error: "Invalid voice" }, { status: 400 });
+    }
+
+    // Validate prosody params (e.g., "-10%", "+5Hz")
+    const prosody: { rate?: string; pitch?: string } = {};
+    if (rate && typeof rate === "string" && /^[+-]?\d+%$/.test(rate)) {
+      prosody.rate = rate;
+    }
+    if (pitch && typeof pitch === "string" && /^[+-]?\d+Hz$/.test(pitch)) {
+      prosody.pitch = pitch;
     }
 
     // Reject overly long requests — chapters should be ≤450 words
@@ -165,7 +189,7 @@ export async function POST(req: NextRequest) {
     const audioBuffers: Buffer[] = [];
 
     for (const chunk of textChunks) {
-      const buf = await synthesizeWithRetry(chunk, voice);
+      const buf = await synthesizeWithRetry(chunk, voice, prosody);
       audioBuffers.push(buf);
     }
 
