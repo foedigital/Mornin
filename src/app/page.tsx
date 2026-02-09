@@ -6,6 +6,7 @@ import BattleSection from "@/components/BattleSection";
 import GospelSection from "@/components/GospelSection";
 import SaintSection from "@/components/SaintSection";
 import ArtSection from "@/components/ArtSection";
+import LightningSection from "@/components/LightningSection";
 import MediaSection from "@/components/MediaSection";
 import WorkoutSection from "@/components/WorkoutSection";
 import ReadingSection from "@/components/ReadingSection";
@@ -41,6 +42,7 @@ export default function Home() {
       {/* Content Sections */}
       <div className="space-y-6">
         <QuoteSection />
+        <LightningSection />
         <MediaSection />
         <WorkoutSection />
         <ReadingSection />
