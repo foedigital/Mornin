@@ -393,7 +393,6 @@ export default function LibraryAudioPlayer() {
             {/* Secondary controls */}
             <div className="flex items-center justify-center gap-6 mt-6">
               <SpeedBtn />
-              <SleepBtn />
               <button
                 onClick={() => togglePanel("bookmarks")}
                 className={`w-11 h-11 flex items-center justify-center relative transition-colors ${
@@ -532,11 +531,25 @@ export default function LibraryAudioPlayer() {
           <Scrubber progress={progress} duration={duration} currentTime={currentTime} onSeek={seekTo} />
         </div>
 
-        {/* Controls: [speed, sleep] [skip, play, skip] [bookmark] */}
-        <div className="flex items-center justify-between px-5 pb-4 pt-1">
+        {/* Controls: [speed, voice] [skip, play, skip] [bookmark] */}
+        <div className="flex items-center justify-between px-5 pb-3 pt-1">
           <div className="flex items-center">
             <SpeedBtn />
-            <SleepBtn />
+            <button
+              onClick={() => setPanel((c) => (c === "voices" ? "none" : "voices"))}
+              className={`w-11 h-11 flex items-center justify-center transition-colors ${
+                panel === "voices" ? "text-accent" : "text-gray-400 hover:text-gray-200"
+              }`}
+              aria-label="Voice"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+                />
+              </svg>
+            </button>
           </div>
           <div className="flex items-center gap-3">
             <SkipBtn dir="back" />
@@ -555,6 +568,30 @@ export default function LibraryAudioPlayer() {
             </button>
           </div>
         </div>
+
+        {/* Voice picker panel */}
+        {panel === "voices" && (
+          <div className="px-5 pb-4">
+            <div className="flex flex-wrap gap-2">
+              {LIBRARY_VOICES.map((v) => (
+                <button
+                  key={v.id}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    voice.id === v.id
+                      ? "bg-accent/20 text-accent ring-1 ring-accent/40"
+                      : "text-gray-300 bg-white/5 hover:bg-white/10"
+                  }`}
+                  onClick={() => setVoice(v)}
+                >
+                  {v.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              {voice.desc} — applies on next chapter
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
