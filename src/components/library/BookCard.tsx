@@ -10,6 +10,8 @@ interface BookCardProps {
   book: Book;
   progress: BookProgress | null;
   onDelete: (id: string) => void;
+  onArchive: (bookId: string) => void;
+  isArchived: boolean;
   onPlayChapter: (bookId: string, chapterIndex: number) => void;
   currentlyPlayingBookId: string | null;
   currentlyPlayingChapter: number | null;
@@ -53,6 +55,8 @@ export default function BookCard({
   book,
   progress,
   onDelete,
+  onArchive,
+  isArchived,
   onPlayChapter,
   currentlyPlayingBookId,
   currentlyPlayingChapter,
@@ -226,6 +230,19 @@ export default function BookCard({
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 bg-[#252547] border border-white/10 rounded-lg shadow-xl py-1 z-20 min-w-[160px]">
+                <button
+                  onClick={() => {
+                    onArchive(book.id);
+                    setShowMenu(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                    isArchived
+                      ? "text-green-400 hover:bg-green-400/10"
+                      : "text-gray-300 hover:bg-white/5"
+                  }`}
+                >
+                  {isArchived ? "Archived" : "Add to archive"}
+                </button>
                 <button
                   onClick={() => {
                     handleDelete();

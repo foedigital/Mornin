@@ -24,6 +24,29 @@ import BookCard, { type DownloadStatus } from "@/components/library/BookCard";
 import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
 import { preprocessForTTS, aggressiveCleanup } from "@/lib/tts-preprocessor";
 
+const LIBRARY_ARCHIVE_KEY = "mornin-library-archived";
+
+interface ArchivedBook {
+  title: string;
+  author: string;
+  url: string;
+  dateArchived: number;
+}
+
+function loadArchivedBooks(): ArchivedBook[] {
+  try {
+    const raw = localStorage.getItem(LIBRARY_ARCHIVE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function saveArchivedBooks(books: ArchivedBook[]) {
+  try {
+    localStorage.setItem(LIBRARY_ARCHIVE_KEY, JSON.stringify(books));
+  } catch {}
+}
+
 interface ImportState {
   active: boolean;
   phase: "extracting" | "audio" | "done";
@@ -60,6 +83,7 @@ export default function LibraryPage() {
   const downloadAbortRef = useRef<Record<string, boolean>>({});
   const [importState, setImportState] = useState<ImportState | null>(null);
   const importAbortRef = useRef(false);
+  const [archivedUrls, setArchivedUrls] = useState<Set<string>>(new Set());
 
   const { currentBookId, currentChapter, playChapter } = useLibraryAudio();
 
@@ -91,6 +115,8 @@ export default function LibraryPage() {
 
   useEffect(() => {
     loadBooks();
+    const archived = loadArchivedBooks();
+    setArchivedUrls(new Set(archived.map((b) => b.url)));
   }, [loadBooks]);
 
   // Reload progress periodically when audio is playing
@@ -286,6 +312,29 @@ export default function LibraryPage() {
     setBookSizeMap((prev) => ({ ...prev, [bookId]: 0 }));
     setTotalStorageUsed((prev) => Math.max(0, prev - freed));
   }, []);
+
+  const handleArchive = useCallback((bookId: string) => {
+    const book = books.find((b) => b.id === bookId);
+    if (!book) return;
+
+    const archived = loadArchivedBooks();
+    // Toggle: if already archived, remove it
+    if (archived.some((a) => a.url === book.url)) {
+      const updated = archived.filter((a) => a.url !== book.url);
+      saveArchivedBooks(updated);
+      setArchivedUrls(new Set(updated.map((b) => b.url)));
+      return;
+    }
+
+    archived.push({
+      title: book.title,
+      author: book.author,
+      url: book.url,
+      dateArchived: Date.now(),
+    });
+    saveArchivedBooks(archived);
+    setArchivedUrls(new Set(archived.map((b) => b.url)));
+  }, [books]);
 
   const handleImportArchive = useCallback(async () => {
     if (importState?.active) return;
@@ -552,6 +601,8 @@ export default function LibraryPage() {
               book={book}
               progress={progressMap[book.id] ?? null}
               onDelete={handleDelete}
+              onArchive={handleArchive}
+              isArchived={archivedUrls.has(book.url)}
               onPlayChapter={handlePlayChapter}
               currentlyPlayingBookId={currentBookId}
               currentlyPlayingChapter={currentChapter}

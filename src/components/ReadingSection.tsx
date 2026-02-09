@@ -7,6 +7,14 @@ import DownloadModal from "@/components/library/DownloadModal";
 import type { Book } from "@/lib/library-db";
 
 const CONVERTED_KEY = "mornin-converted-audiobooks";
+const LIBRARY_ARCHIVE_KEY = "mornin-library-archived";
+
+interface ArchivedBook {
+  title: string;
+  author: string;
+  url: string;
+  dateArchived: number;
+}
 
 function loadConverted(): Set<string> {
   try {
@@ -20,6 +28,14 @@ function saveConverted(urls: Set<string>) {
   try {
     localStorage.setItem(CONVERTED_KEY, JSON.stringify(Array.from(urls)));
   } catch {}
+}
+
+function loadArchivedBooks(): ArchivedBook[] {
+  try {
+    const raw = localStorage.getItem(LIBRARY_ARCHIVE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
 }
 
 interface Reading {
@@ -96,6 +112,7 @@ export default function ReadingSection() {
   const [converted, setConverted] = useState<Set<string>>(new Set());
   const [downloadTarget, setDownloadTarget] = useState<Reading | null>(null);
   const [category, setCategory] = useState("all");
+  const [archivedBooks, setArchivedBooks] = useState<ArchivedBook[]>([]);
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -109,6 +126,7 @@ export default function ReadingSection() {
     setIndex(dayOfYear % readings.length);
     setCompleted(loadCompleted());
     setConverted(loadConverted());
+    setArchivedBooks(loadArchivedBooks());
   }, []);
 
   const filtered = useMemo(() => {
@@ -195,6 +213,7 @@ export default function ReadingSection() {
   const isRead = completed.has(readingKey(reading));
 
   const completedReadings = shuffled.filter((r) => completed.has(readingKey(r)));
+  const totalArchiveCount = completedReadings.length + archivedBooks.length;
 
   return (
     <>
@@ -359,7 +378,7 @@ export default function ReadingSection() {
       </div>
 
       {/* Archive of completed readings */}
-      {completedReadings.length > 0 && (
+      {totalArchiveCount > 0 && (
         <div className="card">
           <button
             className="flex items-center justify-between w-full"
@@ -373,7 +392,7 @@ export default function ReadingSection() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
-                {completedReadings.length} read
+                {totalArchiveCount} read
               </span>
               <svg
                 className={`w-4 h-4 text-gray-500 transition-transform ${showArchive ? "rotate-180" : ""}`}
@@ -389,6 +408,38 @@ export default function ReadingSection() {
 
           {showArchive && (
             <div className="mt-4 space-y-3">
+              {/* Archived library audiobooks */}
+              {archivedBooks.map((ab) => (
+                <div
+                  key={`lib-${ab.url}`}
+                  className="flex items-start gap-3 py-2 border-b border-white/5 last:border-0"
+                >
+                  <div className="mt-0.5 flex-shrink-0">
+                    <div className="w-5 h-5 rounded border-2 border-accent bg-accent flex items-center justify-center">
+                      <svg className="w-3 h-3 text-dark-bg" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <a
+                      href={ab.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-300 hover:text-accent transition-colors font-medium"
+                    >
+                      {ab.title}
+                    </a>
+                    <p className="text-xs text-gray-500">
+                      {ab.author} &middot; audiobook
+                    </p>
+                  </div>
+                  <span className="text-xs text-gray-600 bg-white/5 px-2 py-0.5 rounded-full flex-shrink-0">
+                    {"\u{1F3A7}"}
+                  </span>
+                </div>
+              ))}
+              {/* Completed readings from literature list */}
               {completedReadings.map((r) => (
                 <div
                   key={readingKey(r)}
