@@ -33,17 +33,9 @@ const SILENT_MP3 =
 
 export const LIBRARY_VOICES = [
   { id: "en-US-AndrewMultilingualNeural", name: "Andrew", desc: "Male, warm & natural" },
-  { id: "en-US-AvaMultilingualNeural", name: "Ava", desc: "Female, smooth & clear" },
-  { id: "en-US-BrianMultilingualNeural", name: "Brian", desc: "Male, deep & steady" },
   { id: "en-US-RogerNeural", name: "Roger", desc: "Male, deep & authoritative" },
-  { id: "en-US-ChristopherNeural", name: "Christopher", desc: "Male, clear" },
   { id: "en-US-SteffanNeural", name: "Steffan", desc: "Male, calm & measured" },
   { id: "en-US-EricNeural", name: "Eric", desc: "Male, crisp & professional" },
-  { id: "en-US-JennyNeural", name: "Jenny", desc: "Female, natural" },
-  { id: "en-US-AriaNeural", name: "Aria", desc: "Female, expressive" },
-  { id: "en-US-GuyNeural", name: "Guy", desc: "Male, calm" },
-  { id: "en-GB-SoniaNeural", name: "Sonia", desc: "British female" },
-  { id: "en-GB-RyanNeural", name: "Ryan", desc: "British male" },
 ] as const;
 
 export type LibraryVoice = (typeof LIBRARY_VOICES)[number];

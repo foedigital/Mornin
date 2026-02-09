@@ -5,17 +5,9 @@ export const maxDuration = 30;
 
 const VALID_VOICES = [
   "en-US-AndrewMultilingualNeural",
-  "en-US-AvaMultilingualNeural",
-  "en-US-BrianMultilingualNeural",
-  "en-US-ChristopherNeural",
-  "en-US-JennyNeural",
-  "en-US-AriaNeural",
-  "en-US-GuyNeural",
   "en-US-RogerNeural",
   "en-US-SteffanNeural",
   "en-US-EricNeural",
-  "en-GB-SoniaNeural",
-  "en-GB-RyanNeural",
 ];
 
 const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
