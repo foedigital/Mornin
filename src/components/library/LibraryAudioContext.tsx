@@ -32,9 +32,9 @@ const SILENT_MP3 =
   "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwMHAAAAAAD/+1DEAAAH+AV1UAAAIAAADSAAAABBCQ0Z2QkAALBkDg4sGQOD4ICARB8H38QBAEwfB8HwQdwfygIAgc/lAQBAEAQOD/ygIAgCAIHB///KAgCAIA//5QEAff/+UBAEAf/KAg7///5QEAQB///KD///8oCDv///lAQBAEAQBA5///8=";
 
 export const LIBRARY_VOICES = [
+  { id: "en-US-SteffanNeural", name: "Steffan", desc: "Male, calm & measured" },
   { id: "en-US-AndrewMultilingualNeural", name: "Andrew", desc: "Male, warm & natural" },
   { id: "en-US-RogerNeural", name: "Roger", desc: "Male, deep & authoritative" },
-  { id: "en-US-SteffanNeural", name: "Steffan", desc: "Male, calm & measured" },
   { id: "en-US-EricNeural", name: "Eric", desc: "Male, crisp & professional" },
 ] as const;
 

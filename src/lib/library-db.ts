@@ -151,7 +151,7 @@ export async function saveProgress(progress: BookProgress): Promise<void> {
 
 // --- Downloads ---
 
-export const DOWNLOAD_VOICE_ID = "en-US-AndrewMultilingualNeural";
+export const DOWNLOAD_VOICE_ID = "en-US-SteffanNeural";
 export const MAX_DOWNLOAD_BYTES = 20 * 1024 * 1024 * 1024; // 20 GB
 
 /** Count how many chapters of a book are cached for the download voice */
