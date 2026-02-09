@@ -4,95 +4,45 @@
  * Cleans text BEFORE sending to /api/tts so Edge TTS doesn't choke on
  * non-English passages, unusual Unicode, or broken formatting.
  *
+ * Uses `any-ascii` to transliterate non-Latin scripts (Greek, Cyrillic, etc.)
+ * into pronounceable Latin equivalents instead of stripping them.
+ *
  * Two modes:
  *  - preprocessForTTS()    — standard cleanup, preserves meaning
  *  - aggressiveCleanup()   — nuclear option, strips everything non-ASCII
  */
 
-// ── Non-English detection ──────────────────────────────────────────────
+import anyAscii from "any-ascii";
 
-/** Unicode ranges for scripts that are NOT basic Latin / English */
-const NON_LATIN_RE =
-  /[\u0370-\u03FF\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0B00-\u0B7F\u0C00-\u0C7F\u0D00-\u0D7F\u0E00-\u0E7F\u1000-\u109F\u1100-\u11FF\u1F00-\u1FFF\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]/;
-
-/** Extended Latin characters used in French, German, Spanish, Italian, etc. */
-const EXTENDED_LATIN_RE = /[À-ÖØ-öø-ÿĀ-žƀ-ɏ]/;
+// ── Transliteration ─────────────────────────────────────────────────────
 
 /**
- * Heuristic: is this line primarily non-English?
- * Returns true if >40% of alphabetic chars are non-Latin or extended-Latin.
+ * Transliterate non-ASCII characters to their Latin/ASCII equivalents.
+ * Greek "ὁμολογουμένος ζῆν" → "homologoymenos zin"
+ * French "Château" → "Chateau"
+ * Leaves plain English unchanged.
+ * Also removes emoji and other symbols that have no text equivalent.
  */
-function isNonEnglishLine(line: string): boolean {
-  const trimmed = line.trim();
-  if (trimmed.length < 3) return false;
-
-  const alphaChars = trimmed.replace(/[^a-zA-ZÀ-ÖØ-öø-ÿĀ-žƀ-ɏ\u0370-\u9FFF\uAC00-\uD7AF]/g, "");
-  if (alphaChars.length < 3) return false;
-
-  let nonEnglishCount = 0;
-  for (const ch of alphaChars) {
-    if (NON_LATIN_RE.test(ch) || EXTENDED_LATIN_RE.test(ch)) {
-      nonEnglishCount++;
-    }
-  }
-
-  return nonEnglishCount / alphaChars.length > 0.4;
-}
-
-/**
- * Detect and replace blocks of non-English text with a spoken note.
- * Groups consecutive non-English lines into a single replacement.
- */
-function replaceNonEnglishBlocks(text: string): string {
-  const lines = text.split("\n");
-  const result: string[] = [];
-  let inForeignBlock = false;
-
-  for (const line of lines) {
-    if (isNonEnglishLine(line)) {
-      if (!inForeignBlock) {
-        result.push("[Foreign language passage.]");
-        inForeignBlock = true;
-      }
-      // skip the line (already replaced)
-    } else {
-      inForeignBlock = false;
-      result.push(line);
-    }
-  }
-
-  return result.join("\n");
-}
-
-/**
- * Replace inline non-Latin characters/words within English text.
- * Handles cases where Greek, Cyrillic, Arabic, CJK etc. words are embedded
- * in otherwise English sentences.
- * E.g., "to live consistently (ὁμολογουμένος ζῆν)" → "to live consistently"
- */
-function replaceInlineNonLatinChars(text: string): string {
+function transliterateForTTS(text: string): string {
   let t = text;
 
-  // Non-Latin script character class including Greek Extended (U+1F00-1FFF)
-  const NL = "\u0370-\u03FF\u0400-\u04FF\u0500-\u052F\u0600-\u06FF\u0900-\u097F\u0980-\u09FF\u0A00-\u0A7F\u0B00-\u0B7F\u0C00-\u0C7F\u0D00-\u0D7F\u0E00-\u0E7F\u1000-\u109F\u1100-\u11FF\u1F00-\u1FFF\u3000-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF";
-  const nlDetect = new RegExp(`[${NL}]`);
-  const nlSequence = new RegExp(`[${NL}]+`, "g");
+  // Handle special punctuation BEFORE anyAscii (which would flatten them to basic ASCII)
+  // Em/en dashes → comma pause (better for TTS than a plain hyphen)
+  t = t.replace(/[—–]/g, ", ");
+  t = t.replace(/,\s*,/g, ",");
+  // Smart quotes → straight quotes
+  t = t.replace(/[""„‟❝❞«»‹›❮❯]/g, '"');
+  t = t.replace(/[''‚‛❛❜]/g, "'");
+  // Ellipsis
+  t = t.replace(/…/g, "...");
 
-  // Remove parenthetical foreign text: (Greek words) or [Greek words]
-  t = t.replace(new RegExp(`\\([^)]*[${NL}][^)]*\\)`, "g"), "");
-  t = t.replace(new RegExp(`\\[[^\\]]*[${NL}][^\\]]*\\]`, "g"), "");
+  // Transliterate remaining non-ASCII → Latin/ASCII
+  t = anyAscii(t);
 
-  // Replace any remaining sequences of non-Latin script characters
-  t = t.replace(nlSequence, "");
+  // anyAscii converts emoji to :name: tokens — remove them
+  t = t.replace(/:[a-z_]+:/g, "");
 
-  // Remove emoji and miscellaneous symbols
-  // Use surrogate pair ranges since target may not support 'u' flag
-  t = t.replace(/[\u2600-\u26FF\u2700-\u27BF]/g, "");
-  t = t.replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]/g, "");
-
-  // Clean up leftover empty parens/brackets and double spaces
-  t = t.replace(/\(\s*\)/g, "");
-  t = t.replace(/\[\s*\]/g, "");
+  // Clean up extra spaces from removals
   t = t.replace(/ {2,}/g, " ");
 
   return t;
@@ -183,20 +133,17 @@ function cleanPoetryFormatting(text: string): string {
 export function preprocessForTTS(text: string): string {
   let t = text;
 
-  // Step 1: Replace full non-English blocks (lines that are >40% non-Latin)
-  t = replaceNonEnglishBlocks(t);
+  // Step 1: Transliterate non-Latin scripts to pronounceable Latin
+  // Greek "ὁμολογουμένος" → "homologoymenos", French "Château" → "Chateau"
+  t = transliterateForTTS(t);
 
-  // Step 2: Replace inline non-Latin chars within English text
-  // (catches Greek/Cyrillic/etc. words embedded in English sentences)
-  t = replaceInlineNonLatinChars(t);
-
-  // Step 3: Clean special characters
+  // Step 2: Clean special characters (HTML entities, punctuation, etc.)
   t = cleanSpecialCharacters(t);
 
-  // Step 4: Clean poetry/formatting
+  // Step 3: Clean poetry/formatting
   t = cleanPoetryFormatting(t);
 
-  // Step 5: Final whitespace normalization
+  // Step 4: Final whitespace normalization
   t = t.replace(/ {2,}/g, " ");
   t = t.trim();
 
