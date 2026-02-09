@@ -63,6 +63,7 @@ export default function BookCard({
   storageSize,
 }: BookCardProps) {
   const [expanded, setExpanded] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmRemoveDl, setConfirmRemoveDl] = useState(false);
 
@@ -207,17 +208,40 @@ export default function BookCard({
             </button>
           )}
 
-          <button
-            onClick={handleDelete}
-            className={`p-2 transition-colors ${
-              confirmDelete ? "text-red-400 hover:text-red-300" : "text-gray-600 hover:text-gray-400"
-            }`}
-            aria-label="Delete book"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-          </button>
+          {/* Overflow menu */}
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowMenu(!showMenu);
+                setConfirmDelete(false);
+              }}
+              className="p-2 text-gray-600 hover:text-gray-400 transition-colors"
+              aria-label="More options"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <circle cx="12" cy="5" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="12" cy="19" r="2" />
+              </svg>
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-[#252547] border border-white/10 rounded-lg shadow-xl py-1 z-20 min-w-[160px]">
+                <button
+                  onClick={() => {
+                    handleDelete();
+                    if (confirmDelete) setShowMenu(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                    confirmDelete
+                      ? "text-red-400 hover:bg-red-400/10"
+                      : "text-gray-300 hover:bg-white/5"
+                  }`}
+                >
+                  {confirmDelete ? "Tap again to delete" : "Delete book"}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

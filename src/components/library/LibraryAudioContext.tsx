@@ -47,6 +47,7 @@ interface LibraryAudioState {
   currentBookId: string | null;
   currentChapter: number | null;
   bookTitle: string;
+  bookAuthor: string;
   chapterTitle: string;
   totalChapters: number;
   duration: number;
@@ -113,6 +114,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const [currentBookId, setCurrentBookId] = useState<string | null>(null);
   const [currentChapter, setCurrentChapter] = useState<number | null>(null);
   const [bookTitle, setBookTitle] = useState("");
+  const [bookAuthor, setBookAuthor] = useState("");
   const [chapterTitle, setChapterTitle] = useState("");
   const [totalChapters, setTotalChapters] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -308,6 +310,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       setCurrentBookId(book.id);
       setCurrentChapter(chapterIndex);
       setBookTitle(book.title);
+      setBookAuthor(book.author);
       setChapterTitle(chapter.title);
       setTotalChapters(book.chapters.length);
       setIsActive(true);
@@ -510,6 +513,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     setIsPlaying(false);
     setCurrentBookId(null);
     setCurrentChapter(null);
+    setBookAuthor("");
     bookRef.current = null;
   }, [currentBookId, currentChapter]);
 
@@ -554,6 +558,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     currentBookId,
     currentChapter,
     bookTitle,
+    bookAuthor,
     chapterTitle,
     totalChapters,
     duration,

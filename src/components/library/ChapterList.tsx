@@ -28,7 +28,7 @@ export default function ChapterList({
   const completedUpTo = progress?.currentChapter ?? -1;
 
   return (
-    <div className="space-y-1.5">
+    <div className="divide-y divide-white/[0.08]">
       {chapters.map((chapter) => {
         const isComplete = chapter.index < completedUpTo;
         const isCurrent = chapter.index === completedUpTo;
@@ -39,21 +39,23 @@ export default function ChapterList({
           <button
             key={chapter.index}
             onClick={() => onPlayChapter(bookId, chapter.index)}
-            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 min-h-[56px] py-3 text-left transition-all duration-200 ${
               isPlaying
-                ? "bg-accent/20 text-accent"
-                : "hover:bg-white/5 text-gray-300"
+                ? "border-l-[3px] border-accent bg-accent/5 text-accent"
+                : isCurrent
+                  ? "border-l-[3px] border-accent/50 text-gray-200"
+                  : "border-l-[3px] border-transparent hover:bg-white/5 text-gray-300"
             }`}
           >
-            {/* Play / check icon */}
-            <div className="flex-shrink-0 w-7 h-7 flex items-center justify-center">
+            {/* Play / check icon — 44px touch target */}
+            <div className="flex-shrink-0 w-11 h-11 flex items-center justify-center">
               {isPlaying ? (
                 <svg className="w-5 h-5 text-accent" fill="currentColor" viewBox="0 0 24 24">
                   <rect x="6" y="4" width="4" height="16" rx="1" />
                   <rect x="14" y="4" width="4" height="16" rx="1" />
                 </svg>
               ) : isComplete ? (
-                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-green-500/70" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
@@ -73,13 +75,8 @@ export default function ChapterList({
             {/* Duration + word count */}
             <div className="flex-shrink-0 text-right">
               <p className="text-xs text-gray-500">{formatDuration(duration)}</p>
-              <p className="text-xs text-gray-600">{chapter.wordCount}w</p>
+              <p className="text-[11px] text-gray-600 mt-0.5">{chapter.wordCount}w</p>
             </div>
-
-            {/* Current indicator */}
-            {isCurrent && !isPlaying && (
-              <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-            )}
           </button>
         );
       })}
