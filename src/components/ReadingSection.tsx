@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import readingsData from "../../data/readings.json";
 import LiteraturePlayButton from "@/components/LiteraturePlayButton";
 import DownloadModal from "@/components/library/DownloadModal";
@@ -39,10 +39,25 @@ const TYPE_ICONS: Record<string, string> = {
   "short story": "\u{1F4D6}",
   novella: "\u{1F4D5}",
   "short story collection": "\u{1F4DA}",
+  novel: "\u{1F4D7}",
   essay: "\u{270D}\u{FE0F}",
   speech: "\u{1F3A4}",
   philosophy: "\u{1F9D8}",
+  theology: "\u{26EA}",
+  memoir: "\u{1F4DD}",
 };
+
+const CATEGORY_TABS = [
+  { key: "all", label: "All" },
+  { key: "poem", label: "Poems" },
+  { key: "short story", label: "Short Stories" },
+  { key: "novella", label: "Novellas" },
+  { key: "novel", label: "Novels" },
+  { key: "nonfiction", label: "Non-Fiction" },
+  { key: "speech", label: "Speeches" },
+];
+
+const NONFICTION_TYPES = ["philosophy", "theology", "memoir", "essay"];
 
 function seededShuffle(arr: Reading[], seed: number): Reading[] {
   const shuffled = [...arr];
@@ -80,6 +95,7 @@ export default function ReadingSection() {
   const [showArchive, setShowArchive] = useState(false);
   const [converted, setConverted] = useState<Set<string>>(new Set());
   const [downloadTarget, setDownloadTarget] = useState<Reading | null>(null);
+  const [category, setCategory] = useState("all");
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -93,6 +109,18 @@ export default function ReadingSection() {
     setIndex(dayOfYear % readings.length);
     setCompleted(loadCompleted());
     setConverted(loadConverted());
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (category === "all") return shuffled;
+    if (category === "nonfiction") return shuffled.filter(r => NONFICTION_TYPES.includes(r.type));
+    if (category === "short story") return shuffled.filter(r => r.type === "short story" || r.type === "short story collection");
+    return shuffled.filter(r => r.type === category);
+  }, [shuffled, category]);
+
+  const handleCategoryChange = useCallback((newCategory: string) => {
+    setCategory(newCategory);
+    setIndex(0);
   }, []);
 
   const toggleCompleted = useCallback(
@@ -113,14 +141,14 @@ export default function ReadingSection() {
   );
 
   const next = useCallback(() => {
-    setIndex((prev) => (prev !== null ? (prev + 1) % shuffled.length : 0));
-  }, [shuffled.length]);
+    setIndex((prev) => (prev !== null ? (prev + 1) % filtered.length : 0));
+  }, [filtered.length]);
 
   const prev = useCallback(() => {
     setIndex((prev) =>
-      prev !== null ? (prev - 1 + shuffled.length) % shuffled.length : 0
+      prev !== null ? (prev - 1 + filtered.length) % filtered.length : 0
     );
-  }, [shuffled.length]);
+  }, [filtered.length]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -159,9 +187,10 @@ export default function ReadingSection() {
     setDownloadTarget(null);
   }, []);
 
-  if (index === null || shuffled.length === 0) return null;
+  if (index === null || filtered.length === 0) return null;
 
-  const reading = shuffled[index];
+  const safeIndex = index % filtered.length;
+  const reading = filtered[safeIndex];
   const icon = TYPE_ICONS[reading.type] || "\u{1F4D6}";
   const isRead = completed.has(readingKey(reading));
 
@@ -175,19 +204,43 @@ export default function ReadingSection() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className="text-accent text-lg">{icon}</span>
             <h2 className="text-accent font-semibold text-sm uppercase tracking-wider">
-              Today&apos;s Reading
+              Literature
             </h2>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-xs">tap / swipe</span>
             <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
-              {index + 1}/{shuffled.length}
+              {safeIndex + 1}/{filtered.length}
             </span>
           </div>
+        </div>
+
+        {/* Category filter tabs */}
+        <div
+          className="flex gap-1.5 overflow-x-auto pb-3 mb-3 -mx-1 px-1"
+          style={{ scrollbarWidth: "none" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {CATEGORY_TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleCategoryChange(tab.key);
+              }}
+              className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                category === tab.key
+                  ? "bg-accent text-dark-bg"
+                  : "bg-white/5 text-gray-400 hover:bg-white/10"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         <div className="flex items-start gap-3 mb-2">

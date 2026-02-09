@@ -162,15 +162,7 @@
       "url": "https://www.poetryfoundation.org/poetrymagazine/poems/44212/the-love-song-of-j-alfred-prufrock",
       "readTime": "5 min"
     },
-    {
-      "title": "The Man in the Arena",
-      "author": "Theodore Roosevelt",
-      "type": "speech",
-      "year": 1910,
-      "excerpt": "It is not the critic who counts; not the man who points out how the strong man stumbles...",
-      "url": "https://www.presidency.ucsb.edu/documents/address-the-sorbonne-paris-france-citizenship-republic",
-      "readTime": "20 min"
-    },
+
     {
       "title": "The Tell-Tale Heart",
       "author": "Edgar Allan Poe",
@@ -188,6 +180,33 @@
       "excerpt": "The thousand injuries of Fortunato I had borne as I best could, but when he ventured upon insult I vowed revenge.",
       "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-cask-of-amontillado",
       "readTime": "12 min"
+    },
+    {
+      "title": "The Masque of the Red Death",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1842,
+      "excerpt": "The 'Red Death' had long devastated the country. No pestilence had ever been so fatal, or so hideous.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-masque-of-the-red-death",
+      "readTime": "10 min"
+    },
+    {
+      "title": "The Pit and the Pendulum",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1842,
+      "excerpt": "I was sick — sick unto death with that long agony; and when they at length unbound me, and I was permitted to sit, I felt that my senses were leaving me.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-pit-and-the-pendulum",
+      "readTime": "20 min"
+    },
+    {
+      "title": "The Fall of the House of Usher",
+      "author": "Edgar Allan Poe",
+      "type": "short story",
+      "year": 1839,
+      "excerpt": "During the whole of a dull, dark, and soundless day in the autumn of the year... I had been passing alone, on horseback, through a singularly dreary tract of country.",
+      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-fall-of-the-house-of-usher",
+      "readTime": "25 min"
     },
     {
       "title": "The Gift of the Magi",
@@ -271,60 +290,6 @@
       "readTime": "35 min"
     },
     {
-      "title": "The Metamorphosis",
-      "author": "Franz Kafka",
-      "type": "novella",
-      "year": 1915,
-      "excerpt": "One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.",
-      "url": "https://www.gutenberg.org/ebooks/5200",
-      "readTime": "60 min"
-    },
-    {
-      "title": "A Christmas Carol",
-      "author": "Charles Dickens",
-      "type": "novella",
-      "year": 1843,
-      "excerpt": "Marley was dead: to begin with. There is no doubt whatever about that.",
-      "url": "https://www.gutenberg.org/ebooks/46",
-      "readTime": "90 min"
-    },
-    {
-      "title": "The Adventures of Sherlock Holmes",
-      "author": "Arthur Conan Doyle",
-      "type": "short story collection",
-      "year": 1892,
-      "excerpt": "To Sherlock Holmes she is always the woman. I have seldom heard him mention her under any other name.",
-      "url": "https://www.gutenberg.org/ebooks/1661",
-      "readTime": "5+ hours"
-    },
-    {
-      "title": "Heart of Darkness",
-      "author": "Joseph Conrad",
-      "type": "novella",
-      "year": 1899,
-      "excerpt": "The Nellie, a cruising yawl, swung to her anchor without a flutter of the sails, and was at rest.",
-      "url": "https://www.gutenberg.org/ebooks/219",
-      "readTime": "90 min"
-    },
-    {
-      "title": "The Call of the Wild",
-      "author": "Jack London",
-      "type": "novella",
-      "year": 1903,
-      "excerpt": "Buck did not read the newspapers, or he would have known that trouble was brewing.",
-      "url": "https://www.gutenberg.org/ebooks/215",
-      "readTime": "3 hours"
-    },
-    {
-      "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
-      "author": "Robert Louis Stevenson",
-      "type": "novella",
-      "year": 1886,
-      "excerpt": "Mr. Utterson the lawyer was a man of a rugged countenance that was never lighted by a smile.",
-      "url": "https://www.gutenberg.org/ebooks/43",
-      "readTime": "2 hours"
-    },
-    {
       "title": "The Lottery",
       "author": "Shirley Jackson",
       "type": "short story",
@@ -370,23 +335,234 @@
       "readTime": "25 min"
     },
     {
-      "title": "The Pit and the Pendulum",
-      "author": "Edgar Allan Poe",
+      "title": "In the Penal Colony",
+      "author": "Franz Kafka",
       "type": "short story",
-      "year": 1842,
-      "excerpt": "I was sick — sick unto death with that long agony; and when they at length unbound me, and I was permitted to sit, I felt that my senses were leaving me.",
-      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-pit-and-the-pendulum",
-      "readTime": "20 min"
-    },
-    {
-      "title": "The Fall of the House of Usher",
-      "author": "Edgar Allan Poe",
-      "type": "short story",
-      "year": 1839,
-      "excerpt": "During the whole of a dull, dark, and soundless day in the autumn of the year... I had been passing alone, on horseback, through a singularly dreary tract of country.",
-      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-fall-of-the-house-of-usher",
+      "year": 1919,
+      "excerpt": "'It's a remarkable piece of apparatus,' said the officer to the explorer, surveying with a certain air of admiration the apparatus which was after all quite familiar to him.",
+      "url": "https://www.gutenberg.org/ebooks/49836",
       "readTime": "25 min"
     },
+    {
+      "title": "Before the Law",
+      "author": "Franz Kafka",
+      "type": "short story",
+      "year": 1915,
+      "excerpt": "Before the law sits a gatekeeper. To this gatekeeper comes a man from the country who asks to gain entry into the law.",
+      "url": "https://www.gutenberg.org/ebooks/7849",
+      "readTime": "5 min"
+    },
+    {
+      "title": "The Signal-Man",
+      "author": "Charles Dickens",
+      "type": "short story",
+      "year": 1866,
+      "excerpt": "'Halloa! Below there!' When he heard a voice thus calling to him, he was standing at the door of his box, with a flag in his hand.",
+      "url": "https://americanliterature.com/author/charles-dickens/short-story/the-signal-man",
+      "readTime": "15 min"
+    },
+
+    {
+      "title": "The Adventures of Sherlock Holmes",
+      "author": "Arthur Conan Doyle",
+      "type": "short story collection",
+      "year": 1892,
+      "excerpt": "To Sherlock Holmes she is always the woman. I have seldom heard him mention her under any other name.",
+      "url": "https://www.gutenberg.org/ebooks/1661",
+      "readTime": "5+ hours"
+    },
+    {
+      "title": "The Return of Sherlock Holmes",
+      "author": "Arthur Conan Doyle",
+      "type": "short story collection",
+      "year": 1905,
+      "excerpt": "It was in the spring of the year 1894 that all London was interested, and the fashionable world dismayed, by the murder of the Honourable Ronald Adair.",
+      "url": "https://www.gutenberg.org/ebooks/108",
+      "readTime": "8 hours"
+    },
+
+    {
+      "title": "The Metamorphosis",
+      "author": "Franz Kafka",
+      "type": "novella",
+      "year": 1915,
+      "excerpt": "One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.",
+      "url": "https://www.gutenberg.org/ebooks/5200",
+      "readTime": "60 min"
+    },
+    {
+      "title": "A Christmas Carol",
+      "author": "Charles Dickens",
+      "type": "novella",
+      "year": 1843,
+      "excerpt": "Marley was dead: to begin with. There is no doubt whatever about that.",
+      "url": "https://www.gutenberg.org/ebooks/46",
+      "readTime": "90 min"
+    },
+    {
+      "title": "Heart of Darkness",
+      "author": "Joseph Conrad",
+      "type": "novella",
+      "year": 1899,
+      "excerpt": "The Nellie, a cruising yawl, swung to her anchor without a flutter of the sails, and was at rest.",
+      "url": "https://www.gutenberg.org/ebooks/219",
+      "readTime": "90 min"
+    },
+    {
+      "title": "The Call of the Wild",
+      "author": "Jack London",
+      "type": "novella",
+      "year": 1903,
+      "excerpt": "Buck did not read the newspapers, or he would have known that trouble was brewing.",
+      "url": "https://www.gutenberg.org/ebooks/215",
+      "readTime": "3 hours"
+    },
+    {
+      "title": "The Strange Case of Dr. Jekyll and Mr. Hyde",
+      "author": "Robert Louis Stevenson",
+      "type": "novella",
+      "year": 1886,
+      "excerpt": "Mr. Utterson the lawyer was a man of a rugged countenance that was never lighted by a smile.",
+      "url": "https://www.gutenberg.org/ebooks/43",
+      "readTime": "2 hours"
+    },
+    {
+      "title": "The Hound of the Baskervilles",
+      "author": "Arthur Conan Doyle",
+      "type": "novella",
+      "year": 1902,
+      "excerpt": "Mr. Sherlock Holmes, who was usually very late in the mornings, save upon those not infrequent occasions when he was up all night, was seated at the breakfast table.",
+      "url": "https://www.gutenberg.org/ebooks/2852",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "Notes from the Underground",
+      "author": "Fyodor Dostoyevsky",
+      "type": "novella",
+      "year": 1864,
+      "excerpt": "I am a sick man... I am a spiteful man. I am an unattractive man.",
+      "url": "https://www.gutenberg.org/ebooks/600",
+      "readTime": "3 hours"
+    },
+    {
+      "title": "Siddhartha",
+      "author": "Hermann Hesse",
+      "type": "novella",
+      "year": 1922,
+      "excerpt": "In the shade of the house, in the sunshine of the riverbank near the boats, in the shade of the Sal-wood forest, Siddhartha grew up.",
+      "url": "https://www.gutenberg.org/ebooks/2500",
+      "readTime": "3 hours"
+    },
+    {
+      "title": "Animal Farm",
+      "author": "George Orwell",
+      "type": "novella",
+      "year": 1945,
+      "excerpt": "Mr. Jones, of the Manor Farm, had locked the hen-houses for the night, but was too drunk to remember to shut the pop-holes.",
+      "url": "https://www.gutenberg.net.au/ebooks/FR100039.html",
+      "readTime": "3 hours"
+    },
+
+    {
+      "title": "The Trial",
+      "author": "Franz Kafka",
+      "type": "novel",
+      "year": 1925,
+      "excerpt": "Someone must have slandered Josef K., for one morning, without having done anything truly wrong, he was arrested.",
+      "url": "https://www.gutenberg.org/ebooks/7849",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "A Tale of Two Cities",
+      "author": "Charles Dickens",
+      "type": "novel",
+      "year": 1859,
+      "excerpt": "It was the best of times, it was the worst of times, it was the age of wisdom, it was the age of foolishness.",
+      "url": "https://www.gutenberg.org/ebooks/98",
+      "readTime": "15 hours"
+    },
+    {
+      "title": "A Study in Scarlet",
+      "author": "Arthur Conan Doyle",
+      "type": "novel",
+      "year": 1887,
+      "excerpt": "In the year 1878 I took my degree of Doctor of Medicine of the University of London, and proceeded to Netley to go through the course prescribed for surgeons in the army.",
+      "url": "https://www.gutenberg.org/ebooks/244",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "The Count of Monte Cristo",
+      "author": "Alexandre Dumas",
+      "type": "novel",
+      "year": 1844,
+      "excerpt": "On the 24th of February, 1815, the look-out of Notre-Dame de la Garde signalled the three-master, the Pharaon from Smyrna, Trieste, and Naples.",
+      "url": "https://www.gutenberg.org/ebooks/1184",
+      "readTime": "45 hours"
+    },
+    {
+      "title": "Frankenstein; Or, The Modern Prometheus",
+      "author": "Mary Shelley",
+      "type": "novel",
+      "year": 1818,
+      "excerpt": "You will rejoice to hear that no disaster has accompanied the commencement of an enterprise which you have regarded with such evil forebodings.",
+      "url": "https://www.gutenberg.org/ebooks/84",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "Crime and Punishment",
+      "author": "Fyodor Dostoyevsky",
+      "type": "novel",
+      "year": 1866,
+      "excerpt": "On an exceptionally hot evening early in July, a young man came out of the garret in which he lodged and walked slowly, as though in hesitation, towards K. bridge.",
+      "url": "https://www.gutenberg.org/ebooks/2554",
+      "readTime": "20 hours"
+    },
+    {
+      "title": "The Red Badge of Courage",
+      "author": "Stephen Crane",
+      "type": "novel",
+      "year": 1895,
+      "excerpt": "The cold passed reluctantly from the earth, and the retiring fogs revealed an army stretched out on the hills, resting.",
+      "url": "https://www.gutenberg.org/ebooks/463",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "All Quiet on the Western Front",
+      "author": "Erich Maria Remarque",
+      "type": "novel",
+      "year": 1929,
+      "excerpt": "We are at rest five miles behind the front. Yesterday we were relieved, and now our bellies are full of beef and haricot beans.",
+      "url": "https://www.gutenberg.org/ebooks/75011",
+      "readTime": "6 hours"
+    },
+    {
+      "title": "A Farewell to Arms",
+      "author": "Ernest Hemingway",
+      "type": "novel",
+      "year": 1929,
+      "excerpt": "In the late summer of that year we lived in a house in a village that looked across the river and the plain to the mountains.",
+      "url": "https://www.gutenberg.org/ebooks/75201",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "The Thirty-Nine Steps",
+      "author": "John Buchan",
+      "type": "novel",
+      "year": 1915,
+      "excerpt": "I returned from the City about three o'clock on that May afternoon pretty well disgusted with life.",
+      "url": "https://www.gutenberg.org/ebooks/558",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "The Picture of Dorian Gray",
+      "author": "Oscar Wilde",
+      "type": "novel",
+      "year": 1890,
+      "excerpt": "The studio was filled with the rich odour of roses, and when the light summer wind stirred amidst the trees of the garden, there came through the open door the heavy scent of the lilac.",
+      "url": "https://www.gutenberg.org/ebooks/174",
+      "readTime": "7 hours"
+    },
+
     {
       "title": "Meditations (Book 2)",
       "author": "Marcus Aurelius",
@@ -405,6 +581,108 @@
       "url": "https://www.gutenberg.org/ebooks/132",
       "readTime": "2 hours"
     },
+    {
+      "title": "The Prince",
+      "author": "Niccolò Machiavelli",
+      "type": "philosophy",
+      "year": 1532,
+      "excerpt": "All states, all powers, that have held and hold rule over men have been and are either republics or principalities.",
+      "url": "https://www.gutenberg.org/ebooks/1232",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "The Enchiridion",
+      "author": "Epictetus",
+      "type": "philosophy",
+      "year": 135,
+      "excerpt": "Some things are in our control and others not. Things in our control are opinion, pursuit, desire, aversion, and whatever are our own actions.",
+      "url": "https://www.gutenberg.org/ebooks/45109",
+      "readTime": "1 hour"
+    },
+    {
+      "title": "Apology",
+      "author": "Plato",
+      "type": "philosophy",
+      "year": -399,
+      "excerpt": "How you, O Athenians, have been affected by my accusers, I cannot tell; but I know that their persuasive words almost made me forget who I was.",
+      "url": "https://www.gutenberg.org/ebooks/1656",
+      "readTime": "1 hour"
+    },
+    {
+      "title": "Thus Spoke Zarathustra",
+      "author": "Friedrich Nietzsche",
+      "type": "philosophy",
+      "year": 1883,
+      "excerpt": "When Zarathustra was thirty years old, he left his home and the lake of his home, and went into the mountains.",
+      "url": "https://www.gutenberg.org/ebooks/1998",
+      "readTime": "10 hours"
+    },
+
+    {
+      "title": "Orthodoxy",
+      "author": "G.K. Chesterton",
+      "type": "theology",
+      "year": 1908,
+      "excerpt": "The only possible excuse for this book is that it is an answer to a challenge.",
+      "url": "https://www.gutenberg.org/ebooks/130",
+      "readTime": "5 hours"
+    },
+    {
+      "title": "The Confessions of St. Augustine",
+      "author": "St. Augustine",
+      "type": "theology",
+      "year": 397,
+      "excerpt": "Great art Thou, O Lord, and greatly to be praised; great is Thy power, and Thy wisdom infinite.",
+      "url": "https://www.gutenberg.org/ebooks/3296",
+      "readTime": "12 hours"
+    },
+
+    {
+      "title": "The Autobiography of Benjamin Franklin",
+      "author": "Benjamin Franklin",
+      "type": "memoir",
+      "year": 1791,
+      "excerpt": "Dear Son: I have ever had pleasure in obtaining any little anecdotes of my ancestors.",
+      "url": "https://www.gutenberg.org/ebooks/20203",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "Narrative of the Life of Frederick Douglass",
+      "author": "Frederick Douglass",
+      "type": "memoir",
+      "year": 1845,
+      "excerpt": "I was born in Tuckahoe, near Hillsborough, and about twelve miles from Easton, in Talbot county, Maryland.",
+      "url": "https://www.gutenberg.org/ebooks/23",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "Up from Slavery",
+      "author": "Booker T. Washington",
+      "type": "memoir",
+      "year": 1901,
+      "excerpt": "I was born a slave on a plantation in Franklin County, Virginia. I am not quite sure of the exact place or exact date of my birth.",
+      "url": "https://www.gutenberg.org/ebooks/2376",
+      "readTime": "6 hours"
+    },
+    {
+      "title": "Personal Memoirs of U.S. Grant",
+      "author": "Ulysses S. Grant",
+      "type": "memoir",
+      "year": 1885,
+      "excerpt": "My family is American, and has been for generations, in all its branches, direct and collateral.",
+      "url": "https://www.gutenberg.org/ebooks/4367",
+      "readTime": "30 hours"
+    },
+    {
+      "title": "Theodore Roosevelt: An Autobiography",
+      "author": "Theodore Roosevelt",
+      "type": "memoir",
+      "year": 1913,
+      "excerpt": "My grandfather on my father's side was of almost purely Dutch blood.",
+      "url": "https://www.gutenberg.org/ebooks/3335",
+      "readTime": "15 hours"
+    },
+
     {
       "title": "Walden (Chapter 1: Economy)",
       "author": "Henry David Thoreau",
@@ -432,6 +710,16 @@
       "url": "https://americanliterature.com/author/henry-david-thoreau/essay/civil-disobedience",
       "readTime": "30 min"
     },
+
+    {
+      "title": "The Man in the Arena",
+      "author": "Theodore Roosevelt",
+      "type": "speech",
+      "year": 1910,
+      "excerpt": "It is not the critic who counts; not the man who points out how the strong man stumbles...",
+      "url": "https://www.presidency.ucsb.edu/documents/address-the-sorbonne-paris-france-citizenship-republic",
+      "readTime": "20 min"
+    },
     {
       "title": "The Gettysburg Address",
       "author": "Abraham Lincoln",
@@ -442,22 +730,76 @@
       "readTime": "2 min"
     },
     {
-      "title": "The Prince",
-      "author": "Niccolò Machiavelli",
-      "type": "philosophy",
-      "year": 1532,
-      "excerpt": "All states, all powers, that have held and hold rule over men have been and are either republics or principalities.",
-      "url": "https://www.gutenberg.org/ebooks/1232",
-      "readTime": "4 hours"
+      "title": "Second Inaugural Address",
+      "author": "Abraham Lincoln",
+      "type": "speech",
+      "year": 1865,
+      "excerpt": "At this second appearing to take the oath of the Presidential office there is less occasion for an extended address than there was at the first.",
+      "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-42",
+      "readTime": "3 min"
     },
     {
-      "title": "The Masque of the Red Death",
-      "author": "Edgar Allan Poe",
-      "type": "short story",
-      "year": 1842,
-      "excerpt": "The 'Red Death' had long devastated the country. No pestilence had ever been so fatal, or so hideous.",
-      "url": "https://americanliterature.com/author/edgar-allan-poe/short-story/the-masque-of-the-red-death",
+      "title": "First Inaugural Address",
+      "author": "Franklin D. Roosevelt",
+      "type": "speech",
+      "year": 1933,
+      "excerpt": "The only thing we have to fear is fear itself — nameless, unreasoning, unjustified terror which paralyzes needed efforts to convert retreat into advance.",
+      "url": "https://www.presidency.ucsb.edu/documents/inaugural-address-8",
       "readTime": "10 min"
+    },
+    {
+      "title": "Day of Infamy",
+      "author": "Franklin D. Roosevelt",
+      "type": "speech",
+      "year": 1941,
+      "excerpt": "Yesterday, December 7th, 1941 — a date which will live in infamy — the United States of America was suddenly and deliberately attacked.",
+      "url": "https://www.americanrhetoric.com/speeches/fdrpearlharbor.htm",
+      "readTime": "3 min"
+    },
+    {
+      "title": "Inaugural Address",
+      "author": "John F. Kennedy",
+      "type": "speech",
+      "year": 1961,
+      "excerpt": "Ask not what your country can do for you — ask what you can do for your country.",
+      "url": "https://www.americanrhetoric.com/speeches/jfkinaugural.htm",
+      "readTime": "8 min"
+    },
+    {
+      "title": "Space Shuttle Challenger Disaster Address",
+      "author": "Ronald Reagan",
+      "type": "speech",
+      "year": 1986,
+      "excerpt": "The crew of the space shuttle Challenger honored us by the manner in which they lived their lives. We will never forget them, nor the last time we saw them, this morning, as they prepared for their journey and waved goodbye and slipped the surly bonds of earth to touch the face of God.",
+      "url": "https://www.americanrhetoric.com/speeches/ronaldreaganchallenger.htm",
+      "readTime": "5 min"
+    },
+    {
+      "title": "We Shall Fight on the Beaches",
+      "author": "Winston Churchill",
+      "type": "speech",
+      "year": 1940,
+      "excerpt": "We shall fight on the beaches, we shall fight on the landing grounds, we shall fight in the fields and in the streets; we shall never surrender.",
+      "url": "https://www.americanrhetoric.com/speeches/winstonchurchillweshallfiightonthebeaches.htm",
+      "readTime": "15 min"
+    },
+    {
+      "title": "I Have a Dream",
+      "author": "Martin Luther King Jr.",
+      "type": "speech",
+      "year": 1963,
+      "excerpt": "I have a dream that one day this nation will rise up and live out the true meaning of its creed: that all men are created equal.",
+      "url": "https://www.americanrhetoric.com/speeches/mlkihaveadream.htm",
+      "readTime": "12 min"
+    },
+    {
+      "title": "Duty, Honor, Country",
+      "author": "Douglas MacArthur",
+      "type": "speech",
+      "year": 1962,
+      "excerpt": "Duty, Honor, Country — those three hallowed words reverently dictate what you ought to be, what you can be, what you will be.",
+      "url": "https://www.americanrhetoric.com/speeches/douglasmacarthurthabornconcede.htm",
+      "readTime": "15 min"
     }
   ]
 }
