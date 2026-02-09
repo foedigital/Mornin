@@ -5,6 +5,7 @@ import {
   getAllBooks,
   addBook,
   deleteBook,
+  updateBookMeta,
   getProgress,
   getCachedAudio,
   getBookCachedChapterCount,
@@ -313,6 +314,11 @@ export default function LibraryPage() {
     setTotalStorageUsed((prev) => Math.max(0, prev - freed));
   }, []);
 
+  const handleEdit = useCallback(async (bookId: string, title: string, author: string) => {
+    await updateBookMeta(bookId, title, author);
+    setBooks((prev) => prev.map((b) => b.id === bookId ? { ...b, title, author } : b));
+  }, []);
+
   const handleArchive = useCallback((bookId: string) => {
     const book = books.find((b) => b.id === bookId);
     if (!book) return;
@@ -603,6 +609,7 @@ export default function LibraryPage() {
               onDelete={handleDelete}
               onArchive={handleArchive}
               isArchived={archivedUrls.has(book.url)}
+              onEdit={handleEdit}
               onPlayChapter={handlePlayChapter}
               currentlyPlayingBookId={currentBookId}
               currentlyPlayingChapter={currentChapter}

@@ -12,6 +12,7 @@ interface BookCardProps {
   onDelete: (id: string) => void;
   onArchive: (bookId: string) => void;
   isArchived: boolean;
+  onEdit: (bookId: string, title: string, author: string) => void;
   onPlayChapter: (bookId: string, chapterIndex: number) => void;
   currentlyPlayingBookId: string | null;
   currentlyPlayingChapter: number | null;
@@ -57,6 +58,7 @@ export default function BookCard({
   onDelete,
   onArchive,
   isArchived,
+  onEdit,
   onPlayChapter,
   currentlyPlayingBookId,
   currentlyPlayingChapter,
@@ -70,6 +72,9 @@ export default function BookCard({
   const [showMenu, setShowMenu] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmRemoveDl, setConfirmRemoveDl] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(book.title);
+  const [editAuthor, setEditAuthor] = useState(book.author);
 
   const totalChapters = book.chapters.length;
   const completedChapters = progress ? progress.currentChapter : 0;
@@ -84,6 +89,21 @@ export default function BookCard({
       setConfirmDelete(true);
       setTimeout(() => setConfirmDelete(false), 3000);
     }
+  };
+
+  const handleSaveEdit = () => {
+    const trimmedTitle = editTitle.trim();
+    const trimmedAuthor = editAuthor.trim();
+    if (trimmedTitle && (trimmedTitle !== book.title || trimmedAuthor !== book.author)) {
+      onEdit(book.id, trimmedTitle, trimmedAuthor);
+    }
+    setEditing(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditTitle(book.title);
+    setEditAuthor(book.author);
+    setEditing(false);
   };
 
   return (
@@ -134,21 +154,65 @@ export default function BookCard({
 
         {/* Title + author */}
         <div className="flex-1 min-w-0 py-1">
-          <h3 className="text-sm font-semibold text-gray-100 leading-snug line-clamp-2">
-            {book.title}
-          </h3>
-          <p className="text-xs text-gray-500 mt-1 truncate">{book.author}</p>
-          <p className="text-xs text-gray-600 mt-1.5">
-            {totalChapters} ch{totalChapters !== 1 ? "s" : ""}
-            {" · "}
-            {storageSize > 0 ? (
-              <span className="text-green-500/70">{formatSize(storageSize)}</span>
-            ) : (
-              <span title="Estimated">~{formatSize(estimateSize(book))}</span>
-            )}
-            {progress && !progress.completed && ` · Ch. ${completedChapters + 1}`}
-            {progress?.completed && " · Complete"}
-          </p>
+          {editing ? (
+            <div className="space-y-2" onClick={(e) => e.stopPropagation()}>
+              <input
+                type="text"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-accent/50"
+                placeholder="Title"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit();
+                  if (e.key === "Escape") handleCancelEdit();
+                }}
+              />
+              <input
+                type="text"
+                value={editAuthor}
+                onChange={(e) => setEditAuthor(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-400 focus:outline-none focus:border-accent/50"
+                placeholder="Author"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSaveEdit();
+                  if (e.key === "Escape") handleCancelEdit();
+                }}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleSaveEdit}
+                  className="px-3 py-1.5 text-xs font-medium bg-accent text-dark-bg rounded-lg hover:bg-accent/90 transition-colors"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-400 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-sm font-semibold text-gray-100 leading-snug line-clamp-2">
+                {book.title}
+              </h3>
+              <p className="text-xs text-gray-500 mt-1 truncate">{book.author}</p>
+              <p className="text-xs text-gray-600 mt-1.5">
+                {totalChapters} ch{totalChapters !== 1 ? "s" : ""}
+                {" · "}
+                {storageSize > 0 ? (
+                  <span className="text-green-500/70">{formatSize(storageSize)}</span>
+                ) : (
+                  <span title="Estimated">~{formatSize(estimateSize(book))}</span>
+                )}
+                {progress && !progress.completed && ` · Ch. ${completedChapters + 1}`}
+                {progress?.completed && " · Complete"}
+              </p>
+            </>
+          )}
         </div>
 
         {/* Actions */}
@@ -230,6 +294,17 @@ export default function BookCard({
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 bg-[#252547] border border-white/10 rounded-lg shadow-xl py-1 z-20 min-w-[160px]">
+                <button
+                  onClick={() => {
+                    setEditing(true);
+                    setEditTitle(book.title);
+                    setEditAuthor(book.author);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
+                >
+                  Edit title / author
+                </button>
                 <button
                   onClick={() => {
                     onArchive(book.id);

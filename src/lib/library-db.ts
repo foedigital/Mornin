@@ -108,6 +108,16 @@ export async function deleteBook(id: string): Promise<void> {
   await db.delete("progress", id);
 }
 
+export async function updateBookMeta(id: string, title: string, author: string): Promise<void> {
+  const db = await getDB();
+  const book = await db.get("books", id);
+  if (book) {
+    book.title = title;
+    book.author = author;
+    await db.put("books", book);
+  }
+}
+
 export async function updateBookLastPlayed(id: string): Promise<void> {
   const db = await getDB();
   const book = await db.get("books", id);
