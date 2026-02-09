@@ -275,23 +275,24 @@ export default function LibraryAudioPlayer() {
         {showVoices && (
           <div className="px-4 pb-3 border-t border-white/5">
             <p className="text-xs text-gray-500 uppercase tracking-wider py-2">Voice</p>
-            {LIBRARY_VOICES.map((v) => (
-              <button
-                key={v.id}
-                className={`block w-full text-left text-sm py-2 px-3 rounded-lg transition-colors ${
-                  voice.id === v.id
-                    ? "bg-accent/20 text-accent"
-                    : "text-gray-300 hover:bg-white/5"
-                }`}
-                onClick={() => {
-                  setVoice(v);
-                  setShowVoices(false);
-                }}
-              >
-                {v.name}
-                <span className="text-xs text-gray-500 ml-2">{v.desc}</span>
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {LIBRARY_VOICES.map((v) => (
+                <button
+                  key={v.id}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    voice.id === v.id
+                      ? "bg-accent/20 text-accent ring-1 ring-accent/40"
+                      : "text-gray-300 bg-white/5 hover:bg-white/10"
+                  }`}
+                  onClick={() => setVoice(v)}
+                >
+                  {v.name}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-gray-600 mt-2">
+              {voice.desc} — voice change applies on next chapter
+            </p>
           </div>
         )}
       </div>
