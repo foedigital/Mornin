@@ -1043,6 +1043,88 @@
       "excerpt": "Not merely in the realm of commerce but in the world of ideas as well our age is organizing a regular clearance sale.",
       "url": "https://www.gutenberg.org/ebooks/60333",
       "readTime": "6 hours"
+    },
+
+    {
+      "title": "The Divine Comedy",
+      "author": "Dante Alighieri",
+      "type": "theology",
+      "year": 1320,
+      "excerpt": "In the midway of this our mortal life, I found me in a gloomy wood, astray, gone from the path direct.",
+      "url": "https://www.gutenberg.org/ebooks/1004",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "The Brothers Karamazov",
+      "author": "Fyodor Dostoyevsky",
+      "type": "novel",
+      "year": 1880,
+      "excerpt": "Alexey Fyodorovitch Karamazov was the third son of Fyodor Pavlovitch Karamazov, a landowner well known in our district in his own day.",
+      "url": "https://www.gutenberg.org/ebooks/28054",
+      "readTime": "30 hours"
+    },
+    {
+      "title": "The Spiritual Exercises of St. Ignatius",
+      "author": "St. Ignatius of Loyola",
+      "type": "theology",
+      "year": 1548,
+      "excerpt": "By the term 'Spiritual Exercises' is meant every method of examination of conscience, of meditation, of contemplation, of vocal and mental prayer.",
+      "url": "https://www.gutenberg.org/ebooks/70790",
+      "readTime": "4 hours"
+    },
+    {
+      "title": "Leaves from St. John Chrysostom",
+      "author": "St. John Chrysostom",
+      "type": "theology",
+      "year": 407,
+      "excerpt": "The golden mouth from which came such eloquence that all the world wondered — it is still, but it still speaks to us.",
+      "url": "https://www.gutenberg.org/ebooks/62447",
+      "readTime": "6 hours"
+    },
+    {
+      "title": "Tragic Sense of Life",
+      "author": "Miguel de Unamuno",
+      "type": "philosophy",
+      "year": 1912,
+      "excerpt": "The man of flesh and bone; the man who is born, suffers, and dies — above all, who dies; the man who eats and drinks and plays and sleeps and thinks and wills.",
+      "url": "https://www.gutenberg.org/ebooks/14636",
+      "readTime": "8 hours"
+    },
+    {
+      "title": "The Bridal Wreath (Kristin Lavransdatter)",
+      "author": "Sigrid Undset",
+      "type": "novel",
+      "year": 1920,
+      "excerpt": "When the lands that now belong to Jörundgaard were divided into three, the one that lay in the middle was called Skog.",
+      "url": "https://www.gutenberg.org/ebooks/67929",
+      "readTime": "7 hours"
+    },
+    {
+      "title": "The American Republic",
+      "author": "Orestes Brownson",
+      "type": "philosophy",
+      "year": 1865,
+      "excerpt": "The ancients summed up the whole of human wisdom in the maxim, Know Thyself, and certainly there is for an individual no more important knowledge than knowledge of himself.",
+      "url": "https://www.gutenberg.org/ebooks/2053",
+      "readTime": "6 hours"
+    },
+    {
+      "title": "An Essay in Aid of a Grammar of Assent",
+      "author": "John Henry Newman",
+      "type": "theology",
+      "year": 1870,
+      "excerpt": "Propositions, I have said, may be classed as true and false; but in a third respect, in which they are not merely uttered, but are accompanied by a mental act on the part of the speaker.",
+      "url": "https://www.gutenberg.org/ebooks/34022",
+      "readTime": "9 hours"
+    },
+    {
+      "title": "The Life of St. Teresa of Jesus",
+      "author": "St. Teresa of Avila",
+      "type": "theology",
+      "year": 1565,
+      "excerpt": "I wish I had been allowed to describe clearly and in detail my many sins and wicked life, that so my readers might see how grateful they ought to be for the goodness of God.",
+      "url": "https://www.gutenberg.org/ebooks/8120",
+      "readTime": "14 hours"
     }
   ]
 }

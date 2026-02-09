@@ -49,6 +49,21 @@ interface Reading {
 }
 
 const STORAGE_KEY = "mornin-readings-completed";
+const HIDDEN_KEY = "mornin-readings-hidden";
+
+function loadHidden(): Set<string> {
+  try {
+    const raw = localStorage.getItem(HIDDEN_KEY);
+    if (raw) return new Set(JSON.parse(raw));
+  } catch {}
+  return new Set();
+}
+
+function saveHidden(hidden: Set<string>) {
+  try {
+    localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden)));
+  } catch {}
+}
 
 const TYPE_ICONS: Record<string, string> = {
   poem: "\u{1F4DC}",
@@ -113,6 +128,7 @@ export default function ReadingSection() {
   const [downloadTarget, setDownloadTarget] = useState<Reading | null>(null);
   const [category, setCategory] = useState("all");
   const [archivedBooks, setArchivedBooks] = useState<ArchivedBook[]>([]);
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
@@ -127,18 +143,31 @@ export default function ReadingSection() {
     setCompleted(loadCompleted());
     setConverted(loadConverted());
     setArchivedBooks(loadArchivedBooks());
+    setHidden(loadHidden());
   }, []);
 
   const filtered = useMemo(() => {
-    if (category === "all") return shuffled;
-    if (category === "nonfiction") return shuffled.filter(r => NONFICTION_TYPES.includes(r.type));
-    if (category === "short story") return shuffled.filter(r => r.type === "short story" || r.type === "short story collection");
-    return shuffled.filter(r => r.type === category);
-  }, [shuffled, category]);
+    const visible = shuffled.filter(r => !hidden.has(readingKey(r)));
+    if (category === "all") return visible;
+    if (category === "nonfiction") return visible.filter(r => NONFICTION_TYPES.includes(r.type));
+    if (category === "short story") return visible.filter(r => r.type === "short story" || r.type === "short story collection");
+    return visible.filter(r => r.type === category);
+  }, [shuffled, category, hidden]);
 
   const handleCategoryChange = useCallback((newCategory: string) => {
     setCategory(newCategory);
     setIndex(0);
+  }, []);
+
+  const hideReading = useCallback((reading: Reading) => {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      next.add(readingKey(reading));
+      saveHidden(next);
+      return next;
+    });
+    // Advance to next card so user sees a new one
+    setIndex((prev) => (prev !== null ? prev : 0));
   }, []);
 
   const toggleCompleted = useCallback(
@@ -232,6 +261,19 @@ export default function ReadingSection() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-gray-600 text-xs">tap / swipe</span>
+            {hidden.size > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setHidden(new Set());
+                  saveHidden(new Set());
+                }}
+                className="text-[10px] text-gray-600 hover:text-gray-400 transition-colors"
+                title="Unhide all dismissed readings"
+              >
+                {hidden.size} hidden
+              </button>
+            )}
             <span className="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-full">
               {safeIndex + 1}/{filtered.length}
             </span>
@@ -267,6 +309,20 @@ export default function ReadingSection() {
             {reading.title}
           </h3>
           <div className="flex items-center gap-1.5 flex-shrink-0">
+            {/* Dismiss / hide reading */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                hideReading(reading);
+              }}
+              className="flex items-center justify-center w-9 h-9 rounded-full bg-white/5 text-gray-600 hover:text-gray-400 hover:bg-white/10 transition-colors"
+              aria-label="Hide this reading"
+              title="Not interested"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
             <LiteraturePlayButton
               text={reading.excerpt}
               contentId={readingKey(reading)}
