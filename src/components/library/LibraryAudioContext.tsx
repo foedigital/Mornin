@@ -22,6 +22,7 @@ import {
   type Book,
   type Bookmark,
 } from "@/lib/library-db";
+import { preprocessForTTS } from "@/lib/tts-preprocessor";
 
 const VOICE_KEY = "mornin-library-voice";
 const SPEED_KEY = "mornin-library-speed";
@@ -228,10 +229,11 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     // Check cache, if missing start pre-fetching
     getCachedAudio(cacheKey).then((cached) => {
       if (cached) return; // already cached
+      const cleaned = preprocessForTTS(nextChapterData.text);
       fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: nextChapterData.text, voice: voice.id }),
+        body: JSON.stringify({ text: cleaned, voice: voice.id }),
       })
         .then((res) => (res.ok ? res.blob() : null))
         .then((blob) => {
@@ -286,10 +288,11 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
 
   const fetchAudio = useCallback(
     async (text: string, voiceId: string): Promise<Blob> => {
+      const cleaned = preprocessForTTS(text);
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, voice: voiceId }),
+        body: JSON.stringify({ text: cleaned, voice: voiceId }),
       });
       if (!res.ok) throw new Error("TTS failed");
       return res.blob();

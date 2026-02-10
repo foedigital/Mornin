@@ -8,6 +8,37 @@ export interface Chapter {
   wordCount: number;
 }
 
+export interface Part {
+  index: number;
+  label: string;
+  startChapter: number;
+  endChapter: number;
+}
+
+const CHAPTERS_PER_PART = 20;
+
+/** Group chapters into Parts of 20. Returns empty array for books with ≤20 chapters. */
+export function assignParts(chapters: Chapter[]): Part[] {
+  const total = chapters.length;
+  if (total <= CHAPTERS_PER_PART) return [];
+
+  const numberOfParts = Math.ceil(total / CHAPTERS_PER_PART);
+  const parts: Part[] = [];
+
+  for (let p = 0; p < numberOfParts; p++) {
+    const startIdx = p * CHAPTERS_PER_PART;
+    const endIdx = Math.min(startIdx + CHAPTERS_PER_PART - 1, total - 1);
+    parts.push({
+      index: p,
+      label: `Part ${p + 1} (Ch. ${startIdx + 1}\u2013${endIdx + 1})`,
+      startChapter: startIdx,
+      endChapter: endIdx,
+    });
+  }
+
+  return parts;
+}
+
 export function chunkIntoChapters(text: string): Chapter[] {
   const totalWords = text.split(/\s+/).length;
 
@@ -65,7 +96,7 @@ export function chunkIntoChapters(text: string): Chapter[] {
         }
       }
     }
-    if (chapters.length >= 2) return enforceMaxChapterSize(chapters);
+    if (chapters.length >= 2) return finalizeChapters(enforceMaxChapterSize(chapters));
   }
 
   // Try paragraph-based splitting first
@@ -114,7 +145,7 @@ export function chunkIntoChapters(text: string): Chapter[] {
       }
     }
 
-    if (chapters.length >= 2) return enforceMaxChapterSize(chapters);
+    if (chapters.length >= 2) return finalizeChapters(enforceMaxChapterSize(chapters));
   }
 
   // Fallback: split on sentence boundaries when no paragraph breaks exist
@@ -157,7 +188,7 @@ export function chunkIntoChapters(text: string): Chapter[] {
     }
   }
 
-  return enforceMaxChapterSize(chapters);
+  return finalizeChapters(enforceMaxChapterSize(chapters));
 }
 
 const MAX_CHAPTER_WORDS = 580; // Hard cap — must stay under TTS 600-word limit
@@ -176,6 +207,7 @@ function enforceMaxChapterSize(chapters: Chapter[]): Chapter[] {
     const sentences = ch.text.split(/(?<=[.!?])\s+/);
     let current: string[] = [];
     let currentWords = 0;
+    let isFirstPart = true;
 
     for (const sentence of sentences) {
       const sentenceWords = sentence.split(/\s+/).length;
@@ -183,10 +215,11 @@ function enforceMaxChapterSize(chapters: Chapter[]): Chapter[] {
       if (currentWords + sentenceWords > TARGET_WORDS && currentWords >= MIN_WORDS) {
         result.push({
           index: result.length,
-          title: `Chapter ${result.length + 1}`,
+          title: isFirstPart && !isGenericTitle(ch.title) ? ch.title : `Chapter ${result.length + 1}`,
           text: current.join(" "),
           wordCount: currentWords,
         });
+        isFirstPart = false;
         current = [sentence];
         currentWords = sentenceWords;
       } else {
@@ -203,7 +236,7 @@ function enforceMaxChapterSize(chapters: Chapter[]): Chapter[] {
       } else {
         result.push({
           index: result.length,
-          title: `Chapter ${result.length + 1}`,
+          title: isFirstPart && !isGenericTitle(ch.title) ? ch.title : `Chapter ${result.length + 1}`,
           text: current.join(" "),
           wordCount: currentWords,
         });
@@ -212,6 +245,25 @@ function enforceMaxChapterSize(chapters: Chapter[]): Chapter[] {
   }
 
   return result;
+}
+
+/** Check if a chapter title is auto-generated (vs extracted from source text) */
+function isGenericTitle(title: string): boolean {
+  return /^Chapter \d+$/.test(title);
+}
+
+/** Final pass: ensure sequential indices and zero-padded generic titles */
+function finalizeChapters(chapters: Chapter[]): Chapter[] {
+  const total = chapters.length;
+  const padLen = String(total).length;
+
+  return chapters.map((ch, i) => ({
+    ...ch,
+    index: i,
+    title: isGenericTitle(ch.title)
+      ? `Chapter ${String(i + 1).padStart(padLen, "0")}`
+      : ch.title,
+  }));
 }
 
 export function estimateChapterDuration(wordCount: number): number {

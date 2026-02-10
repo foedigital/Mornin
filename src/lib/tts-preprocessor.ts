@@ -14,6 +14,54 @@
 
 import anyAscii from "any-ascii";
 
+// ── Formatting artifact removal (HTML, markdown) ────────────────────────
+
+/**
+ * Strip HTML tags and markdown formatting from text.
+ * Preserves the actual words but removes all formatting markers
+ * that would be read aloud by TTS (underscores, asterisks, HTML tags, etc.).
+ */
+function stripFormattingArtifacts(text: string): string {
+  let t = text;
+
+  // 1. Remove HTML tags completely (keep inner text)
+  t = t.replace(/<\/?[^>]+(>|$)/g, "");
+
+  // 2. Remove markdown images before links: ![alt](url) → alt
+  t = t.replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1");
+
+  // 3. Remove markdown links but keep link text: [text](url) → text
+  t = t.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+
+  // 4. Remove markdown bold/italic markers (KEEP the words inside)
+  //    Order matters: do bold-italic first, then bold, then italic
+  t = t.replace(/\*\*\*(.+?)\*\*\*/g, "$1"); // ***bold italic***
+  t = t.replace(/___(.+?)___/g, "$1"); // ___bold italic___
+  t = t.replace(/\*\*(.+?)\*\*/g, "$1"); // **bold**
+  t = t.replace(/__(.+?)__/g, "$1"); // __bold__
+  t = t.replace(/\*(.+?)\*/g, "$1"); // *italic*
+  t = t.replace(/_([^_]+)_/g, "$1"); // _italic_
+
+  // 5. Handle stray underscores that aren't part of italic pairs
+  t = t.replace(/_{2,}/g, " "); // multiple underscores → space
+  t = t.replace(/_/g, " "); // any remaining single underscores → space
+
+  // 6. Handle stray asterisks
+  t = t.replace(/\*{2,}/g, " ");
+  t = t.replace(/\*/g, " ");
+
+  // 7. Remove markdown headers
+  t = t.replace(/^#{1,6}\s+/gm, "");
+
+  // 8. Remove markdown blockquote markers
+  t = t.replace(/^>\s+/gm, "");
+
+  // 9. Remove markdown horizontal rules
+  t = t.replace(/^[-*_]{3,}\s*$/gm, "");
+
+  return t;
+}
+
 // ── Transliteration ─────────────────────────────────────────────────────
 
 /**
@@ -132,6 +180,10 @@ function cleanPoetryFormatting(text: string): string {
  */
 export function preprocessForTTS(text: string): string {
   let t = text;
+
+  // Step 0: Strip HTML tags and markdown formatting artifacts
+  // _italic_ → italic, **bold** → bold, <em>text</em> → text
+  t = stripFormattingArtifacts(t);
 
   // Step 1: Transliterate non-Latin scripts to pronounceable Latin
   // Greek "ὁμολογουμένος" → "homologoymenos", French "Château" → "Chateau"

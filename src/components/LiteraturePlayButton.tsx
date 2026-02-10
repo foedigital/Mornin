@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useRef, useEffect } from "react";
+import { preprocessForTTS } from "@/lib/tts-preprocessor";
 
 interface LiteraturePlayButtonProps {
   text: string;
@@ -111,7 +112,7 @@ export default function LiteraturePlayButton({
         let blob = sampleCache.get(cacheKey);
 
         if (!blob) {
-          const sampleText = first75Words(text);
+          const sampleText = preprocessForTTS(first75Words(text));
           const res = await fetch("/api/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
