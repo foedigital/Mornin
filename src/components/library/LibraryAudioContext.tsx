@@ -128,6 +128,8 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   const bookRef = useRef<Book | null>(null);
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isLoadingChapterRef = useRef(false);
+  const nextChapterBlobUrlRef = useRef<string | null>(null);
+  const currentBlobUrlRef = useRef<string | null>(null);
 
   // Load saved voice and speed on mount
   useEffect(() => {
@@ -213,22 +215,34 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     }
   }, [isPlaying]);
 
-  // Pre-generate next chapter audio in background
+  // Pre-generate next chapter audio in background and prepare blob URL
   useEffect(() => {
     if (!isPlaying || currentChapter === null) return;
     const book = bookRef.current;
     if (!book) return;
     const nextIdx = currentChapter + 1;
-    if (nextIdx >= book.chapters.length) return;
+    if (nextIdx >= book.chapters.length) {
+      nextChapterBlobUrlRef.current = null;
+      return;
+    }
 
     const nextChapterData = book.chapters[nextIdx];
     if (!nextChapterData) return;
 
     const cacheKey = audioCacheKey(book.id, nextIdx, voice.id);
 
-    // Check cache, if missing start pre-fetching
+    // Revoke any previous pre-buffered URL
+    if (nextChapterBlobUrlRef.current) {
+      URL.revokeObjectURL(nextChapterBlobUrlRef.current);
+      nextChapterBlobUrlRef.current = null;
+    }
+
     getCachedAudio(cacheKey).then((cached) => {
-      if (cached) return; // already cached
+      if (cached) {
+        // Already cached — create blob URL ready for instant playback
+        nextChapterBlobUrlRef.current = URL.createObjectURL(cached);
+        return;
+      }
       const cleaned = preprocessForTTS(nextChapterData.text);
       fetch("/api/tts", {
         method: "POST",
@@ -237,7 +251,10 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       })
         .then((res) => (res.ok ? res.blob() : null))
         .then((blob) => {
-          if (blob) setCachedAudio(cacheKey, blob);
+          if (blob) {
+            setCachedAudio(cacheKey, blob);
+            nextChapterBlobUrlRef.current = URL.createObjectURL(blob);
+          }
         })
         .catch(() => {});
     });
@@ -252,39 +269,6 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     window.addEventListener("speechsynthesis-play", handler);
     return () => window.removeEventListener("speechsynthesis-play", handler);
   }, []);
-
-  const handleChapterEnd = useCallback(() => {
-    // Ignore ended events from SILENT_MP3 or during chapter loading
-    if (isLoadingChapterRef.current) return;
-
-    const book = bookRef.current;
-    if (!book || currentChapter === null) return;
-
-    const nextIdx = currentChapter + 1;
-    if (nextIdx < book.chapters.length) {
-      // Auto-advance
-      loadAndPlayChapter(book, nextIdx);
-    } else {
-      // Book complete
-      saveProgress({
-        bookId: book.id,
-        currentChapter: book.chapters.length,
-        currentTime: 0,
-        completed: true,
-      });
-      setIsPlaying(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentChapter]);
-
-  // Update ended handler when currentChapter changes
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const handler = () => handleChapterEnd();
-    audio.addEventListener("ended", handler);
-    return () => audio.removeEventListener("ended", handler);
-  }, [handleChapterEnd]);
 
   const fetchAudio = useCallback(
     async (text: string, voiceId: string): Promise<Blob> => {
@@ -301,7 +285,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
   );
 
   const loadAndPlayChapter = useCallback(
-    async (book: Book, chapterIndex: number) => {
+    async (book: Book, chapterIndex: number, isAutoAdvance = false) => {
       const audio = audioRef.current;
       if (!audio) return;
 
@@ -319,30 +303,49 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       setIsActive(true);
       bookRef.current = book;
 
+      // Revoke previous blob URL to prevent memory leaks
+      if (currentBlobUrlRef.current) {
+        URL.revokeObjectURL(currentBlobUrlRef.current);
+        currentBlobUrlRef.current = null;
+      }
+
       try {
-        // iOS audio unlock: play silent audio in user gesture context
-        audio.src = SILENT_MP3;
-        await audio.play().catch(() => {});
-
-        const cacheKey = audioCacheKey(book.id, chapterIndex, voice.id);
-        let blob = await getCachedAudio(cacheKey);
-
-        if (!blob) {
-          blob = await fetchAudio(chapter.text, voice.id);
-          await setCachedAudio(cacheKey, blob);
+        // iOS audio unlock: only needed on first user-gesture play, not auto-advance
+        if (!isAutoAdvance) {
+          audio.src = SILENT_MP3;
+          await audio.play().catch(() => {});
         }
 
-        const url = URL.createObjectURL(blob);
+        // Use pre-buffered blob URL if available (instant transition)
+        let url = nextChapterBlobUrlRef.current;
+        if (url && isAutoAdvance) {
+          nextChapterBlobUrlRef.current = null;
+        } else {
+          // Fall back to cache or fetch
+          const cacheKey = audioCacheKey(book.id, chapterIndex, voice.id);
+          let blob = await getCachedAudio(cacheKey);
+
+          if (!blob) {
+            blob = await fetchAudio(chapter.text, voice.id);
+            await setCachedAudio(cacheKey, blob);
+          }
+
+          url = URL.createObjectURL(blob);
+        }
+
+        currentBlobUrlRef.current = url;
         audio.src = url;
 
-        // Try to resume from saved position
-        const savedProg = await getProgress(book.id);
-        if (
-          savedProg &&
-          savedProg.currentChapter === chapterIndex &&
-          savedProg.currentTime > 0
-        ) {
-          audio.currentTime = savedProg.currentTime;
+        // Resume from saved position only on manual play (not auto-advance)
+        if (!isAutoAdvance) {
+          const savedProg = await getProgress(book.id);
+          if (
+            savedProg &&
+            savedProg.currentChapter === chapterIndex &&
+            savedProg.currentTime > 0
+          ) {
+            audio.currentTime = savedProg.currentTime;
+          }
         }
 
         await audio.play();
@@ -352,6 +355,16 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
         window.dispatchEvent(new CustomEvent("library-audio-play"));
       } catch (err) {
         console.error("Library audio error:", err);
+        // If play failed in background (e.g., OS restriction), retry when user returns
+        if (isAutoAdvance) {
+          const retryPlay = () => {
+            if (document.visibilityState === "visible") {
+              document.removeEventListener("visibilitychange", retryPlay);
+              audio.play().catch(() => {});
+            }
+          };
+          document.addEventListener("visibilitychange", retryPlay);
+        }
       } finally {
         isLoadingChapterRef.current = false;
         setIsLoading(false);
@@ -359,6 +372,38 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     },
     [fetchAudio, voice.id]
   );
+
+  const handleChapterEnd = useCallback(() => {
+    // Ignore ended events from SILENT_MP3 or during chapter loading
+    if (isLoadingChapterRef.current) return;
+
+    const book = bookRef.current;
+    if (!book || currentChapter === null) return;
+
+    const nextIdx = currentChapter + 1;
+    if (nextIdx < book.chapters.length) {
+      // Auto-advance — skip iOS unlock and saved progress restore
+      loadAndPlayChapter(book, nextIdx, true);
+    } else {
+      // Book complete
+      saveProgress({
+        bookId: book.id,
+        currentChapter: book.chapters.length,
+        currentTime: 0,
+        completed: true,
+      });
+      setIsPlaying(false);
+    }
+  }, [currentChapter, loadAndPlayChapter]);
+
+  // Attach ended handler — re-attaches when chapter or loadAndPlayChapter changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const handler = () => handleChapterEnd();
+    audio.addEventListener("ended", handler);
+    return () => audio.removeEventListener("ended", handler);
+  }, [handleChapterEnd]);
 
   const playChapter = useCallback(
     (book: Book, chapterIndex: number) => {
@@ -511,6 +556,15 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
         currentTime: audio?.currentTime ?? 0,
         completed: false,
       });
+    }
+    // Clean up blob URLs
+    if (currentBlobUrlRef.current) {
+      URL.revokeObjectURL(currentBlobUrlRef.current);
+      currentBlobUrlRef.current = null;
+    }
+    if (nextChapterBlobUrlRef.current) {
+      URL.revokeObjectURL(nextChapterBlobUrlRef.current);
+      nextChapterBlobUrlRef.current = null;
     }
     setIsActive(false);
     setIsPlaying(false);
