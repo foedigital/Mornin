@@ -56,6 +56,7 @@ function loadSaved(): SavedRecipe[] {
 function persistSaved(recipes: SavedRecipe[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 

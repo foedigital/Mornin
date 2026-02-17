@@ -27,6 +27,7 @@ function loadConverted(): Set<string> {
 function saveConverted(urls: Set<string>) {
   try {
     localStorage.setItem(CONVERTED_KEY, JSON.stringify(Array.from(urls)));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 
@@ -62,6 +63,7 @@ function loadHidden(): Set<string> {
 function saveHidden(hidden: Set<string>) {
   try {
     localStorage.setItem(HIDDEN_KEY, JSON.stringify(Array.from(hidden)));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 
@@ -112,6 +114,7 @@ function loadCompleted(): Set<string> {
 function saveCompleted(completed: Set<string>) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(completed)));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 

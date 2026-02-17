@@ -384,6 +384,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     if (nextIdx < book.chapters.length) {
       // Auto-advance — skip iOS unlock and saved progress restore
       loadAndPlayChapter(book, nextIdx, true);
+      window.dispatchEvent(new Event("mornin-data-changed"));
     } else {
       // Book complete
       saveProgress({
@@ -393,6 +394,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
         completed: true,
       });
       setIsPlaying(false);
+      window.dispatchEvent(new Event("mornin-data-changed"));
     }
   }, [currentChapter, loadAndPlayChapter]);
 
@@ -414,6 +416,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
 
   const pause = useCallback(() => {
     audioRef.current?.pause();
+    window.dispatchEvent(new Event("mornin-data-changed"));
   }, []);
 
   const resume = useCallback(() => {
@@ -426,6 +429,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     const nextIdx = currentChapter + 1;
     if (nextIdx < book.chapters.length) {
       loadAndPlayChapter(book, nextIdx);
+      window.dispatchEvent(new Event("mornin-data-changed"));
     }
   }, [currentChapter, loadAndPlayChapter]);
 
@@ -440,6 +444,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       const prevIdx = currentChapter - 1;
       if (prevIdx >= 0) {
         loadAndPlayChapter(book, prevIdx);
+        window.dispatchEvent(new Event("mornin-data-changed"));
       } else {
         if (audio) audio.currentTime = 0;
       }
@@ -515,12 +520,14 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     };
     saveBookmark(bm).then(() => {
       setBookmarks((prev) => [...prev, bm]);
+      window.dispatchEvent(new Event("mornin-data-changed"));
     });
   }, [currentBookId, currentChapter]);
 
   const removeBookmark = useCallback((id: string) => {
     deleteBookmarkDB(id).then(() => {
       setBookmarks((prev) => prev.filter((b) => b.id !== id));
+      window.dispatchEvent(new Event("mornin-data-changed"));
     });
   }, []);
 
@@ -572,6 +579,7 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
     setCurrentChapter(null);
     setBookAuthor("");
     bookRef.current = null;
+    window.dispatchEvent(new Event("mornin-data-changed"));
   }, [currentBookId, currentChapter]);
 
   // Media Session API — lock screen / notification controls
@@ -586,6 +594,10 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
       title: chapterTitle,
       artist: bookTitle,
       album: "Mornin Library",
+      artwork: [
+        { src: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+        { src: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
     });
 
     navigator.mediaSession.setActionHandler("play", () => audioRef.current?.play());

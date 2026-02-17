@@ -45,6 +45,7 @@ function loadArchivedBooks(): ArchivedBook[] {
 function saveArchivedBooks(books: ArchivedBook[]) {
   try {
     localStorage.setItem(LIBRARY_ARCHIVE_KEY, JSON.stringify(books));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 
@@ -135,6 +136,7 @@ export default function LibraryPage() {
   const handleBookAdded = useCallback((book: Book) => {
     setBooks((prev) => [book, ...prev]);
     setDownloadStatusMap((prev) => ({ ...prev, [book.id]: "none" }));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
@@ -153,6 +155,7 @@ export default function LibraryPage() {
     });
     const storageUsed = await getTotalAudioCacheSize();
     setTotalStorageUsed(storageUsed);
+    window.dispatchEvent(new Event("mornin-data-changed"));
   }, []);
 
   const handlePlayChapter = useCallback(
@@ -317,6 +320,7 @@ export default function LibraryPage() {
   const handleEdit = useCallback(async (bookId: string, title: string, author: string) => {
     await updateBookMeta(bookId, title, author);
     setBooks((prev) => prev.map((b) => b.id === bookId ? { ...b, title, author } : b));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   }, []);
 
   const handleArchive = useCallback((bookId: string) => {

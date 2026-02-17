@@ -241,3 +241,15 @@ export async function deleteBookmark(id: string): Promise<void> {
   const db = await getDB();
   await db.delete("bookmarks", id);
 }
+
+// --- Bulk reads (for cloud sync) ---
+
+export async function getAllProgress(): Promise<BookProgress[]> {
+  const db = await getDB();
+  return db.getAll("progress");
+}
+
+export async function getAllBookmarks(): Promise<Bookmark[]> {
+  const db = await getDB();
+  return db.getAll("bookmarks");
+}

@@ -37,6 +37,7 @@ function loadSaved(): SavedVideo[] {
 function saveSaved(videos: SavedVideo[]) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(videos));
+    window.dispatchEvent(new Event("mornin-data-changed"));
   } catch {}
 }
 
