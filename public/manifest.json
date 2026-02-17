@@ -1,8 +1,10 @@
 {
+  "id": "mornin-pwa",
   "name": "Morning Motivation",
-  "short_name": "Morning",
+  "short_name": "Mornin",
   "description": "Start your day with history, faith, wisdom, and art",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#1a1a2e",
   "theme_color": "#f97316",
