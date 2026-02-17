@@ -9,6 +9,7 @@ import ArtSection from "@/components/ArtSection";
 import LightningSection from "@/components/LightningSection";
 import MediaSection from "@/components/MediaSection";
 import WorkoutSection from "@/components/WorkoutSection";
+import RecipeSection from "@/components/RecipeSection";
 import ReadingSection from "@/components/ReadingSection";
 import { getToday } from "@/lib/dates";
 
@@ -45,6 +46,7 @@ export default function Home() {
         <LightningSection />
         <MediaSection />
         <WorkoutSection />
+        <RecipeSection />
         <ReadingSection />
         <BattleSection />
         <GospelSection />
