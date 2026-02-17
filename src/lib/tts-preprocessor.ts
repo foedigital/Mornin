@@ -195,7 +195,11 @@ export function preprocessForTTS(text: string): string {
   // Step 3: Clean poetry/formatting
   t = cleanPoetryFormatting(t);
 
-  // Step 4: Final whitespace normalization
+  // Step 4: Final cleanup — strip any underscores/asterisks that survived
+  // (anyAscii can reintroduce underscores from certain Unicode chars)
+  t = t.replace(/[_*]/g, " ");
+
+  // Step 5: Final whitespace normalization
   t = t.replace(/ {2,}/g, " ");
   t = t.trim();
 
