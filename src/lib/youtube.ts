@@ -10,7 +10,6 @@
 
 import channelsData from "../../data/channels.json";
 import fitnessChannelsData from "../../data/fitness-channels.json";
-import foodChannelsData from "../../data/food-channels.json";
 
 export interface YouTubeVideo {
   videoId: string;
@@ -91,14 +90,3 @@ export async function fetchFitnessVideos(): Promise<YouTubeVideo[]> {
     .filter((v): v is YouTubeVideo => v !== null);
 }
 
-export async function fetchFoodVideos(): Promise<YouTubeVideo[]> {
-  const channels = foodChannelsData.channels;
-
-  const results = await Promise.allSettled(
-    channels.map((ch) => fetchVideoForChannel(ch))
-  );
-
-  return results
-    .map((r) => (r.status === "fulfilled" ? r.value : null))
-    .filter((v): v is YouTubeVideo => v !== null);
-}
