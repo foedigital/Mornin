@@ -1,0 +1,15 @@
+{
+  "channels": [
+    { "id": "UC8Y-jrV8oR3s2Ix4viDkZtA", "name": "Food Network", "category": "cooking" },
+    { "id": "UCJ0ce4YSzxK01tA7Ma5SYlA", "name": "Guy Fieri", "category": "cooking" },
+    { "id": "UCfDNi1aEljAQ17mUrfUjkvg", "name": "Alton Brown", "category": "cooking" },
+    { "id": "UCIEv3lZ_tNXHzL3ox-_uUGQ", "name": "Gordon Ramsay", "category": "cooking" },
+    { "id": "UChBEbMKI1eCcejTtmI32UEw", "name": "Joshua Weissman", "category": "healthy" },
+    { "id": "UCJHA_jMfCvEnv-3kRjTCQXw", "name": "Babish Culinary Universe", "category": "cooking" },
+    { "id": "UCbpMy0Fg74eXXkvxJrtEn3w", "name": "Bon Appetit", "category": "cooking" },
+    { "id": "UCbRj3Tcy1Zoz3rcf83nW5kw", "name": "Sam the Cooking Guy", "category": "cooking" },
+    { "id": "UCJFp8uSYCjXOMnkUyb3CQ3Q", "name": "Tasty", "category": "cooking" },
+    { "id": "UCxAS_aK7sS2x_bqnlJHDSHw", "name": "America's Test Kitchen", "category": "cooking" },
+    { "id": "UCqqJQ_cXSat0KIAVfIfKkVA", "name": "J. Kenji Lopez-Alt", "category": "healthy" }
+  ]
+}
