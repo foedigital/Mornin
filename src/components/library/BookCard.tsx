@@ -21,6 +21,8 @@ interface BookCardProps {
   onDownload: (bookId: string) => void;
   onRemoveDownload: (bookId: string) => void;
   storageSize: number; // actual cached bytes, 0 if not downloaded
+  isNowReading: boolean;
+  onSetNowReading: (bookId: string | null) => void;
 }
 
 function formatSize(bytes: number): string {
@@ -67,6 +69,8 @@ export default function BookCard({
   onDownload,
   onRemoveDownload,
   storageSize,
+  isNowReading,
+  onSetNowReading,
 }: BookCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -107,7 +111,33 @@ export default function BookCard({
   };
 
   return (
-    <div className="card">
+    <div className={`card${isNowReading ? " border border-accent/30" : ""}`}>
+      {/* Now Reading banner */}
+      {isNowReading && (
+        <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <svg className="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span className="text-xs font-semibold text-accent uppercase tracking-wider">Now Reading</span>
+            {progress && !progress.completed && (
+              <span className="text-xs text-gray-500">
+                Ch. {(progress.currentChapter ?? 0) + 1} of {totalChapters}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={() => onPlayChapter(book.id, progress?.currentChapter ?? 0)}
+            className="flex items-center gap-2 px-4 py-1.5 bg-accent hover:bg-accent/90 text-dark-bg text-xs font-semibold rounded-full transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            {progress && !progress.completed ? "Resume" : "Play"}
+          </button>
+        </div>
+      )}
+
       {/* Header row */}
       <div className="flex items-start gap-4">
         {/* Book cover icon */}
@@ -294,6 +324,19 @@ export default function BookCard({
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 bg-[#252547] border border-white/10 rounded-lg shadow-xl py-1 z-20 min-w-[160px]">
+                <button
+                  onClick={() => {
+                    onSetNowReading(isNowReading ? null : book.id);
+                    setShowMenu(false);
+                  }}
+                  className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
+                    isNowReading
+                      ? "text-accent hover:bg-accent/10"
+                      : "text-gray-300 hover:bg-white/5"
+                  }`}
+                >
+                  {isNowReading ? "Now Reading \u2713" : "Set as Now Reading"}
+                </button>
                 <button
                   onClick={() => {
                     setEditing(true);

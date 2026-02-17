@@ -26,6 +26,7 @@ import { useLibraryAudio } from "@/components/library/LibraryAudioContext";
 import { preprocessForTTS, aggressiveCleanup } from "@/lib/tts-preprocessor";
 
 const LIBRARY_ARCHIVE_KEY = "mornin-library-archived";
+const NOW_READING_KEY = "mornin-library-now-reading";
 
 interface ArchivedBook {
   title: string;
@@ -86,6 +87,7 @@ export default function LibraryPage() {
   const [importState, setImportState] = useState<ImportState | null>(null);
   const importAbortRef = useRef(false);
   const [archivedUrls, setArchivedUrls] = useState<Set<string>>(new Set());
+  const [nowReadingBookId, setNowReadingBookId] = useState<string | null>(null);
 
   const { currentBookId, currentChapter, playChapter } = useLibraryAudio();
 
@@ -119,6 +121,9 @@ export default function LibraryPage() {
     loadBooks();
     const archived = loadArchivedBooks();
     setArchivedUrls(new Set(archived.map((b) => b.url)));
+    try {
+      setNowReadingBookId(localStorage.getItem(NOW_READING_KEY));
+    } catch {}
   }, [loadBooks]);
 
   // Reload progress periodically when audio is playing
@@ -152,6 +157,14 @@ export default function LibraryPage() {
       const next = { ...prev };
       delete next[id];
       return next;
+    });
+    // Clear "now reading" if this book was it
+    setNowReadingBookId((prev) => {
+      if (prev === id) {
+        try { localStorage.removeItem(NOW_READING_KEY); } catch {}
+        return null;
+      }
+      return prev;
     });
     const storageUsed = await getTotalAudioCacheSize();
     setTotalStorageUsed(storageUsed);
@@ -321,6 +334,18 @@ export default function LibraryPage() {
     await updateBookMeta(bookId, title, author);
     setBooks((prev) => prev.map((b) => b.id === bookId ? { ...b, title, author } : b));
     window.dispatchEvent(new Event("mornin-data-changed"));
+  }, []);
+
+  const handleSetNowReading = useCallback((bookId: string | null) => {
+    try {
+      if (bookId) {
+        localStorage.setItem(NOW_READING_KEY, bookId);
+      } else {
+        localStorage.removeItem(NOW_READING_KEY);
+      }
+      window.dispatchEvent(new Event("mornin-data-changed"));
+    } catch {}
+    setNowReadingBookId(bookId);
   }, []);
 
   const handleArchive = useCallback((bookId: string) => {
@@ -605,7 +630,11 @@ export default function LibraryPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {books.map((book) => (
+          {[...books].sort((a, b) => {
+            if (a.id === nowReadingBookId) return -1;
+            if (b.id === nowReadingBookId) return 1;
+            return 0;
+          }).map((book) => (
             <BookCard
               key={book.id}
               book={book}
@@ -622,6 +651,8 @@ export default function LibraryPage() {
               onDownload={handleDownload}
               onRemoveDownload={handleRemoveDownload}
               storageSize={bookSizeMap[book.id] ?? 0}
+              isNowReading={book.id === nowReadingBookId}
+              onSetNowReading={handleSetNowReading}
             />
           ))}
         </div>
