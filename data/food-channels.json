@@ -49,6 +49,31 @@
       "id": "UCxAS_aK7sS2x_bqnlJHDSHw",
       "name": "America's Test Kitchen",
       "category": "cooking"
+    },
+    {
+      "id": "UCn5fhcGRrCvrmFibPbT6q1A",
+      "name": "Brian Lagerstrom",
+      "category": "cooking"
+    },
+    {
+      "id": "UClrMJRlvoyoWsVlB-7c61PQ",
+      "name": "Cowboy Kent Rollins",
+      "category": "cooking"
+    },
+    {
+      "id": "UCfyehHM_eo4g5JUyWmms2LA",
+      "name": "Sorted Food",
+      "category": "cooking"
+    },
+    {
+      "id": "UCuL-5ytBmu6KG0BwjSFaD0g",
+      "name": "Not Another Cooking Show",
+      "category": "cooking"
+    },
+    {
+      "id": "UCXGR70CkW_pXb8n52LzCCRw",
+      "name": "Mythical Kitchen",
+      "category": "cooking"
     }
   ]
 }
