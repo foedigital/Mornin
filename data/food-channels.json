@@ -1,0 +1,54 @@
+{
+  "channels": [
+    {
+      "id": "UCJHA_jMfCvEnv-3kRjTCQXw",
+      "name": "Babish Culinary Universe",
+      "category": "cooking"
+    },
+    {
+      "id": "UCfDNi1aEljAQ17mUrfUjkvg",
+      "name": "Alton Brown",
+      "category": "cooking"
+    },
+    {
+      "id": "UChBEbMKI1eCcejTtmI32UEw",
+      "name": "Joshua Weissman",
+      "category": "cooking"
+    },
+    {
+      "id": "UCDq5v10l4wkV5-ZBIJJFbzQ",
+      "name": "Ethan Chlebowski",
+      "category": "cooking"
+    },
+    {
+      "id": "UC9_p50tH3WmMslWRWKnM7dQ",
+      "name": "Adam Ragusea",
+      "category": "cooking"
+    },
+    {
+      "id": "UCqqJQ_cXSat0KIAVfIfKkVA",
+      "name": "J. Kenji Lopez-Alt",
+      "category": "cooking"
+    },
+    {
+      "id": "UCbRj3Tcy1Zoz3rcf83nW5kw",
+      "name": "Sam the Cooking Guy",
+      "category": "cooking"
+    },
+    {
+      "id": "UCzH5n3Ih5kgQoiDAQt2FwLw",
+      "name": "Pro Home Cooks",
+      "category": "cooking"
+    },
+    {
+      "id": "UCSuT9FSddzI6W5Bij9XwtmA",
+      "name": "Internet Shaquille",
+      "category": "cooking"
+    },
+    {
+      "id": "UCxAS_aK7sS2x_bqnlJHDSHw",
+      "name": "America's Test Kitchen",
+      "category": "cooking"
+    }
+  ]
+}
