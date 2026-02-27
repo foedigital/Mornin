@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import readingsData from "../../data/readings.json";
 import LiteraturePlayButton from "@/components/LiteraturePlayButton";
 import DownloadModal from "@/components/library/DownloadModal";
 import type { Book } from "@/lib/library-db";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 const CONVERTED_KEY = "mornin-converted-audiobooks";
 const LIBRARY_ARCHIVE_KEY = "mornin-library-archived";
@@ -132,7 +133,6 @@ export default function ReadingSection() {
   const [category, setCategory] = useState("all");
   const [archivedBooks, setArchivedBooks] = useState<ArchivedBook[]>([]);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const now = new Date();
@@ -200,23 +200,10 @@ export default function ReadingSection() {
     );
   }, [filtered.length]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const delta = e.changedTouches[0].clientX - touchStartX.current;
-      if (delta > 50) prev();
-      touchStartX.current = null;
-    },
-    [prev]
-  );
-
-  const handleClick = useCallback(() => {
-    next();
-  }, [next]);
+  const { handleTouchStart, handleTouchEnd, handleClick } = useSwipeNavigation({
+    onNext: next,
+    onPrev: prev,
+  });
 
   const handleStartDownload = useCallback((r: Reading) => {
     setDownloadTarget(r);

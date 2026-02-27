@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchAllChannelVideos, type YouTubeVideo } from "@/lib/youtube";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 const CATEGORY_LABELS: Record<string, string> = {
   podcast: "Podcast",
@@ -23,7 +24,6 @@ export default function MediaSection() {
   const [videos, setVideos] = useState<YouTubeVideo[]>([]);
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     fetchAllChannelVideos()
@@ -46,25 +46,10 @@ export default function MediaSection() {
     setIndex((prev) => (prev - 1 + videos.length) % videos.length);
   }, [videos.length]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const delta = e.changedTouches[0].clientX - touchStartX.current;
-      if (delta > 50) {
-        prev();
-      }
-      touchStartX.current = null;
-    },
-    [prev]
-  );
-
-  const handleClick = useCallback(() => {
-    next();
-  }, [next]);
+  const { handleTouchStart, handleTouchEnd, handleClick } = useSwipeNavigation({
+    onNext: next,
+    onPrev: prev,
+  });
 
   if (loading) {
     return (

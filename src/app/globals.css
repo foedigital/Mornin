@@ -12,4 +12,10 @@
   .card {
     @apply bg-dark-card rounded-2xl p-6 shadow-lg border border-white/5;
   }
+
+  /* Swipeable cards: remove 300ms tap delay, disable tap highlight */
+  .card.cursor-pointer {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }

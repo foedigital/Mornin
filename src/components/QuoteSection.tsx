@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import quotesData from "../../data/quotes.json";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 interface Quote {
   text: string;
@@ -35,7 +36,6 @@ function getShuffledQuotes(): { quotes: Quote[]; startIndex: number } {
 export default function QuoteSection() {
   const [index, setIndex] = useState<number | null>(null);
   const [shuffled, setShuffled] = useState<Quote[]>([]);
-  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     const { quotes: q, startIndex } = getShuffledQuotes();
@@ -53,31 +53,10 @@ export default function QuoteSection() {
     );
   }, [shuffled.length]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const delta = e.changedTouches[0].clientX - touchStartX.current;
-      if (delta > 50) {
-        // Swiped right → go back
-        prevQuote();
-      }
-      touchStartX.current = null;
-    },
-    [prevQuote]
-  );
-
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      // Only advance on tap, not at the end of a swipe
-      // Touch events that triggered a swipe won't fire click
-      nextQuote();
-    },
-    [nextQuote]
-  );
+  const { handleTouchStart, handleTouchEnd, handleClick } = useSwipeNavigation({
+    onNext: nextQuote,
+    onPrev: prevQuote,
+  });
 
   if (index === null || shuffled.length === 0) return null;
 

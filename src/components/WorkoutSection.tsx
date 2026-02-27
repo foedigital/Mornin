@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { fetchFitnessVideos, type YouTubeVideo } from "@/lib/youtube";
+import { useSwipeNavigation } from "@/hooks/useSwipeNavigation";
 
 /* ── Constants ─────────────────────────────────────────────────── */
 
@@ -61,7 +62,6 @@ export default function WorkoutSection() {
   const [vidLoading, setVidLoading] = useState(true);
   const [saved, setSaved] = useState<SavedVideo[]>([]);
   const [showArchive, setShowArchive] = useState(false);
-  const touchStartX = useRef<number | null>(null);
 
   /* Fetch fitness videos */
   useEffect(() => {
@@ -119,19 +119,10 @@ export default function WorkoutSection() {
     setVidIndex((p) => (p - 1 + videos.length) % videos.length);
   }, [videos.length]);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-  }, []);
-
-  const handleTouchEnd = useCallback(
-    (e: React.TouchEvent) => {
-      if (touchStartX.current === null) return;
-      const delta = e.changedTouches[0].clientX - touchStartX.current;
-      if (delta > 50) prevVid();
-      touchStartX.current = null;
-    },
-    [prevVid]
-  );
+  const { handleTouchStart, handleTouchEnd, handleClick } = useSwipeNavigation({
+    onNext: nextVid,
+    onPrev: prevVid,
+  });
 
   const currentVideo = videos[vidIndex];
   const isSaved = currentVideo
@@ -158,7 +149,7 @@ export default function WorkoutSection() {
       ) : videos.length > 0 && currentVideo ? (
         <div
           className="card cursor-pointer select-none active:scale-[0.98] transition-transform"
-          onClick={nextVid}
+          onClick={handleClick}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
