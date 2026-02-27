@@ -206,6 +206,72 @@ export function preprocessForTTS(text: string): string {
   return t;
 }
 
+// ── Narrator preprocessing ──────────────────────────────────────────────
+
+/**
+ * Narrator-quality preprocessing for the "Guy" voice.
+ *
+ * Goes beyond standard cleanup to make Edge TTS read like a real person:
+ *  - Paragraph breaks become breathing pauses (ellipsis ≈ 500ms in Edge TTS)
+ *  - Scene breaks (*** / ---) become long narrative pauses
+ *  - Dialogue ends get a beat before narration resumes
+ *  - Single line breaks become gentle pauses (not collapsed to nothing)
+ *  - Ellipsis gets breathing room so the reader doesn't rush through them
+ *
+ * The output is fully pre-processed — the server should NOT run normalizeForTTS
+ * on top of this, or it will undo the carefully placed pauses.
+ */
+export function preprocessForNarration(text: string): string {
+  let t = text;
+
+  // Standard cleanup (formatting, transliteration, special chars)
+  t = stripFormattingArtifacts(t);
+  t = transliterateForTTS(t);
+  t = cleanSpecialCharacters(t);
+
+  // Normalize line endings
+  t = t.replace(/\r\n/g, "\n");
+
+  // ── Scene breaks → long narrative pause ────────────────────────────
+  // Patterns like ***, ---, === between paragraphs
+  t = t.replace(/^\s*[*\-=]{3,}\s*$/gm, "\n\n...\n\n");
+
+  // ── Paragraph breaks → breathing pause ─────────────────────────────
+  // Edge TTS treats "..." as a ~500ms pause — much more natural than ". "
+  t = t.replace(/\n{3,}/g, "\n\n");
+  t = t.replace(/\n\n/g, " ... ");
+
+  // ── Single line breaks → context-aware pause ───────────────────────
+  // If preceding text already ends with punctuation, just add space
+  t = t.replace(/([.!?:;,])\n/g, "$1 ");
+  // Otherwise, add a period for a gentle sentence-end pause
+  t = t.replace(/([^\n])\n([^\n])/g, "$1. $2");
+  // Clean up double periods from this conversion
+  t = t.replace(/([.!?])\.\s/g, "$1 ");
+
+  // ── Dialogue breathing room ────────────────────────────────────────
+  // After "dialogue." or "dialogue!" or "dialogue?" + closing quote,
+  // add a beat before the next sentence (narration or new dialogue).
+  // This mimics how a real narrator takes a breath between voices.
+  t = t.replace(/([.!?])(["'])\s+(?=[A-Z])/g, "$1$2 ... ");
+
+  // ── Ellipsis breathing room ────────────────────────────────────────
+  // Don't let the narrator rush through "..." moments
+  t = t.replace(/\.{4,}/g, "...");
+  t = t.replace(/\.\.\.(?!\s|$|\.)/g, "... ");
+
+  // ── Clean up excessive pauses ──────────────────────────────────────
+  // Three or more consecutive pause markers → cap at two
+  t = t.replace(/(\.\.\.\s*){3,}/g, "... ... ");
+
+  // ── Final cleanup ──────────────────────────────────────────────────
+  t = t.replace(/[_*]/g, " ");
+  t = t.replace(/ {2,}/g, " ");
+  t = t.trim();
+
+  return t;
+}
+
 /**
  * Aggressive cleanup: strips EVERYTHING that isn't basic ASCII English.
  * Used as a last resort when standard preprocessing still fails.

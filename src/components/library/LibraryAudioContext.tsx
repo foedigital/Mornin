@@ -22,7 +22,7 @@ import {
   type Book,
   type Bookmark,
 } from "@/lib/library-db";
-import { preprocessForTTS } from "@/lib/tts-preprocessor";
+import { preprocessForTTS, preprocessForNarration } from "@/lib/tts-preprocessor";
 
 const VOICE_KEY = "mornin-library-voice";
 const SPEED_KEY = "mornin-library-speed";
@@ -33,6 +33,7 @@ const SILENT_MP3 =
   "data:audio/mpeg;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwMHAAAAAAD/+1DEAAAH+AV1UAAAIAAADSAAAABBCQ0Z2QkAALBkDg4sGQOD4ICARB8H38QBAEwfB8HwQdwfygIAgc/lAQBAEAQOD/ygIAgCAIHB///KAgCAIA//5QEAff/+UBAEAf/KAg7///5QEAQB///KD///8oCDv///lAQBAEAQBA5///8=";
 
 export const LIBRARY_VOICES = [
+  { id: "narrator-guy", name: "Guy", desc: "Deep, melodic narrator" },
   { id: "en-US-SteffanNeural", name: "Steffan", desc: "Male, calm & measured" },
   { id: "en-US-AndrewMultilingualNeural", name: "Andrew", desc: "Male, warm & natural" },
   { id: "en-US-RogerNeural", name: "Roger", desc: "Male, deep & authoritative" },
@@ -243,11 +244,18 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
         nextChapterBlobUrlRef.current = URL.createObjectURL(cached);
         return;
       }
-      const cleaned = preprocessForTTS(nextChapterData.text);
+      const isNarrator = voice.id === "narrator-guy";
+      const cleaned = isNarrator
+        ? preprocessForNarration(nextChapterData.text)
+        : preprocessForTTS(nextChapterData.text);
       fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: cleaned, voice: voice.id }),
+        body: JSON.stringify({
+          text: cleaned,
+          voice: voice.id,
+          ...(isNarrator && { narrator: true }),
+        }),
       })
         .then((res) => (res.ok ? res.blob() : null))
         .then((blob) => {
@@ -272,11 +280,18 @@ export function LibraryAudioProvider({ children }: { children: ReactNode }) {
 
   const fetchAudio = useCallback(
     async (text: string, voiceId: string): Promise<Blob> => {
-      const cleaned = preprocessForTTS(text);
+      const isNarrator = voiceId === "narrator-guy";
+      const cleaned = isNarrator
+        ? preprocessForNarration(text)
+        : preprocessForTTS(text);
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: cleaned, voice: voiceId }),
+        body: JSON.stringify({
+          text: cleaned,
+          voice: voiceId,
+          ...(isNarrator && { narrator: true }),
+        }),
       });
       if (!res.ok) throw new Error("TTS failed");
       return res.blob();

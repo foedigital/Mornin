@@ -8,7 +8,15 @@ const VALID_VOICES = [
   "en-US-RogerNeural",
   "en-US-SteffanNeural",
   "en-US-EricNeural",
+  "narrator-guy",
 ];
+
+// "Guy" narrator: uses RogerNeural (deepest male voice) with prosody
+// tuned for deep, melodic, soothing audiobook narration
+const NARRATOR_GUY = {
+  baseVoice: "en-US-RogerNeural",
+  prosody: { rate: "-10%", pitch: "-10Hz" },
+};
 
 const AUDIO_FORMAT = "audio-24khz-96kbitrate-mono-mp3";
 
@@ -145,7 +153,7 @@ async function synthesizeWithRetry(
 
 export async function POST(req: NextRequest) {
   try {
-    const { text, voice = "en-US-AndrewMultilingualNeural", rate, pitch } = await req.json();
+    const { text, voice = "en-US-AndrewMultilingualNeural", rate, pitch, narrator } = await req.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -155,13 +163,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid voice" }, { status: 400 });
     }
 
-    // Validate prosody params (e.g., "-10%", "+5Hz")
+    // Resolve narrator voice → actual Edge TTS voice + prosody
+    let actualVoice = voice;
     const prosody: { rate?: string; pitch?: string } = {};
-    if (rate && typeof rate === "string" && /^[+-]?\d+%$/.test(rate)) {
-      prosody.rate = rate;
-    }
-    if (pitch && typeof pitch === "string" && /^[+-]?\d+Hz$/.test(pitch)) {
-      prosody.pitch = pitch;
+
+    if (voice === "narrator-guy") {
+      actualVoice = NARRATOR_GUY.baseVoice;
+      prosody.rate = NARRATOR_GUY.prosody.rate;
+      prosody.pitch = NARRATOR_GUY.prosody.pitch;
+    } else {
+      // Validate user-supplied prosody params (e.g., "-10%", "+5Hz")
+      if (rate && typeof rate === "string" && /^[+-]?\d+%$/.test(rate)) {
+        prosody.rate = rate;
+      }
+      if (pitch && typeof pitch === "string" && /^[+-]?\d+Hz$/.test(pitch)) {
+        prosody.pitch = pitch;
+      }
     }
 
     // Reject overly long requests — chapters should be ≤450 words
@@ -173,15 +190,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Safety cap, then normalize for clean TTS reading
-    const normalizedText = normalizeForTTS(text.slice(0, MAX_TOTAL_CHARS));
+    // When narrator=true, the client already ran preprocessForNarration()
+    // which includes all cleanup + narrator-specific pauses. Skip normalizeForTTS
+    // so we don't undo the carefully placed pause markers.
+    const normalizedText = narrator
+      ? text.slice(0, MAX_TOTAL_CHARS)
+      : normalizeForTTS(text.slice(0, MAX_TOTAL_CHARS));
 
     // Split long text into chunks and synthesize with retries
     const textChunks = splitTextForTTS(normalizedText);
     const audioBuffers: Buffer[] = [];
 
     for (const chunk of textChunks) {
-      const buf = await synthesizeWithRetry(chunk, voice, prosody);
+      const buf = await synthesizeWithRetry(chunk, actualVoice, prosody);
       audioBuffers.push(buf);
     }
 
