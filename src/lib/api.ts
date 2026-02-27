@@ -62,6 +62,19 @@ export interface GospelReading {
   text: string;
 }
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+}
+
 export async function fetchDailyGospel(): Promise<GospelReading | null> {
   const now = new Date();
   const dateStr =
@@ -84,15 +97,20 @@ export async function fetchDailyGospel(): Promise<GospelReading | null> {
     const rawRef = (await refRes.text()).trim();
     const rawText = (await textRes.text()).trim();
 
-    // Fix reference format: "Mark 6,7-13." -> "Mark 6:7-13"
-    const reference = rawRef
-      .replace(/(\d+),(\d+)/g, "$1:$2")  // comma to colon between chapter,verse
-      .replace(/\.\s*$/, "");              // trailing period
+    // Clean reference: strip HTML tags, decode entities, fix format
+    const reference = decodeHtmlEntities(
+      rawRef.replace(/<[^>]+>/g, "")       // strip all HTML tags (e.g. <font dir="ltr">)
+    )
+      .replace(/(\d+),(\d+)/g, "$1:$2")   // comma to colon between chapter,verse
+      .replace(/\.\s*$/, "")               // trailing period
+      .trim();
 
     // Clean up HTML and formatting from the response
-    const text = rawText
-      .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<[^>]+>/g, "")
+    const text = decodeHtmlEntities(
+      rawText
+        .replace(/<br\s*\/?>/gi, "\n")     // line breaks to newlines
+        .replace(/<[^>]+>/g, "")           // strip all remaining HTML tags
+    )
       .replace(/--/g, "\u2014")            // -- to em dash
       .replace(/Copyright[\s\S]*$/, "")
       .replace(/To receive the Gospel[\s\S]*$/, "")

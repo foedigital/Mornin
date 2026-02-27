@@ -46,13 +46,15 @@ function getBroadcast(game: NHLGame): string | null {
   return game.tvBroadcasts[0].network;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const seasonId = getSeasonId();
 
   try {
     const res = await fetch(
       `https://api-web.nhle.com/v1/club-schedule-season/TBL/${seasonId}`,
-      { next: { revalidate: 3600 } }
+      { cache: "no-store" }
     );
 
     if (!res.ok) {
@@ -149,7 +151,7 @@ export async function GET() {
 
     return NextResponse.json(result, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=1800",
+        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",
       },
     });
   } catch {
