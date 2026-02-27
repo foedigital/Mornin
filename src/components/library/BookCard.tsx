@@ -76,6 +76,7 @@ export default function BookCard({
   const [showMenu, setShowMenu] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmRemoveDl, setConfirmRemoveDl] = useState(false);
+  const [confirmArchive, setConfirmArchive] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(book.title);
   const [editAuthor, setEditAuthor] = useState(book.author);
@@ -312,6 +313,7 @@ export default function BookCard({
               onClick={() => {
                 setShowMenu(!showMenu);
                 setConfirmDelete(false);
+                setConfirmArchive(false);
               }}
               className="p-2 text-gray-600 hover:text-gray-400 transition-colors"
               aria-label="More options"
@@ -350,16 +352,22 @@ export default function BookCard({
                 </button>
                 <button
                   onClick={() => {
-                    onArchive(book.id);
-                    setShowMenu(false);
+                    if (confirmArchive) {
+                      onArchive(book.id);
+                      setShowMenu(false);
+                      setConfirmArchive(false);
+                    } else {
+                      setConfirmArchive(true);
+                      setTimeout(() => setConfirmArchive(false), 3000);
+                    }
                   }}
                   className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                    isArchived
-                      ? "text-green-400 hover:bg-green-400/10"
+                    confirmArchive
+                      ? "text-amber-400 hover:bg-amber-400/10"
                       : "text-gray-300 hover:bg-white/5"
                   }`}
                 >
-                  {isArchived ? "Archived" : "Add to archive"}
+                  {confirmArchive ? "Tap again to archive" : "Archive & Remove"}
                 </button>
                 <button
                   onClick={() => {

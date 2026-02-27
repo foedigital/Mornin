@@ -126,6 +126,63 @@ export default function LibraryPage() {
     } catch {}
   }, [loadBooks]);
 
+  // Legacy cleanup: archived books that still have IDB data or show in literature
+  useEffect(() => {
+    if (!loaded) return;
+    const archived = loadArchivedBooks();
+    if (archived.length === 0) return;
+
+    const archivedUrlSet = new Set(archived.map((a) => a.url));
+
+    // Delete any IDB books that are already archived (legacy leftovers)
+    const staleBooks = books.filter((b) => archivedUrlSet.has(b.url));
+    if (staleBooks.length > 0) {
+      (async () => {
+        for (const book of staleBooks) {
+          await deleteBook(book.id);
+        }
+        await loadBooks();
+      })();
+    }
+
+    // Ensure archived URLs are removed from converted-audiobooks list
+    try {
+      const raw = localStorage.getItem("mornin-converted-audiobooks");
+      if (raw) {
+        const urls: string[] = JSON.parse(raw);
+        const updated = urls.filter((u) => !archivedUrlSet.has(u));
+        if (updated.length !== urls.length) {
+          localStorage.setItem("mornin-converted-audiobooks", JSON.stringify(updated));
+        }
+      }
+    } catch {}
+
+    // Ensure archived books are hidden from literature recommendations
+    try {
+      const readings = readingsData.readings as { title: string; author: string; url: string }[];
+      const hiddenKey = "mornin-readings-hidden";
+      const raw = localStorage.getItem(hiddenKey);
+      const hidden: string[] = raw ? JSON.parse(raw) : [];
+      let changed = false;
+      for (const ab of archived) {
+        const reading = readings.find((r) => r.url === ab.url);
+        if (reading) {
+          const readingId = `${reading.title}::${reading.author}`;
+          if (!hidden.includes(readingId)) {
+            hidden.push(readingId);
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
+        localStorage.setItem(hiddenKey, JSON.stringify(hidden));
+      }
+    } catch {}
+
+    window.dispatchEvent(new Event("mornin-data-changed"));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
+
   // Reload progress periodically when audio is playing
   useEffect(() => {
     if (!currentBookId) return;
@@ -348,28 +405,54 @@ export default function LibraryPage() {
     setNowReadingBookId(bookId);
   }, []);
 
-  const handleArchive = useCallback((bookId: string) => {
+  const handleArchive = useCallback(async (bookId: string) => {
     const book = books.find((b) => b.id === bookId);
     if (!book) return;
 
+    // 1. Add to archive list (if not already there)
     const archived = loadArchivedBooks();
-    // Toggle: if already archived, remove it
-    if (archived.some((a) => a.url === book.url)) {
-      const updated = archived.filter((a) => a.url !== book.url);
-      saveArchivedBooks(updated);
-      setArchivedUrls(new Set(updated.map((b) => b.url)));
-      return;
+    if (!archived.some((a) => a.url === book.url)) {
+      archived.push({
+        title: book.title,
+        author: book.author,
+        url: book.url,
+        dateArchived: Date.now(),
+      });
+      saveArchivedBooks(archived);
     }
-
-    archived.push({
-      title: book.title,
-      author: book.author,
-      url: book.url,
-      dateArchived: Date.now(),
-    });
-    saveArchivedBooks(archived);
     setArchivedUrls(new Set(archived.map((b) => b.url)));
-  }, [books]);
+
+    // 2. Remove URL from converted-audiobooks list (Literature section green check)
+    try {
+      const raw = localStorage.getItem("mornin-converted-audiobooks");
+      if (raw) {
+        const urls: string[] = JSON.parse(raw);
+        const updated = urls.filter((u) => u !== book.url);
+        localStorage.setItem("mornin-converted-audiobooks", JSON.stringify(updated));
+      }
+    } catch {}
+
+    // 3. Hide from Literature recommendations (match by URL to get correct reading key)
+    try {
+      const reading = (readingsData.readings as { title: string; author: string; url: string }[])
+        .find((r) => r.url === book.url);
+      if (reading) {
+        const hiddenKey = "mornin-readings-hidden";
+        const raw = localStorage.getItem(hiddenKey);
+        const hidden: string[] = raw ? JSON.parse(raw) : [];
+        const readingId = `${reading.title}::${reading.author}`;
+        if (!hidden.includes(readingId)) {
+          hidden.push(readingId);
+          localStorage.setItem(hiddenKey, JSON.stringify(hidden));
+        }
+      }
+    } catch {}
+
+    window.dispatchEvent(new Event("mornin-data-changed"));
+
+    // 4. Delete the book + audio cache + progress from IndexedDB
+    await handleDelete(bookId);
+  }, [books, handleDelete]);
 
   const handleImportArchive = useCallback(async () => {
     if (importState?.active) return;
