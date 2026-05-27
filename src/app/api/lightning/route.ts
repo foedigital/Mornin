@@ -23,20 +23,23 @@ interface NHLGame {
   tvBroadcasts?: { market: string; countryCode: string; network: string }[];
 }
 
+interface ESPNArticle {
+  headline: string;
+  description?: string;
+  published?: string;
+  links?: { web?: { href?: string } };
+}
+
 function getSeasonId(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1;
-  // NHL season starts in October
-  if (month >= 10) {
-    return `${year}${year + 1}`;
-  }
+  if (month >= 10) return `${year}${year + 1}`;
   return `${year - 1}${year}`;
 }
 
 function getBroadcast(game: NHLGame): string | null {
   if (!game.tvBroadcasts?.length) return null;
-  // Prefer US national broadcast, then US home/away, then any
   const national = game.tvBroadcasts.find(
     (b) => b.countryCode === "US" && b.market === "N"
   );
@@ -44,6 +47,23 @@ function getBroadcast(game: NHLGame): string | null {
   const us = game.tvBroadcasts.find((b) => b.countryCode === "US");
   if (us) return us.network;
   return game.tvBroadcasts[0].network;
+}
+
+async function fetchLightningNews() {
+  // ESPN public API — Tampa Bay Lightning team ID 14
+  const res = await fetch(
+    "https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/news?team=14&limit=6",
+    { next: { revalidate: 3600 } }
+  );
+  if (!res.ok) return [];
+  const data = await res.json();
+  const articles: ESPNArticle[] = data.articles || [];
+  return articles.slice(0, 5).map((a) => ({
+    headline: a.headline,
+    description: a.description || "",
+    link: a.links?.web?.href || "",
+    published: a.published || "",
+  }));
 }
 
 export const dynamic = "force-dynamic";
@@ -58,28 +78,20 @@ export async function GET() {
     );
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: "NHL API error" },
-        { status: res.status }
-      );
+      return NextResponse.json({ error: "NHL API error" }, { status: res.status });
     }
 
     const data = await res.json();
     const games: NHLGame[] = data.games || [];
-
-    // Only regular season + playoffs (gameType 2 and 3)
     const seasonGames = games.filter((g) => g.gameType >= 2);
-
     const today = new Date().toISOString().slice(0, 10);
 
-    // Completed games: FINAL or OFF, with a date <= today
     const completedStates = new Set(["FINAL", "OFF"]);
     const completed = seasonGames.filter(
       (g) => completedStates.has(g.gameState) && g.gameDate <= today
     );
     const lastGame = completed.length > 0 ? completed[completed.length - 1] : null;
 
-    // Future games: FUT state, or date > today
     const upcoming = seasonGames.filter(
       (g) => g.gameState === "FUT" || g.gameDate > today
     );
@@ -104,6 +116,7 @@ export async function GET() {
       result.lastGame = {
         id: lastGame.id,
         date: lastGame.gameDate,
+        isPlayoff: lastGame.gameType === 3,
         homeTeam: {
           abbrev: lastGame.homeTeam.abbrev,
           name: lastGame.homeTeam.commonName.default,
@@ -127,7 +140,6 @@ export async function GET() {
     if (nextGame) {
       const isTBLHome = nextGame.homeTeam.abbrev === "TBL";
       const opponent = isTBLHome ? nextGame.awayTeam : nextGame.homeTeam;
-
       result.nextGame = {
         date: nextGame.gameDate,
         startTimeUTC: nextGame.startTimeUTC,
@@ -147,6 +159,16 @@ export async function GET() {
         venue: nextGame.venue.default,
         broadcast: getBroadcast(nextGame),
       };
+    }
+
+    // Offseason: no upcoming games — fetch news headlines instead
+    if (!nextGame) {
+      result.isOffseason = true;
+      try {
+        result.news = await fetchLightningNews();
+      } catch {
+        result.news = [];
+      }
     }
 
     return NextResponse.json(result, {

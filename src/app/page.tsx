@@ -11,6 +11,7 @@ import MediaSection from "@/components/MediaSection";
 import WorkoutSection from "@/components/WorkoutSection";
 import RecipeSection from "@/components/RecipeSection";
 import ReadingSection from "@/components/ReadingSection";
+import WhiteNoisePlayer from "@/components/WhiteNoisePlayer";
 import { getToday } from "@/lib/dates";
 
 export default function Home() {
@@ -43,6 +44,7 @@ export default function Home() {
       {/* Content Sections */}
       <div className="space-y-6">
         <QuoteSection />
+        <WhiteNoisePlayer />
         <LightningSection />
         <MediaSection />
         <WorkoutSection />
