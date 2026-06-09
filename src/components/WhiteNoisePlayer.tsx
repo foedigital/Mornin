@@ -2,80 +2,58 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-function generateBrownNoise(ctx: AudioContext, seconds: number): AudioBuffer {
-  const frameCount = ctx.sampleRate * seconds;
-  const buffer = ctx.createBuffer(1, frameCount, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < frameCount; i++) {
-    const white = Math.random() * 2 - 1;
-    last = (last + 0.02 * white) / 1.02;
-    data[i] = Math.max(-1, Math.min(1, last * 3.5));
-  }
-  return buffer;
-}
-
 export default function WhiteNoisePlayer() {
   const [playing, setPlaying] = useState(false);
-  const ctxRef = useRef<AudioContext | null>(null);
-  const sourceRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainRef = useRef<GainNode | null>(null);
-  const bufferRef = useRef<AudioBuffer | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const AudioCtx = window.AudioContext || (window as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    ctxRef.current = ctx;
-    const gain = ctx.createGain();
-    gain.gain.value = 0.55;
-    gain.connect(ctx.destination);
-    gainRef.current = gain;
-    bufferRef.current = generateBrownNoise(ctx, 30);
-    return () => {
-      if (sourceRef.current) {
-        try { sourceRef.current.stop(); } catch {}
-        sourceRef.current = null;
-      }
-      ctx.close();
-    };
-  }, []);
+    const audio = new Audio("/api/brown-noise");
+    audio.loop = true;
+    audio.volume = 0.55;
+    audio.preload = "auto";
+    audioRef.current = audio;
 
-  const stop = useCallback(() => {
-    if (sourceRef.current) {
-      try { sourceRef.current.stop(); } catch {}
-      sourceRef.current.disconnect();
-      sourceRef.current = null;
-    }
-    setPlaying(false);
-    if ("mediaSession" in navigator) {
-      navigator.mediaSession.playbackState = "paused";
-    }
-  }, []);
+    audio.addEventListener("play", () => setPlaying(true));
+    audio.addEventListener("pause", () => setPlaying(false));
 
-  const start = useCallback(() => {
-    const ctx = ctxRef.current;
-    const buffer = bufferRef.current;
-    const gain = gainRef.current;
-    if (!ctx || !buffer || !gain) return;
-    if (ctx.state === "suspended") ctx.resume();
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-    source.connect(gain);
-    source.start();
-    sourceRef.current = source;
-    setPlaying(true);
     if ("mediaSession" in navigator) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: "Brown Noise",
         artist: "Mornin",
       });
-      navigator.mediaSession.playbackState = "playing";
-      navigator.mediaSession.setActionHandler("pause", stop);
-      navigator.mediaSession.setActionHandler("stop", stop);
+      navigator.mediaSession.setActionHandler("play", () => audio.play().catch(() => {}));
+      navigator.mediaSession.setActionHandler("pause", () => audio.pause());
+      navigator.mediaSession.setActionHandler("stop", () => {
+        audio.pause();
+        audio.currentTime = 0;
+      });
     }
-  }, [stop]);
+
+    const onLibraryPlay = () => audio.pause();
+    window.addEventListener("library-audio-play", onLibraryPlay);
+
+    return () => {
+      window.removeEventListener("library-audio-play", onLibraryPlay);
+      audio.pause();
+      audio.src = "";
+    };
+  }, []);
+
+  const stop = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    audio.currentTime = 0;
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "paused";
+  }, []);
+
+  const start = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    window.dispatchEvent(new Event("speechsynthesis-play"));
+    audio.play().catch(() => {});
+    if ("mediaSession" in navigator) navigator.mediaSession.playbackState = "playing";
+  }, []);
 
   const toggle = useCallback(() => {
     if (playing) stop();
@@ -97,7 +75,7 @@ export default function WhiteNoisePlayer() {
               Brown Noise
             </h2>
             <p className="text-gray-500 text-xs mt-0.5">
-              {playing ? "Playing — continues with screen locked" : "Tap to start"}
+              {playing ? "Playing — use lock screen to control" : "Tap to start"}
             </p>
           </div>
         </div>
