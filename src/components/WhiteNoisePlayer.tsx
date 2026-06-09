@@ -7,7 +7,7 @@ export default function WhiteNoisePlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio("/api/brown-noise");
+    const audio = new Audio("/brown-noise.wav");
     audio.loop = true;
     audio.volume = 0.55;
     audio.preload = "auto";
